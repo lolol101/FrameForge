@@ -1,0 +1,29 @@
+
+plugins {
+    id ("java")
+    id ("application")
+}
+
+mainClassName = "Server"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:16.0.2'
+
+    //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+
+    //testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+tasks.named("test") {
+    useJUnitPlatform()
+}
+
+// compileJava {
+//     options.release = 7
+// }
