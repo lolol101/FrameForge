@@ -4,6 +4,7 @@ import java.io.Serializable;
 public class Request implements Serializable {
     private static final long SerialVersionUID = 1L;
     private Type type; 
+    private String msg;
 
     public enum Type {
         REGISTRATION,
@@ -17,5 +18,13 @@ public class Request implements Serializable {
 
     public Type getType() {
         return this.type;
+    }
+
+    public void setMessage(String str) {
+        msg = str;
+    }
+
+    public String getMessage() {
+        return msg;
     }
 }

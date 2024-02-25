@@ -1,63 +1,42 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import ru.server.Request;
-
+import java.io.*;
+import java.net.*;
+import ru.server.*;
+import java.util.concurrent.*;
 
 public class HttpServer {
 
-    //public static ArrayList<ClientHandler> onlineUsers = new ArrayList<ClientHandler>();
     private static final int NUM_THREADS = 4;
-    private static int port;
+    private static int port = 8080;
+    private ServerSocket serverSocket;
 
     public static void main(String[] args) {
-        HttpServer server = new HttpServer(8080);
+        HttpServer server = new HttpServer();
         server.start();
     }
 
-    HttpServer(int port) {
-        this.port = port;
+    HttpServer() {
+        try {
+            this.serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+        
     }
 
     public void start() {
-        //ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
-        char[] array = new char[100];
-        try (ServerSocket server = new ServerSocket(this.port)) {
-            while (true) {
-                try (Socket conn = server.accept()) {
-                    //InputStreamReader in = new InputStreamReader(conn.getInputStream(), "UTF8");
-                    //in.read(array);
-                    
-                    ObjectInputStream reader = new ObjectInputStream(conn.getInputStream());
+        ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
 
-                    Request new_rq = null;
-                    try {
-                        new_rq = (Request) reader.readObject();
-                    } catch (ClassNotFoundException e) {
-                        System.out.println("Class not Found!!!!!!");
-                    }
-                     
-                    System.out.println(new_rq.getType());
-                } catch (IOException e) {
-                    System.out.println(e);
-                }
+        while (true) {
+            Socket socket = null;
+            try {
+                socket = serverSocket.accept();
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
             }
-        } catch (IOException e) {
-            System.out.println(e);
+            
+            HttpHandler connection = new HttpHandler(socket);
+            pool.execute(connection);
         }
-        
-        
-
     }
 
     
