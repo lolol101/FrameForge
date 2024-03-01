@@ -16,9 +16,14 @@ dependencies {
     //testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    //jackson
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
+
+    //gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 }
 
 tasks.named("test") {

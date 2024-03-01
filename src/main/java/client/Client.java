@@ -7,8 +7,14 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ser.std.ByteArraySerializer;
+import com.google.gson.Gson;
+import java.util.Base64;
+
 
 public class Client {
 
@@ -17,41 +23,40 @@ public class Client {
     public static Socket socket;
 
     private static ObjectMapper jsMapper = new ObjectMapper();
+
     private enum ACTIONS {
         REGISTRATION,
-        AUTHORAZATION,
+        AUTHORIZATION,
         SET,
         GET, 
-        UPDATE
+        UPDATE,
+        IMAGE,
+        BACK_RESPONSE;
     };
+
+    private enum STATUS {
+        OK,
+        NOT_EXISTED_USERNAME,
+        EXISTED_USERNAME,
+        WRONG_PASSWORD
+    }
 
     public static void main(String[] args) {
         socket = null;
+        String inPath = "/home/igorstovba/Documents/Test/photo.jpg";
         try {
             socket = new Socket(SERVER, PORT);
             
-            register("Igor", "SaB4_BaSS");
-            
+            //register("kkkk", "uuiuiuiuiu");
+            // ImageHandler imgHandler = new ImageHandler(inPath, ImageHandler.ImgType.FULL, "JPG");
+            // imgHandler.resizeImage(300, 300);
+            // sendPhoto(imgHandler);
+            //imgHandler.writeToFile(outPath, "JPG");
+
         } catch (Exception e) {
             System.out.println(e);
         }
     }
-
-    // private static String getString() throws IOException {
-    //     InputStream in = socket.getInputStream();
-    //     DataInputStream dataIn = new DataInputStream(in);
-    //     String req = dataIn.readUTF();
-    //     dataIn.close();
-    //     return req;
-    // }
-
-    // private static void sendString(String req) throws IOException {
-    //     OutputStream out = socket.getOutputStream();
-    //     DataOutputStream dataOut = new DataOutputStream(out);
-    //     dataOut.writeUTF(req);
-    //     dataOut.flush();
-    //     dataOut.close();
-    // }
 
     private static JsonNode getRequest() throws IOException {
         InputStream inStream = socket.getInputStream();
@@ -63,10 +68,33 @@ public class Client {
         return jsNode;
     }
 
+    private static void sendPhoto(ImageHandler imgHandler) 
+    throws IOException {
+
+        ByteArrayOutputStream out = imgHandler.getByteArray();
+        String imgAsJson = Base64.getEncoder().encodeToString(out.toByteArray());
+    
+        ObjectNode node = jsMapper.createObjectNode();
+        node.put("type", ACTIONS.IMAGE.toString());
+        node.put("image", imgAsJson);
+        node.put("typeImage", imgHandler.typeImage.toString());
+        node.put("formatImage", imgHandler.formatImage);
+        sendJson(node);
+    }
+
     private static void register(String username, String password) 
     throws IOException {
         ObjectNode node = jsMapper.createObjectNode();
         node.put("type", ACTIONS.REGISTRATION.toString());
+        node.put("username", username);
+        node.put("password", password);
+        sendJson(node);
+    }
+
+    private static void authorize(String username, String password)
+     throws IOException {
+        ObjectNode node = jsMapper.createObjectNode();
+        node.put("type", ACTIONS.AUTHORIZATION.toString());
         node.put("username", username);
         node.put("password", password);
         sendJson(node);
