@@ -1,31 +1,54 @@
 package ru.server;
-
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
 import java.io.ByteArrayOutputStream;
 
 public class ImageHandler {
-
-    public ImageHandler() {
-        
-    }
+    public BufferedImage img;
+    public ImgType typeImage;
+    public String formatImage;
     
-    public static BufferedImage readFromFile(String pathFile, String format) throws IOException {
-        //ByteArrayOutputStream outImage = new ByteArrayOutputStream();
+    public enum ImgType {
+        SCALED, FULL
+    };
 
-        File imageFile = new File(pathFile);
-        BufferedImage img = ImageIO.read(imageFile);
-            //ImageIO.write(img, format, outImage);
-
-        //return outImage;
-        return img;
+    public ImageHandler(String path, ImgType type,
+    String format) throws IOException {
+        typeImage = type;
+        formatImage = format;
+        img = ImageIO.read(new File(path));
     }
 
-    public static void writeToFile(String pathFile, String format,
-    BufferedImage out) throws IOException {
+    public ImageHandler(BufferedImage bufImage, ImgType type,
+    String format) throws IOException {
+        img = bufImage;
+        typeImage = type;
+        formatImage = format;
+    }
+
+
+    public void resizeImage(
+    int targetWidth, int targetHeight) throws IOException {
+        Image resultingImage = img.getScaledInstance(targetWidth, targetHeight, Image.SCALE_FAST);
+        BufferedImage outImg = new BufferedImage(targetHeight, targetWidth, BufferedImage.TYPE_INT_RGB);
+        outImg.getGraphics().drawImage(resultingImage, 0, 0, null);
+        img = outImg;
+        typeImage = ImgType.SCALED;
+    }
+
+    public void writeToFile(String pathFile, String format) throws IOException {
         File input = new File(pathFile);
-        ImageIO.write(out, format, input);
+        ImageIO.write(img, format, input);
     }
+
+    public ByteArrayOutputStream getByteArray() 
+    throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ImageIO.write(img, formatImage, out);
+        return out;
+    } 
 }

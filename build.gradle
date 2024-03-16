@@ -21,6 +21,17 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
+
+    //gson
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
+
+    //mongodb-sync
+    //implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.11.1'
+    //implementation group: 'org.mongodb', name: 'mongodb-crypt', version: '1.8.0'
+
+    //mongodb-async
+    implementation group: 'org.mongodb', name: 'mongodb-driver-reactivestreams', version: '4.11.1'
+
 }
 
 tasks.named("test") {
@@ -30,4 +41,9 @@ tasks.named("test") {
 task rebuild() {
   dependsOn   clean
   finalizedBy build
+}
+
+task rerun() {
+    dependsOn rebuild
+    finalizedBy run
 }
