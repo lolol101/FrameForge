@@ -1,48 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import java.net.URL?>
 <BorderPane prefHeight="600.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/17.0.2-ea"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.ru.hse.frameforge.view.MainPageController"
 >
+    <stylesheets>
+        <URL value="@styles.css" />
+    </stylesheets>
     <top>
-        <BorderPane>
-            <right>
+        <StackPane>
+            <HBox alignment="CENTER" style="-fx-background-color: green">
+                <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="menuButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"
-                            style="-fx-background-color: lightblue; -fx-border-color: transparent;"
-                >
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Profile" />
-                        <MenuItem mnemonicParsing="false" text="Preferences" />
-                        <MenuItem mnemonicParsing="false" text="Settings" />
-                    </items>
+                            styleClass="menu-button-profile">
+                <items>
+                    <MenuItem mnemonicParsing="false" text="Profile"/>
+                    <MenuItem mnemonicParsing="false" text="Preferences"/>
+                    <MenuItem mnemonicParsing="false" text="Settings"/>
+                </items>
                 </MenuButton>
-            </right>
-            <center>
-                <MenuButton fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text="Leaderboard" BorderPane.alignment="CENTER"
-                            style="-fx-background-color: lightblue; -fx-border-color: transparent;">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="View Top 100" />
-                        <MenuItem mnemonicParsing="false" text="My rating history" />
-                    </items>
-                </MenuButton>
-            </center>
-        </BorderPane>
+            </HBox>
+            <MenuButton fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
+                        text="Leaderboard"
+                        styleClass="menu-button-leaderboard">
+                <items>
+                    <MenuItem mnemonicParsing="false" text="View Top 100"/>
+                    <MenuItem mnemonicParsing="false" text="My rating history"/>
+                </items>
+            </MenuButton>
+        </StackPane>
     </top>
     <center>
         <HBox alignment="CENTER"
               style="-fx-background-color: lightyellow; -fx-padding: 10px;">
-            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="600.0"
-                        style="-fx-background-color: white">
-                <StackPane>
+            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="700.0"
+                        style="-fx-background-color: red">
+                <HBox alignment="CENTER" style="-fx-background-color: purple">
                     <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
-                              style="-fx-background-color: lightyellow; -fx-padding: 1px;">
+                              style="-fx-background-color: white; -fx-padding: 1px;">
                     </TilePane>
-                </StackPane>
+                </HBox>
             </ScrollPane>
         </HBox>
     </center>
+    <bottom>
+        <Region style="-fx-background-color: green;" BorderPane.alignment="CENTER"/>
+    </bottom>
 </BorderPane>

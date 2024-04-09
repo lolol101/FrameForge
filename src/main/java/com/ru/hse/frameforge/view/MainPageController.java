@@ -47,8 +47,8 @@ public class MainPageController {
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(600);
 
-        double desiredWidth = 600;
-        double desiredHeight = 300;
+        double desiredWidth = 300;
+        double desiredHeight = 200;
         double centerX = (image.getWidth() - desiredWidth) / 2;
         double centerY = (image.getHeight() - desiredHeight) / 2;
         Rectangle2D viewport = new Rectangle2D(centerX, centerY, desiredWidth, desiredHeight);
@@ -59,6 +59,7 @@ public class MainPageController {
         imageContainer.getChildren().add(imageView);
 
         tilePane.getChildren().add(imageContainer);
+        tilePane.setAlignment(Pos.CENTER);
 
         loadedImageCount++;
         System.out.println("Next image loaded");
