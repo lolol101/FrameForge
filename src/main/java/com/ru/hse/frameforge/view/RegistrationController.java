@@ -16,7 +16,6 @@ import java.util.Objects;
 
 public class RegistrationController {
     // TODO: standardise UI elements naming
-    @FXML private TextField nameTextField;
     @FXML private TextField nicknameTextField;
     @FXML private TextField passwordTextField;
 
@@ -31,14 +30,12 @@ public class RegistrationController {
     }
 
     @FXML public void initialize() {
-        nameTextField.textProperty().bindBidirectional(viewModel.nameProperty);
         nicknameTextField.textProperty().bindBidirectional(viewModel.nicknameProperty);
         passwordTextField.textProperty().bindBidirectional(viewModel.passwordProperty);
     }
 
     @FXML private void onBtnSubmitRequestClick() {
-        // TODO: prevent multiple button clicks;
-        // TODO: request in separate thread
+        // TODO: prevent multiple button clicks - goes here
         sendRegistrationRequest();
     }
 

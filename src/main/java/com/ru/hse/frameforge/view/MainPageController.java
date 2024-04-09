@@ -1,13 +1,20 @@
 package com.ru.hse.frameforge.view;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Objects;
 
 public class MainPageController {
     // TODO: preferred width & height corrections
@@ -29,12 +36,10 @@ public class MainPageController {
 
     private void loadImages() {
         // TODO: redo
-        // TODO: RN when firstly loaded images
         scrollPane.setOnScroll(event -> {
             double scrollPosition = scrollPane.getVvalue();
-            System.out.println(scrollPosition);
             if (scrollPosition == 1.0) {
-                loadNextImage(); // TODO: switch to image butches
+                loadNextImage(); // TODO: switch to image butches: small edit of loadNextImage()
             }
         });
         loadNextImage();
@@ -68,5 +73,19 @@ public class MainPageController {
     private Image getNextImage(String name) {
         // TODO: work with image getters, names & anything else goes here
         return new Image(name);
+    }
+
+    public void showInView() throws IOException {
+        Stage stage = (Stage) menuButton.getScene().getWindow();
+        stage.close();
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginView.fxml")));
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void hideInView() {
+        Stage stage = (Stage) menuButton.getScene().getWindow();
+        stage.close();
     }
 }

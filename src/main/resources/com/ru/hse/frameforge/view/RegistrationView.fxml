@@ -11,7 +11,6 @@
         </font></Label>
     <Label text="Welcome to the Frameforge! Please enter your data, or, if you already have an account, click a button below." />
     <Button fx:id="btnSwitchToRegistration" mnemonicParsing="false" onAction="#onBtnSwitchToLoginWindowClick" text="Open login window" />
-    <TextField fx:id="nameTextField" alignment="CENTER" maxWidth="200" promptText="Enter your name" />
     <TextField fx:id="nicknameTextField" alignment="CENTER" maxWidth="200.0" prefHeight="18.0" prefWidth="300.0" promptText="Enter your preferred nickname" />
     <TextField fx:id="passwordTextField" alignment="CENTER" maxWidth="200.0" prefWidth="200" promptText="Enter your newly created password" />
 

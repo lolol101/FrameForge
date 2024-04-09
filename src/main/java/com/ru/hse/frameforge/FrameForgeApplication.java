@@ -13,11 +13,11 @@ public class FrameForgeApplication extends Application {
     public void start(Stage stage) throws IOException {
         stage.setTitle("FrameForge");
 
-//        FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
-//        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 640, 480);
+        FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
+        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 640, 480);
 
-        FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
-        Scene sceneRegistration = new Scene(fxmlLoaderMain.load(), 640, 480);
+//        FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
+//        Scene sceneRegistration = new Scene(fxmlLoaderMain.load(), 640, 480);
 
         stage.setScene(sceneRegistration);
         stage.show();
