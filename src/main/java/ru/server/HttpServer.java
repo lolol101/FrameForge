@@ -54,12 +54,14 @@ public class HttpServer {
 
         MongoCollection<Document> users = mongoDatabase.getCollection("users");
         IndexOptions options1 = new IndexOptions().unique(true);
+        CountDownLatch latch = new CountDownLatch(1);
         users.createIndex(Indexes.ascending("username"), options1)
-                        .subscribe(new PrintSubscriber<String>());
+                        .subscribe(new PrintSubscriber<String>(latch));
 
+        latch = new CountDownLatch(1);
         MongoCollection<Document> posts = mongoDatabase.getCollection("posts");
         posts.createIndex(Indexes.ascending("createdAt"))
-                        .subscribe(new PrintSubscriber<String>());
+                        .subscribe(new PrintSubscriber<String>(latch));
     }
 
     public void start() {
@@ -69,6 +71,7 @@ public class HttpServer {
             Socket socket = null;
             try {
                 socket = serverSocket.accept();
+                System.out.println("connection established");
             } catch (IOException e) {
                 e.printStackTrace(System.out);
             }
