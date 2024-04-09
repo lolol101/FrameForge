@@ -1,5 +1,6 @@
 /* styles.css */
 
+/*Main Page data: */
 .menu-button-profile {
     -fx-background-color: lightblue;
     -fx-border-color: transparent;
@@ -26,4 +27,50 @@
 
 .menu-button-leaderboard .context-menu {
     -fx-background-color: lightcoral;
+}
+
+
+/*Registration & Login data: */
+
+.main-container {
+    -fx-background-color: #F7F052;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+}
+
+.title-label {
+    -fx-font-size: 32px;
+    -fx-text-fill: #38726C;
+    -fx-font-weight: bold;
+}
+
+.info-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #38726C;
+}
+
+.action-button {
+    -fx-background-color: #F28123;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+}
+
+.action-button:hover {
+    -fx-background-color: #D34E24;
+}
+
+.action-button:pressed {
+    -fx-background-color: #563F1B;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #999999;
+    -fx-border-width: 1px;
+}
+
+.checkbox {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
 }
