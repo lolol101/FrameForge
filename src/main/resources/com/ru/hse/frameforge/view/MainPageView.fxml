@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="600.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ru.hse.frameforge.view.MainPageController"
+>
+    <top>
+        <BorderPane>
+            <right>
+                <MenuButton fx:id="menuButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"
+                            style="-fx-background-color: lightblue; -fx-border-color: transparent;"
+                >
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Profile" />
+                        <MenuItem mnemonicParsing="false" text="Preferences" />
+                        <MenuItem mnemonicParsing="false" text="Settings" />
+                    </items>
+                </MenuButton>
+            </right>
+            <center>
+                <MenuButton fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" text="Leaderboard" BorderPane.alignment="CENTER"
+                            style="-fx-background-color: lightblue; -fx-border-color: transparent;">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="View Top 100" />
+                        <MenuItem mnemonicParsing="false" text="My rating history" />
+                    </items>
+                </MenuButton>
+            </center>
+        </BorderPane>
+    </top>
+    <center>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: lightyellow; -fx-padding: 10px;">
+            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="600.0"
+                        style="-fx-background-color: white">
+                <StackPane>
+                    <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
+                              style="-fx-background-color: lightyellow; -fx-padding: 1px;">
+                    </TilePane>
+                </StackPane>
+            </ScrollPane>
+        </HBox>
+    </center>
+</BorderPane>
