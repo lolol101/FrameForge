@@ -48,15 +48,6 @@ public class RegistrationController {
     }
 
     private void switchToLoginScene(ActionEvent event) throws IOException {
-//        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-//        Parent newRoot = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginView.fxml")));
-//        window.getScene().setRoot(newRoot);
-////         TODO: switch between already existing scenes! Very important
-////        FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("LoginView.fxml"));
-////        Scene loginScene = new Scene(fxmlLoaderRegistration.load(), 640, 480);
-////        Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
-////        window.setScene(loginScene);
-//        window.show();
         Stage stage = (Stage) btnSwitchToRegistration.getScene().getWindow();
         stage.close();
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginView.fxml")));

@@ -2,25 +2,22 @@ package com.ru.hse.frameforge.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.qt.core.QEvent;
-import io.qt.core.QObject;
+import javafx.beans.Observable;
+import javafx.beans.property.Property;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ObservableValue;
 
-public class RegistrationModel extends QObject {
-    private final ObjectMapper jsMapper;
+enum States {
+    Open,
+    Closed
+}
 
-    public RegistrationModel() {
-        jsMapper = new ObjectMapper();
-    }
+enum Commands {
+    sendRegistrationRequest
+}
 
-    //signals:
-    Signal1<ObjectNode> registrationDataReceived = new Signal1<>();
+public class RegistrationModel {
+    StringProperty menuState;
+    Property<Commands> command;
 
-    //slots:
-    public void registrationBtnClicked(String userName, String password) {
-        ObjectNode json = jsMapper.createObjectNode();
-        json.put("Username", userName);
-        json.put("Password", password);
-        json.put("Subscribers", 0);
-        registrationDataReceived.emit(json);
-    }
 }

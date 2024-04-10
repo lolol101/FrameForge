@@ -1,5 +1,6 @@
 package com.ru.hse.frameforge;
 
+import com.ru.hse.frameforge.model.RegistrationModel;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,15 +10,16 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class FrameForgeApplication extends Application {
+    RegistrationModel model = new RegistrationModel();
     @Override
     public void start(Stage stage) throws IOException {
         stage.setTitle("FrameForge");
 
-        FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
-        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 640, 480);
-
-//        FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
-//        Scene sceneRegistration = new Scene(fxmlLoaderMain.load(), 640, 480);
+//        FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
+//        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 640, 480);
+//
+        FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
+        Scene sceneRegistration = new Scene(fxmlLoaderMain.load(), 640, 480);
 
         stage.setScene(sceneRegistration);
         stage.show();

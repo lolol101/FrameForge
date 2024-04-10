@@ -6,7 +6,7 @@ import javafx.beans.property.StringProperty;
 
 
 public class RegistrationViewModel {
-    // ViewModel class for view-model interactions; contains model as a member; is a member of Controller class which
+    // ViewModel class for view-model interactions; contains model as a member; is a member of Controller class
     RegistrationModel model;
     public StringProperty nicknameProperty;
     public StringProperty passwordProperty;
@@ -18,6 +18,6 @@ public class RegistrationViewModel {
     }
 
     public void addUser() {
-        model.registrationBtnClicked(nicknameProperty.getValue(), passwordProperty.getValue());
+
     }
 }

@@ -30,38 +30,33 @@
 }
 
 
-/*Registration & Login data: */
+/*Registration data: */
 
 .main-container {
-    -fx-background-color: #F7F052;
+    -fx-background-color: #f0f0f0;
     -fx-padding: 20px;
     -fx-spacing: 15px;
 }
 
 .title-label {
     -fx-font-size: 32px;
-    -fx-text-fill: #38726C;
-    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
 }
 
 .info-label {
     -fx-font-size: 14px;
-    -fx-text-fill: #38726C;
+    -fx-text-fill: #555555;
 }
 
 .action-button {
-    -fx-background-color: #F28123;
-    -fx-text-fill: black;
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 10px 20px;
 }
 
 .action-button:hover {
-    -fx-background-color: #D34E24;
-}
-
-.action-button:pressed {
-    -fx-background-color: #563F1B;
+    -fx-background-color: lightgreen;
 }
 
 .text-field {
