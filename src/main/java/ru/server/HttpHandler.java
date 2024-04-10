@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.util.JsonRecyclerPools.ThreadLocalPool;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import com.mongodb.reactivestreams.client.*;
@@ -35,6 +36,8 @@ import ru.server.SubscriberHelper.PrintSubscriber;
 
 public class HttpHandler implements Runnable {
     private Socket socket;
+    private PrintWriter out;
+    public BufferedReader in;
     public static MongoDatabase db;
     private static ObjectMapper jsMapper = new ObjectMapper();
     private static String pathToFullImgs = "/home/project/fullImages/";
@@ -82,6 +85,8 @@ public class HttpHandler implements Runnable {
     public void run() {
         try {
             System.out.println("start handleRequest");
+            this.out = new PrintWriter(socket.getOutputStream(), true);
+            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             handleRequest();
             System.out.println("End handleRequest");
         } catch (Exception e) {
@@ -105,7 +110,6 @@ public class HttpHandler implements Runnable {
         //     ImageIO.write(bufImg, "JPG", new File(outPath));
         // }
         JsonNode req = getRequest();
-        //need to wrap in try - catch
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
         ObjectNode response = null;
         switch (type) {
@@ -131,23 +135,13 @@ public class HttpHandler implements Runnable {
                 System.out.println("Unsuppoted type");
                 System.exit(1);
         }
-        sendJson(response);
+        sendJson(response);        
     }
 
-    // public List<String> getKeysInJsonUsingJsonNodeFieldNames(JsonNode json, ObjectMapper mapper) throws JsonMappingException, JsonProcessingException {
 
-    //     List<String> keys = new ArrayList<>();
-    //     Iterator<String> iterator = json.fieldNames();
-    //     iterator.forEachRemaining(e -> keys.add(e));
-    //     return keys;
-    // }
 
     private JsonNode getRequest() throws IOException {
-        InputStream inStream = socket.getInputStream();
-        String json = new BufferedReader(
-            new InputStreamReader(inStream, StandardCharsets.UTF_8))
-        .lines()
-        .collect(Collectors.joining("\n"));
+        String json = in.readLine();
         JsonNode jsNode = jsMapper.readTree(json);
         return jsNode;
     }
@@ -283,10 +277,8 @@ public class HttpHandler implements Runnable {
     // }   
 
     private void sendJson(ObjectNode node)
-     throws IOException{
-        OutputStream outStream = socket.getOutputStream();
-        jsMapper.writeValue(outStream, node);
-        outStream.flush();
-        outStream.close();
+     throws IOException{        
+        String str = jsMapper.writeValueAsString(node);
+        out.println(str);
     }
 }
