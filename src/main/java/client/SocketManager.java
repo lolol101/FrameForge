@@ -23,6 +23,8 @@ public class SocketManager {
         }
     }
 
+    //signals:
+    //slots:
 
 //    private void sendPhoto(ImageHandler imgHandler)
 //            throws IOException {

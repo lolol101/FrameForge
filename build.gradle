@@ -1,29 +1,36 @@
-
 plugins {
-    id ("java")
-    id ("application")
+    id 'java'
+    id 'application'
+    id 'org.javamodularity.moduleplugin' version '1.8.12'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.beryx.jlink' version '2.25.0'
 }
 
-mainClassName = "Client"
+//mainClassName = "FrameForgeApplication"
 
 repositories {
     mavenCentral()
 }
+javafx {
+    version = '21'
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
+}
+
 
 dependencies {
+    implementation('org.controlsfx:controlsfx:11.1.2')
+    implementation('net.synedra:validatorfx:0.4.0') { exclude(group: 'org.openjfx') }
+    implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
+    implementation('eu.hansolo:tilesfx:11.48') { exclude(group: 'org.openjfx') }
+
     implementation 'org.jetbrains:annotations:16.0.2'
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+
 
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
-}
-
-tasks.named("test") {
-    useJUnitPlatform()
 }
 
 task rebuild() {
