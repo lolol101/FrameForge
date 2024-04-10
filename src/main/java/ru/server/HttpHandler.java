@@ -20,13 +20,16 @@ import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
-
+import static com.mongodb.client.model.Updates.set;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+
 import ru.server.SubscriberHelper.CountSubscriber;
 import ru.server.SubscriberHelper.DocumentSubscriber;
 import ru.server.SubscriberHelper.InsertSubscriber;
+import ru.server.SubscriberHelper.PrintSubscriber;
 
 
 
@@ -131,13 +134,13 @@ public class HttpHandler implements Runnable {
         sendJson(response);
     }
 
-    public List<String> getKeysInJsonUsingJsonNodeFieldNames(JsonNode json, ObjectMapper mapper) throws JsonMappingException, JsonProcessingException {
+    // public List<String> getKeysInJsonUsingJsonNodeFieldNames(JsonNode json, ObjectMapper mapper) throws JsonMappingException, JsonProcessingException {
 
-        List<String> keys = new ArrayList<>();
-        Iterator<String> iterator = json.fieldNames();
-        iterator.forEachRemaining(e -> keys.add(e));
-        return keys;
-    }
+    //     List<String> keys = new ArrayList<>();
+    //     Iterator<String> iterator = json.fieldNames();
+    //     iterator.forEachRemaining(e -> keys.add(e));
+    //     return keys;
+    // }
 
     private JsonNode getRequest() throws IOException {
         InputStream inStream = socket.getInputStream();
@@ -169,22 +172,22 @@ public class HttpHandler implements Runnable {
             return response;
         }
         String password = req.get("password").textValue();
-        String extension = req.get("extensionOfImage").textValue();
-        String img = req.get("authorPhoto").textValue();
-        byte[] decodedBytes = Base64.getDecoder().decode(img);
-        String pathToAvatar = pathToAvatarImgs + username + "." + extension;  
-        try {
-            BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(decodedBytes));
-            ImageIO.write(bufImg, extension, new File(pathToAvatar));
-        } catch (IOException e) {
-            response.put("status", STATUS.ERROR.toString());
-            return response;
-        }
+        // String extension = req.get("extensionOfImage").textValue();
+        // String img = req.get("authorPhoto").textValue();
+        // byte[] decodedBytes = Base64.getDecoder().decode(img);
+        // String pathToAvatar = pathToAvatarImgs + username + "." + extension;  
+        // try {
+        //     BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(decodedBytes));
+        //     ImageIO.write(bufImg, extension, new File(pathToAvatar));
+        // } catch (IOException e) {
+        //     response.put("status", STATUS.ERROR.toString());
+        //     return response;
+        // }
         
         Document newUser = new Document()
                             .append("username", username)
-                            .append("password", password)
-                            .append("authorPhoto", pathToAvatar);
+                            .append("password", password);
+                            //.append("authorPhoto", pathToAvatar);
         users.insertOne(newUser)
             .subscribe(new InsertSubscriber<InsertOneResult>());
         return response;
@@ -230,10 +233,18 @@ public class HttpHandler implements Runnable {
     private ObjectNode setLike(JsonNode req) {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
-
-        MongoCollection<Document> users = db.getCollection("users");
+        response.put("status", STATUS.OK.toString());
+        MongoCollection<Document> posts = db.getCollection("posts");
         
+        //update single document
+        // collection.updateOne(
+        //     eq("_id", new ObjectId("57506d62f57802807471dd41")),
+        //     combine(set("stars", 1), set("contact.phone", "228-555-9999"), currentDate("lastModified"))
+        // ).subscribe(new ObservableSubscriber<UpdateResult>());
 
+        // posts.updateOne(
+        //     eq("username", username), set("likes")
+        // ).subscribe(new PrintSubscriber<String>());
 
         return response;
     }
