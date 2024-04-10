@@ -2,57 +2,107 @@ package frameforge.view;
 
 import frameforge.model.RegistrationModel;
 import frameforge.viewmodel.RegistrationViewModel;
-import javafx.event.ActionEvent;
+import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
 
 public class RegistrationController {
+    private Stage stage; // single stage instance shared with some other menus
+    private Scene scene; // unique scene used to avoid repeated loading of the same menu
+
     // TODO: standardise UI elements naming
     @FXML private TextField nicknameTextField;
     @FXML private TextField passwordTextField;
 
     @FXML private Button btnSubmitRequest; // TODO: grey out on click
-    @FXML private Button btnSwitchToRegistration;
+    @FXML private Button btnSwitchToLogin;
 
-    public final RegistrationViewModel viewModel;
+    private RegistrationViewModel viewModel;
+
+    private final ChangeListener<RegistrationModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
+        System.out.println("regView: changeListener fired on client command reception");
+        switch (newCommand) {
+            case show -> {
+                try {
+                    openInView();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case close -> hideInView();
+        }
+        viewModel.getModel().clientCommand.setValue(RegistrationModel.ClientCommands.zero);
+    };
 
     public RegistrationController() {
         RegistrationModel model = new RegistrationModel();
         viewModel = new RegistrationViewModel(model);
     }
 
-    @FXML public void initialize() {
+    public void setModel(RegistrationModel model) {
+        removeListeners();
+        viewModel = new RegistrationViewModel(model);
+        addListeners();
+        System.out.println("registrationView: registration model set");
+    }
+
+    private void removeListeners() {
+        nicknameTextField.textProperty().unbindBidirectional(viewModel.nicknameProperty);
+        passwordTextField.textProperty().unbindBidirectional(viewModel.passwordProperty);
+        viewModel.getModel().clientCommand.removeListener(clientCommandReceiver);
+        System.out.println("registrationView: registration listeners removed");
+    }
+
+    private void addListeners() {
         nicknameTextField.textProperty().bindBidirectional(viewModel.nicknameProperty);
         passwordTextField.textProperty().bindBidirectional(viewModel.passwordProperty);
+        viewModel.getModel().clientCommand.addListener(clientCommandReceiver);
+        System.out.println("registrationView: registration listeners added");
+    }
+
+
+    @FXML public void initialize() {
+        addListeners();
+    }
+
+    public void passStageAndScene(Stage stage, Scene scene) {
+        this.stage = stage;
+        this.scene = scene;
+        System.out.println("regView: this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
 
     @FXML private void onBtnSubmitRequestClick() {
-        // TODO: prevent multiple button clicks - goes here
+        // TODO: prevent multiple button clicks
+        System.out.println("regView: registration request button pressed");
         sendRegistrationRequest();
     }
 
-    @FXML private void onBtnSwitchToLoginWindowClick(ActionEvent event) throws IOException { // TODO: exception handling
-        switchToLoginScene(event);
+    @FXML private void onBtnSwitchToLoginWindowClick() {
+        System.out.println("regView: switch-to-login-window button pressed");
+        sendSwitchToLoginRequest();
     }
 
     private void sendRegistrationRequest() {
-        viewModel.addUser(); // TODO: associated methods naming conventions; gui.model-view-viewmodel responsibility distribution arrangement
+        viewModel.addUser();
     }
 
-    private void switchToLoginScene(ActionEvent event) throws IOException {
-        Stage stage = (Stage) btnSwitchToRegistration.getScene().getWindow();
-        stage.close();
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("LoginView.fxml")));
-        Scene scene = new Scene(root);
+    private void sendSwitchToLoginRequest() {
+        viewModel.switchToLogin();
+    }
+
+    public void openInView() throws IOException {
+        System.out.println("regView: open-in-view request received");
+        System.out.println("regView: setting scene" + scene.hashCode() + " to stage " + stage.hashCode());
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void hideInView() {
+        System.out.println("regView: close-in-view request received");
     }
 }

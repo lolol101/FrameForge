@@ -25,10 +25,10 @@
             onAction="#onBtnSwitchToRegistrationClick"
             text="Open registration window"
             styleClass="action-button"/>
-    <TextField fx:id="nickname" alignment="CENTER"
+    <TextField fx:id="nicknameTextField" alignment="CENTER"
                maxWidth="200.0" prefHeight="18.0" prefWidth="300.0"
                promptText="Enter your nickname" />
-    <PasswordField fx:id="password" alignment="CENTER"
+    <PasswordField fx:id="passwordTextField" alignment="CENTER"
                    maxWidth="200.0" prefWidth="200"
                    promptText="Enter your password" />
     <Button fx:id="btnSubmitLoginRequest" lineSpacing="5.0" focusTraversable="false"

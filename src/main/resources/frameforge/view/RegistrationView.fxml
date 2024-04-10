@@ -23,7 +23,7 @@
     <Label text="Welcome to the Frameforge!&#10;Please enter your data, or, if you already have an account, click a button below."
            wrapText="true" textAlignment="CENTER"
            styleClass="info-label" />
-    <Button fx:id="btnSwitchToRegistration" mnemonicParsing="false" focusTraversable="false"
+    <Button fx:id="btnSwitchToLogin" mnemonicParsing="false" focusTraversable="false"
             onAction="#onBtnSwitchToLoginWindowClick" text="Open login window"
             styleClass="action-button" />
     <TextField fx:id="nicknameTextField" alignment="CENTER"

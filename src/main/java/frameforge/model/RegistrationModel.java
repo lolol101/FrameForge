@@ -2,27 +2,32 @@ package frameforge.model;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-//import com.github.msteinbeck.sig4j.signal.Signal1;
 
 public class RegistrationModel {
-    public Property<Commands> command;
+    public Property<ClientCommands> clientCommand;
+    public Property<ViewActions> viewAction;
 
     // Data:
     public String username;
     public String password;
 
-    public enum Commands {
-        // Client commands:
+    public enum ViewActions {
+        // VM commands:
+        regBtnClicked, // TODO: rename to action, not event - events stay in *Controller classes
+        switchToLoginBtnClicked,
+        zero
+    }
+
+    public enum ClientCommands {
         show,
         close,
-
-        // VM commands:
-        regBtnClicked
+        zero
     }
 
     public RegistrationModel() {
-        username = "";
+        username = ""; // TODO: is needed?
         password = "";
-        command = new SimpleObjectProperty<>();
+        viewAction = new SimpleObjectProperty<>();
+        clientCommand = new SimpleObjectProperty<>();
     }
 }
