@@ -6,8 +6,7 @@ import frameforge.model.LoginModel;
 import frameforge.model.RegistrationModel;
 
 public class Client {
-
-    private final LoginModel loginModel;
+    public final LoginModel loginModel;
     public final RegistrationModel regModel;
     public SocketManager socketManager;
 
@@ -58,7 +57,7 @@ public class Client {
         }
     }
 
-    public void registration() {
+    private void registration() {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("username", regModel.username);
         json.put("password", regModel.password);
@@ -66,10 +65,15 @@ public class Client {
         socketManager.sendingData.add(json);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
         regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
-        // net working
     }
 
-    public void authorization() {
-        // net working
+    private void authorization() {
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("username", regModel.username);
+        json.put("password", regModel.password);
+        json.put("type", ServerCommands.ACTIONS.AUTHORIZATION.toString());
+        socketManager.sendingData.add(json);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
     }
 }
