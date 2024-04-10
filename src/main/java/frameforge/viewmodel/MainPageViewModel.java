@@ -1,12 +1,10 @@
 package frameforge.viewmodel;
 
 import frameforge.model.MainPageModel;
-import frameforge.model.RegistrationModel;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.image.Image;
 
 public class MainPageViewModel {
-    MainPageModel model;
+    private MainPageModel model;
 
     public MainPageViewModel(MainPageModel model) {
         this.model = model;

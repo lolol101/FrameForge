@@ -46,7 +46,7 @@ public class LoginController {
 
     public void setModel(LoginModel model) {
         removeListeners();
-        viewModel = new LoginViewModel(model);
+        viewModel.setModel(model);
         addListeners();
         System.out.println("logView: log model set");
     }

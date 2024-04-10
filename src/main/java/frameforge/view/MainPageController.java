@@ -56,7 +56,7 @@ public class MainPageController {
 
     public void setModel(MainPageModel model) {
         removeListeners();
-        viewModel = new MainPageViewModel(model);
+        viewModel.setModel(model);
         addListeners();
         System.out.println("mainPageView: mainPage model set to " + model.hashCode());
     }
