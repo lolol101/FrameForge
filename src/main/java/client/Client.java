@@ -33,7 +33,7 @@ public class Client {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("username", regModel.username);
         json.put("password", regModel.password);
-        json.put("otherPhoto", 1);
+        json.put("type", ServerCommands.ACTIONS.REGISTRATION.toString());
         socketManager.sendJson(json);
         // net working
     }
