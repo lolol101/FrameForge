@@ -6,7 +6,7 @@
 <BorderPane prefHeight="600.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/17.0.2-ea"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.ru.hse.frameforge.view.MainPageController"
+            fx:controller="gui.view.MainPageController"
 >
     <stylesheets>
         <URL value="@styles.css" />

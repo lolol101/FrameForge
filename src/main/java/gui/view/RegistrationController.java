@@ -1,7 +1,7 @@
-package com.ru.hse.frameforge.view;
+package gui.view;
 
-import com.ru.hse.frameforge.model.RegistrationModel;
-import com.ru.hse.frameforge.viewmodel.RegistrationViewModel;
+import gui.model.RegistrationModel;
+import gui.viewmodel.RegistrationViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

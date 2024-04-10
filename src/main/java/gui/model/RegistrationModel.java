@@ -1,4 +1,4 @@
-package com.ru.hse.frameforge.model;
+package gui.model;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;

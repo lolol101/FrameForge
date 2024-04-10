@@ -1,8 +1,7 @@
 package client;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.ru.hse.frameforge.model.LoginModel;
-import com.ru.hse.frameforge.model.RegistrationModel;
+import gui.model.LoginModel;
+import gui.model.RegistrationModel;
 
 public class Client {
     private final LoginModel loginModel;

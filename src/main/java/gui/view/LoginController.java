@@ -1,7 +1,7 @@
-package com.ru.hse.frameforge.view;
+package gui.view;
 
-import com.ru.hse.frameforge.model.LoginModel;
-import com.ru.hse.frameforge.viewmodel.LoginViewModel;
+import gui.model.LoginModel;
+import gui.viewmodel.LoginViewModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;

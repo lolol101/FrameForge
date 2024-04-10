@@ -11,9 +11,9 @@ module com.ru.hse.frameforge {
     requires java.desktop;
     requires jdk.jdi;
 
-    opens com.ru.hse.frameforge to javafx.fxml;
-    exports com.ru.hse.frameforge;
+    opens gui to javafx.fxml;
+    exports gui;
 
-    opens com.ru.hse.frameforge.view;
-    exports com.ru.hse.frameforge.view;
+    opens gui.view;
+    exports gui.view;
 }

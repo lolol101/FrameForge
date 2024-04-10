@@ -1,6 +1,6 @@
-package com.ru.hse.frameforge.viewmodel;
+package gui.viewmodel;
 
-import com.ru.hse.frameforge.model.LoginModel;
+import gui.model.LoginModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

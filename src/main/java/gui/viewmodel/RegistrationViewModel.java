@@ -1,6 +1,6 @@
-package com.ru.hse.frameforge.viewmodel;
+package gui.viewmodel;
 
-import com.ru.hse.frameforge.model.RegistrationModel;
+import gui.model.RegistrationModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;

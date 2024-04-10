@@ -1,4 +1,4 @@
-package com.ru.hse.frameforge.view;
+package gui.view;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
