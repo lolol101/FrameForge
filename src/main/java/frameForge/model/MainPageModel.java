@@ -1,4 +1,4 @@
-package gui.model;
+package frameForge.model;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.Property;

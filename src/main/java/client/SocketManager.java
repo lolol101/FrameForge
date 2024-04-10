@@ -1,12 +1,15 @@
 package client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class SocketManager {
     private Socket socket = null;
     private static ObjectMapper jsMapper;
+
     public SocketManager() {
         try {
             jsMapper = new ObjectMapper();
@@ -23,8 +26,14 @@ public class SocketManager {
         }
     }
 
-    //signals:
-    //slots:
+    public void sendJson(ObjectNode node) {
+        try (OutputStream outStream = socket.getOutputStream()) {
+            jsMapper.writeValue(outStream, node);
+            outStream.flush();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
 //    private void sendPhoto(ImageHandler imgHandler)
 //            throws IOException {
@@ -58,11 +67,4 @@ public class SocketManager {
 //        sendJson(node);
 //    }
 //
-//    private static void sendJson(ObjectNode node)
-//            throws IOException{
-//        OutputStream outStream = socket.getOutputStream();
-//        jsMapper.writeValue(outStream, node);
-//        outStream.flush();
-//        outStream.close();
-//    }
 }

@@ -1,7 +1,7 @@
-package gui.view;
+package frameForge.view;
 
-import gui.model.RegistrationModel;
-import gui.viewmodel.RegistrationViewModel;
+import frameForge.model.RegistrationModel;
+import frameForge.viewmodel.RegistrationViewModel;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -44,7 +44,7 @@ public class RegistrationController {
     }
 
     private void sendRegistrationRequest() {
-        viewModel.addUser(); // TODO: associated methods naming conventions; model-view-viewmodel responsibility distribution arrangement
+        viewModel.addUser(); // TODO: associated methods naming conventions; gui.model-view-viewmodel responsibility distribution arrangement
     }
 
     private void switchToLoginScene(ActionEvent event) throws IOException {

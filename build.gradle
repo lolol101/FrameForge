@@ -6,8 +6,6 @@ plugins {
     id 'org.beryx.jlink' version '2.25.0'
 }
 
-//mainClassName = "FrameForgeApplication"
-
 repositories {
     mavenCentral()
 }

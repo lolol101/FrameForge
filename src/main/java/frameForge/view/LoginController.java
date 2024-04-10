@@ -1,7 +1,7 @@
-package gui.view;
+package frameForge.view;
 
-import gui.model.LoginModel;
-import gui.viewmodel.LoginViewModel;
+import frameForge.model.LoginModel;
+import frameForge.viewmodel.LoginViewModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;

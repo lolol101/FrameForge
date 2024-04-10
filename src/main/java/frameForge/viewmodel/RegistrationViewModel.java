@@ -1,6 +1,6 @@
-package gui.viewmodel;
+package frameForge.viewmodel;
 
-import gui.model.RegistrationModel;
+import frameForge.model.RegistrationModel;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -8,7 +8,7 @@ import javafx.beans.property.StringProperty;
 
 
 public class RegistrationViewModel {
-    // ViewModel class for view-model interactions; contains model as a member; is a member of Controller class which
+    // ViewModel class for view-gui.model interactions; contains gui.model as a member; is a member of Controller class which
     public RegistrationModel model;
     public BooleanProperty regBtnPressed;
     public StringProperty nicknameProperty;

@@ -1,4 +1,4 @@
-package gui.view;
+package frameForge.view;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;

@@ -1,15 +1,25 @@
 package client;
 
-import gui.model.LoginModel;
-import gui.model.RegistrationModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import frameForge.model.LoginModel;
+import frameForge.model.RegistrationModel;
 
 public class Client {
+    private final String ip = "188.225.82.247";
+    private final int port = 8080;
     private final LoginModel loginModel;
     public final RegistrationModel regModel;
+    private SocketManager socketManager;
+
+    private final ObjectMapper jsMapper;
 
     public Client() {
         loginModel = new LoginModel();
         regModel = new RegistrationModel();
+        jsMapper = new ObjectMapper();
+        socketManager = new SocketManager();
+        socketManager.connect(ip, port);
     }
 
     public void connectModels() {
@@ -20,6 +30,11 @@ public class Client {
 
     // Listeners:
     public void registration() {
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("username", regModel.username);
+        json.put("password", regModel.password);
+        json.put("otherPhoto", 1);
+        socketManager.sendJson(json);
         // net working
     }
 
