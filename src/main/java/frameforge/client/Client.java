@@ -7,12 +7,12 @@ import frameforge.model.MainPageModel;
 import frameforge.model.RegistrationModel;
 
 public class Client {
-    private final String ip = "188.225.82.247";
-    private final int port = 8080;
     public final LoginModel loginModel;
     public final RegistrationModel regModel;
     public final MainPageModel mainPageModel;
     private SocketManager socketManager;
+    public SocketManager socketManager;
+
 
     private final ObjectMapper jsMapper;
 
@@ -23,46 +23,51 @@ public class Client {
 
         jsMapper = new ObjectMapper();
         socketManager = new SocketManager();
-        socketManager.connect(ip, port);
     }
 
-    public void connectModels() {
+    public void connectListeners() {
         regModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
             switch (newCommand) {
                 case regBtnClicked -> {
-                    System.out.println("client: reg-and-open-main-menu request processing");
-                    closeRegistrationMenu();
-                    openMainPageMenu();
+                    registration();
                 }
                 case switchToLoginBtnClicked -> {
-                    System.out.println("client: switch-to-login-menu request processing");
-                    closeRegistrationMenu();
-                    openLoginMenu();
+                    regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
+                    loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
                 }
             }
             regModel.viewAction.setValue(RegistrationModel.ViewActions.zero);
         });
+
         loginModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
             switch (newCommand) {
                 case authBtnClicked -> {
-                    System.out.println("client: log-in-and-open-main-menu request processing");
-                    closeLoginMenu();
-                    openMainPageMenu();
+                    authorization();
                 }
                 case switchToRegistrationBtnClicked -> {
                     System.out.println("client: switch-to-login-menu request processing");
-                    closeLoginMenu();
-                    openRegistrationMenu();
+                    loginModel.clientCommand.setValue(LoginModel.ClientCommands.close);
+                    regModel.clientCommand.setValue(RegistrationModel.ClientCommands.show);
                 }
             }
             loginModel.viewAction.setValue(LoginModel.ViewActions.zero);
         });
+
+        socketManager.clientCommand.addListener((obs, oldCommand, newCommand) -> {
+            if (newCommand == SocketManager.ClientCommands.sendJson)
+                socketManager.sendJson();
+        });
+
+        socketManager.socketAction.addListener((obs, oldCommand, newCommand) -> {
+            if (newCommand == SocketManager.SocketActions.acceptJson)
+                handleRequest();
+        });
+
         mainPageModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
             switch (newCommand) {
                 case returnToLoginBtnClicked -> {
-                    System.out.println("client: quit-from-main-to-login-menu request processing");
-                    closeMainPageMenu();
-                    openLoginMenu();
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
+                    loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
                 }
                 case reachedNextPostBox -> {
                     // TODO: get images from server or locally
@@ -73,50 +78,41 @@ public class Client {
     }
 
     // Listeners:
-    public void registration() {
-        // TODO: rn this method fires on initialization - fix it
-        System.out.println("client: reg request processing");
+    public void handleRequest() {
+        ObjectNode json = socketManager.acceptedData.remove();
+        ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
+        ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
+        switch (type) {
+            case ServerCommands.RESPONSE_TYPE.REGISTER_BACK:
+                if (status == ServerCommands.STATUS.OK) {
+                    // TODO
+                }
+                else if (status == ServerCommands.STATUS.USERNAME_EXIST) {
+                    // TODO
+                }
+                break;
+            case ServerCommands.RESPONSE_TYPE.AUTHORIZATION_BACK:
+                break;
+        }
+    }
+
+    private void registration() {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("username", regModel.username);
         json.put("password", regModel.password);
         json.put("type", ServerCommands.ACTIONS.REGISTRATION.toString());
-        socketManager.sendJson(json);
-        // TODO: если вставить сюда открытие меню, то оно не происходит
-        // net working
+        socketManager.sendingData.add(json);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
     }
 
-    public void authorization() {
-        System.out.println("client: auth request processing");
-        // net working
-    }
-
-    public void closeLoginMenu() {
-        System.out.println("client: close-login-menu-request sent");
-        loginModel.clientCommand.setValue(LoginModel.ClientCommands.close);
-    }
-
-    public void openLoginMenu() {
-        System.out.println("client: open-login-menu-request sent");
-        loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
-    }
-
-    public void closeRegistrationMenu() {
-        System.out.println("client: close-reg-menu-request sent");
-        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
-    }
-
-    public void openRegistrationMenu() {
-        System.out.println("client: open-reg-menu-request sent");
-        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.show);
-    }
-
-    public void closeMainPageMenu() {
-        System.out.println("client: close-main-menu-request sent");
-        mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
-    }
-
-    public void openMainPageMenu() {
-        System.out.println("client: open-main-menu-request sent to model " + mainPageModel.hashCode());
-        mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
+    private void authorization() {
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("username", regModel.username);
+        json.put("password", regModel.password);
+        json.put("type", ServerCommands.ACTIONS.AUTHORIZATION.toString());
+        socketManager.sendingData.add(json);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
     }
 }

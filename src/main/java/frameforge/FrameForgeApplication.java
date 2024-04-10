@@ -19,10 +19,18 @@ public class FrameForgeApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         Client client = new Client();
-        client.regModel.username = "I123";
-        client.regModel.password = "123123123";
-        client.registration();
-        client.connectModels();
+
+        client.connectListeners();
+        client.socketManager.connect("188.225.82.247", 8080);
+
+        Thread thread = new Thread(() -> {
+           while (true) {
+               client.socketManager.acceptJson();
+           }
+        });
+
+        thread.start();
+
         stage.setTitle("frameforge");
 
         // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?
