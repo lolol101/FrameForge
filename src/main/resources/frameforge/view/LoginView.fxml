@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<?import java.net.URL?>
+<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0"
+      spacing="10.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="frameforge.view.LoginController"
+      styleClass="main-container">
+    <stylesheets>
+        <URL value="@styles.css" />
+    </stylesheets>
+    <Label alignment="TOP_CENTER" prefHeight="27.0" prefWidth="200.0"
+           wrapText="true" text="Login" textAlignment="CENTER" styleClass="title-label">
+        <font>
+            <Font size="27.0" />
+        </font>
+    </Label>
+    <Label text="Welcome to the Frameforge!&#10;Please enter your login and password, or, if you don't have an account, click a button below."
+           wrapText="true" textAlignment="CENTER"
+           styleClass="info-label" />
+    <Button fx:id="btnSwitchToRegistration" mnemonicParsing="false" focusTraversable="false"
+            onAction="#onBtnSwitchToRegistrationClick"
+            text="Open registration window"
+            styleClass="action-button"/>
+    <TextField fx:id="nickname" alignment="CENTER"
+               maxWidth="200.0" prefHeight="18.0" prefWidth="300.0"
+               promptText="Enter your nickname" />
+    <PasswordField fx:id="password" alignment="CENTER"
+                   maxWidth="200.0" prefWidth="200"
+                   promptText="Enter your password" />
+    <Button fx:id="btnSubmitLoginRequest" lineSpacing="5.0" focusTraversable="false"
+            onAction="#onBtnSubmitLoginRequestClick"
+            text="Submit login request"
+            styleClass="action-button"/>
+</VBox>

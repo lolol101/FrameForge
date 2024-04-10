@@ -1,4 +1,4 @@
-module com.ru.hse.frameforge {
+module frameforge {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
@@ -11,9 +11,9 @@ module com.ru.hse.frameforge {
     requires java.desktop;
     requires jdk.jdi;
 
-    opens frameForge to javafx.fxml;
-    exports frameForge;
+    opens frameforge to javafx.fxml;
+    exports frameforge;
 
-    opens frameForge.view;
-    exports frameForge.view;
+    opens frameforge.view;
+    exports frameforge.view;
 }

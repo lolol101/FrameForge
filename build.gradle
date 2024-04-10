@@ -14,7 +14,6 @@ javafx {
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
-
 dependencies {
     implementation('org.controlsfx:controlsfx:11.1.2')
     implementation('net.synedra:validatorfx:0.4.0') { exclude(group: 'org.openjfx') }
@@ -30,6 +29,9 @@ dependencies {
 
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 }
+
+mainClassName = 'frameforge.FrameForgeApplication'
+
 
 task rebuild() {
     dependsOn   clean

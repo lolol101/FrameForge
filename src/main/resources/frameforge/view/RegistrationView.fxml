@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<?import java.net.URL?>
+<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0"
+      spacing="10.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="frameforge.view.RegistrationController"
+      styleClass="main-container">
+    <stylesheets>
+        <URL value="@styles.css" />
+    </stylesheets>
+    <Label alignment="TOP_CENTER" prefHeight="27.0" prefWidth="200.0"
+           wrapText="true" text="Registration" textAlignment="CENTER" styleClass="title-label">
+        <font>
+            <Font size="27.0" />
+        </font>
+    </Label>
+    <Label text="Welcome to the Frameforge!&#10;Please enter your data, or, if you already have an account, click a button below."
+           wrapText="true" textAlignment="CENTER"
+           styleClass="info-label" />
+    <Button fx:id="btnSwitchToRegistration" mnemonicParsing="false" focusTraversable="false"
+            onAction="#onBtnSwitchToLoginWindowClick" text="Open login window"
+            styleClass="action-button" />
+    <TextField fx:id="nicknameTextField" alignment="CENTER"
+               maxWidth="200.0" prefHeight="18.0" prefWidth="300.0"
+               promptText="Enter your preferred nickname"
+               styleClass="text-field" />
+    <TextField fx:id="passwordTextField" alignment="CENTER"
+               maxWidth="200.0" prefWidth="200"
+               promptText="Enter your newly created password"
+               styleClass="text-field" />
+    <CheckBox alignment="CENTER" prefHeight="18.0" prefWidth="200.0" text="I agree with terms and conditions" styleClass="checkbox" />
+    <Button fx:id="btnSubmitRequest" lineSpacing="5.0" focusTraversable="false"
+            onAction="#onBtnSubmitRequestClick"
+            text="Submit registration request"
+            styleClass="action-button" />
+</VBox>
