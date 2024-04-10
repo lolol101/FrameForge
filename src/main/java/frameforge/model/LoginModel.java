@@ -4,24 +4,28 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class LoginModel {
-    public Property<RegistrationModel.Commands> command;
+    public Property<ClientCommands> clientCommand;
+    public Property<ViewActions> viewAction;
 
-    // Data:
     public String username;
     public String password;
 
-    public enum Commands {
-        // Client commands:
-        show,
-        close,
+    public enum ViewActions {
+        authBtnClicked,
+        switchToRegistrationBtnClicked,
+        zero
+    }
 
-        // VM commands:
-        authBtnClicked
+    public enum ClientCommands {
+        open,
+        close,
+        zero
     }
 
     public LoginModel() {
         username = "";
         password = "";
-        command = new SimpleObjectProperty<>();
+        clientCommand = new SimpleObjectProperty<>();
+        viewAction = new SimpleObjectProperty<>();
     }
 }

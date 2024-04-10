@@ -20,6 +20,6 @@ public class RegistrationViewModel {
     public void addUser() {
         model.username = nicknameProperty.getValue();
         model.password = passwordProperty.getValue();
-        model.command.setValue(RegistrationModel.Commands.regBtnClicked);
+        model.viewAction.setValue(RegistrationModel.ViewActions.regBtnClicked);
     }
 }

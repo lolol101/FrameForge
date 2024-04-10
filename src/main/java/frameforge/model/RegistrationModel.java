@@ -2,27 +2,31 @@ package frameforge.model;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-//import com.github.msteinbeck.sig4j.signal.Signal1;
 
 public class RegistrationModel {
-    public Property<Commands> command;
+    public Property<ClientCommands> clientCommand;
+    public Property<ViewActions> viewAction;
 
     // Data:
     public String username;
     public String password;
 
-    public enum Commands {
-        // Client commands:
+    public enum ViewActions {
+        regBtnClicked,
+        switchToLoginBtnClicked,
+        zero
+    }
+
+    public enum ClientCommands {
         show,
         close,
-
-        // VM commands:
-        regBtnClicked
+        zero
     }
 
     public RegistrationModel() {
         username = "";
         password = "";
-        command = new SimpleObjectProperty<>();
+        clientCommand = new SimpleObjectProperty<>();
+        viewAction = new SimpleObjectProperty<>();
     }
 }
