@@ -126,7 +126,7 @@ public class MainPageController {
 
     public void openInView() throws IOException {
         System.out.println("mainPageView: open-in-view request received");
-        System.out.println("mainPageView: setting scene" + scene.hashCode() + " to stage " + stage.hashCode());
+        System.out.println("mainPageView: setting scene=" + scene.hashCode() + " to stage=" + stage.hashCode());
         loadNextImage();
         loadImages(); // TODO: should be here or not?
         stage.setScene(scene);

@@ -10,7 +10,6 @@ public class Client {
     public final LoginModel loginModel;
     public final RegistrationModel regModel;
     public final MainPageModel mainPageModel;
-    private SocketManager socketManager;
     public SocketManager socketManager;
 
 
@@ -85,7 +84,8 @@ public class Client {
         switch (type) {
             case ServerCommands.RESPONSE_TYPE.REGISTER_BACK:
                 if (status == ServerCommands.STATUS.OK) {
-                    // TODO
+                    // regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
                 }
                 else if (status == ServerCommands.STATUS.USERNAME_EXIST) {
                     // TODO
