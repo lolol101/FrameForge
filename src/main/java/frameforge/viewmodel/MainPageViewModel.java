@@ -18,11 +18,8 @@ public class MainPageViewModel {
         return model;
     } // TODO: solve getter&setter abundance
 
-    public Image getNextImage() {
-        return new Image(getClass()
-                .getResource("images/pic_" + 0 + ".jpg")
-                .toExternalForm()
-        );
+    public Image getNextImage() throws NullPointerException {
+        return model.getLastLoadedImage();
     }
 
     public void quit() {

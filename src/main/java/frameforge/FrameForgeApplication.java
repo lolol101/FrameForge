@@ -36,12 +36,6 @@ public class FrameForgeApplication extends Application {
             System.out.println(e.getMessage());
         }
 
-//        new Thread(() -> {
-//            while(true) {
-//                client.socketManager.acceptJson();
-//            }
-//        }).start();
-
         stage.setTitle("frameforge");
 
         // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?

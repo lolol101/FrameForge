@@ -40,6 +40,7 @@ public class MainPageController {
                 }
             }
             case close -> hideInView();
+            case loadPost -> loadNextImageFromModel();
         }
         viewModel.getModel().clientCommand.setValue(MainPageModel.ClientCommands.zero);
     };
@@ -77,42 +78,49 @@ public class MainPageController {
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
 
-    private void loadImages() {
+    private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
             double scrollPosition = scrollPane.getVvalue();
             if (scrollPosition == 1.0) {
-                loadNextImage(); // TODO: switch to image butches
+                sendRequestGetNextImage(); // TODO: switch to image butches
             }
         });
-        loadNextImage();
-        loadNextImage();
-        loadNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
+        sendRequestGetNextImage();
+        sendRequestGetNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
     }
 
-    private void loadNextImage() {
-        // TODO: move from testing to client interactions & split this method in two
-        Image image = getNextImage();
-        ImageView imageView = new ImageView(image);
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(600);
+    private void sendRequestGetNextImage() {
+        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+    }
 
-        double desiredWidth = 300;
-        double desiredHeight = 200;
-        double centerX = (image.getWidth() - desiredWidth) / 2;
-        double centerY = (image.getHeight() - desiredHeight) / 2;
-        Rectangle2D viewport = new Rectangle2D(centerX, centerY, desiredWidth, desiredHeight);
-        imageView.setViewport(viewport);
+    private void loadNextImageFromModel() {
+        Image image = null;
+        try {
+            image = getNextImage();
+            ImageView imageView = new ImageView(image);
+            imageView.setPreserveRatio(true);
+            imageView.setFitWidth(600);
 
-        HBox imageContainer = new HBox();
-        imageContainer.setAlignment(Pos.CENTER);
-        imageContainer.getChildren().add(imageView);
+            double desiredWidth = 300;
+            double desiredHeight = 200;
+            double centerX = (image.getWidth() - desiredWidth) / 2;
+            double centerY = (image.getHeight() - desiredHeight) / 2;
+            Rectangle2D viewport = new Rectangle2D(centerX, centerY, desiredWidth, desiredHeight);
+            imageView.setViewport(viewport);
 
-        tilePane.getChildren().add(imageContainer);
-        tilePane.setAlignment(Pos.CENTER);
+            HBox imageContainer = new HBox();
+            imageContainer.setAlignment(Pos.CENTER);
+            imageContainer.getChildren().add(imageView);
 
-        loadedImageCount++;
-        System.out.println("Next image loaded");
+            tilePane.getChildren().add(imageContainer);
+            tilePane.setAlignment(Pos.CENTER);
+
+            loadedImageCount++;
+            System.out.println("Next image loaded");
+        } catch (NullPointerException e) {
+            System.err.println("error when trying to load an image: please check path settings and model methods inerrancy");
+        }
     }
 
     private Image getNextImage() {
@@ -127,8 +135,8 @@ public class MainPageController {
     public void openInView() throws IOException {
         System.out.println("mainPageView: open-in-view request received");
         System.out.println("mainPageView: setting scene=" + scene.hashCode() + " to stage=" + stage.hashCode());
-        loadNextImage();
-        loadImages(); // TODO: should be here or not?
+        sendRequestGetNextImage();
+        addScrollListener(); // TODO: should be here or no?
         stage.setScene(scene);
         stage.show();
     }
