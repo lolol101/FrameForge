@@ -26,28 +26,22 @@ public class Client {
 
     public void connectListeners() {
         regModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
-            switch (newCommand) {
-                case regBtnClicked -> {
-                    registration();
-                }
-                case switchToLoginBtnClicked -> {
-                    regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
-                    loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
-                }
+            if (newCommand == RegistrationModel.ViewActions.regBtnClicked)
+                registration();
+            else if (newCommand == RegistrationModel.ViewActions.switchToLoginBtnClicked) {
+                regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
+                loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
             }
             regModel.viewAction.setValue(RegistrationModel.ViewActions.zero);
         });
 
         loginModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
-            switch (newCommand) {
-                case authBtnClicked -> {
-                    authorization();
-                }
-                case switchToRegistrationBtnClicked -> {
+            if (newCommand == LoginModel.ViewActions.authBtnClicked)
+                authorization();
+            else if (newCommand == LoginModel.ViewActions.switchToRegistrationBtnClicked) {
                     System.out.println("client: switch-to-login-menu request processing");
                     loginModel.clientCommand.setValue(LoginModel.ClientCommands.close);
                     regModel.clientCommand.setValue(RegistrationModel.ClientCommands.show);
-                }
             }
             loginModel.viewAction.setValue(LoginModel.ViewActions.zero);
         });
@@ -55,22 +49,25 @@ public class Client {
         socketManager.clientCommand.addListener((obs, oldCommand, newCommand) -> {
             if (newCommand == SocketManager.ClientCommands.sendJson)
                 socketManager.sendJson();
+            socketManager.clientCommand.setValue(SocketManager.ClientCommands.zero);
         });
 
         socketManager.socketAction.addListener((obs, oldCommand, newCommand) -> {
             if (newCommand == SocketManager.SocketActions.acceptJson)
                 handleRequest();
+            socketManager.socketAction.setValue(SocketManager.SocketActions.zero);
         });
 
         mainPageModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
             switch (newCommand) {
-                case returnToLoginBtnClicked -> {
+                case returnToLoginBtnClicked:
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
                     loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
-                }
-                case reachedNextPostBox -> {
+                    break;
+
+                case reachedNextPostBox:
                     // TODO: get images from server or locally
-                }
+                    break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
         });
@@ -92,6 +89,7 @@ public class Client {
                 }
                 break;
             case ServerCommands.RESPONSE_TYPE.AUTHORIZATION_BACK:
+                // TODO
                 break;
         }
     }

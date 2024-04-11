@@ -2,6 +2,7 @@ package frameforge.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -72,8 +73,7 @@ public class SocketManager {
             if (inData.isEmpty()) return;
             ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
             acceptedData.add(json);
-            socketAction.setValue(SocketActions.acceptJson);
-            socketAction.setValue(SocketActions.zero);
+            Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
