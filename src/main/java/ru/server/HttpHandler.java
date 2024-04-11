@@ -77,7 +77,6 @@ public class HttpHandler implements Runnable {
         pathToScaledImgs = "/home/project/scaledImages/";
         pathToAvatarImgs = "/home/project/avatarImages/";
     }
-
     public HttpHandler(Socket socket) {
         this.socket = socket;
     }
@@ -244,6 +243,7 @@ public class HttpHandler implements Runnable {
         ArrayList<String> get_comments = (ArrayList<String>)post.get("arrayComments");
         Integer get_likes = post.getInteger("likes");
         ArrayList<String> extensions = new ArrayList<String>();
+        ObjectId get_id = post.getObjectId("_id");
 
         for (int i = 0; i < get_photos_names.size(); i++) {
             extensions.add(get_photos_names.get(i).split("\\.")[1]);
@@ -261,10 +261,12 @@ public class HttpHandler implements Runnable {
             photosAsStrings.add(imgAsJson);
         }
 
+        response.put("_id", get_id.toString());
         response.put("username", get_username);
         response.put("likes", get_likes);
         response.put("arrayPhotos", photosAsStrings.toString()); 
         response.put("arrayComments", get_comments.toString());
+        response.put("imageType", typeImg.toString());
         response.put("extensions", extensions.toString());
 
         return response;
@@ -328,5 +330,7 @@ public class HttpHandler implements Runnable {
      throws IOException{        
         String str = jsMapper.writeValueAsString(node);
         out.println(str);
+        out.flush();
+        socket.close();
     }
 }
