@@ -81,6 +81,7 @@ public class MainPageController {
     private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
+
             double scrollPosition = scrollPane.getVvalue();
             if (scrollPosition == 1.0) {
                 sendRequestGetNextImage(); // TODO: switch to image butches
@@ -88,7 +89,7 @@ public class MainPageController {
         });
         sendRequestGetNextImage();
         try {
-            Thread.sleep(1);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

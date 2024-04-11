@@ -66,6 +66,7 @@ public class SocketManager {
             connect("188.225.82.247", 8080);
             out.println(jsMapper.writeValueAsString(json));
             jsonSent = true;
+            acceptJson();
         } catch
         (Exception e) {
             System.out.println(e.getMessage());
