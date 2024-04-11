@@ -42,7 +42,7 @@
                         style="-fx-background-color: #8bbbae">
                 <HBox alignment="CENTER" style="-fx-background-color: #d1e1d4">
                     <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
-                              style="-fx-background-color: white; -fx-padding: 1px;">
+                              style="-fx-background-color: #d1e1d4; -fx-padding: 1px;">
                     </TilePane>
                 </HBox>
             </ScrollPane>
