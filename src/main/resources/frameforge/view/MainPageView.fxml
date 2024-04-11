@@ -13,10 +13,10 @@
     </stylesheets>
     <top>
         <StackPane>
-            <HBox alignment="CENTER" style="-fx-background-color: green">
+            <HBox alignment="CENTER" style="-fx-background-color: #4e795c">
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="menuButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"
-                            styleClass="menu-button-profile">
+                            styleClass="menu-button-main">
                     <items>
                         <MenuItem mnemonicParsing="false" text="Profile"/>
                         <MenuItem mnemonicParsing="false" text="Preferences"/>
@@ -27,7 +27,7 @@
             </HBox>
             <MenuButton fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
                         text="Leaderboard"
-                        styleClass="menu-button-leaderboard">
+                        styleClass="menu-button-main">
                 <items>
                     <MenuItem mnemonicParsing="false" text="View Top 100"/>
                     <MenuItem mnemonicParsing="false" text="My rating history"/>
@@ -37,10 +37,10 @@
     </top>
     <center>
         <HBox alignment="CENTER"
-              style="-fx-background-color: lightyellow; -fx-padding: 10px;">
+              style="-fx-background-color: #8bbbae;">
             <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="700.0"
-                        style="-fx-background-color: red">
-                <HBox alignment="CENTER" style="-fx-background-color: purple">
+                        style="-fx-background-color: #8bbbae">
+                <HBox alignment="CENTER" style="-fx-background-color: #d1e1d4">
                     <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
                               style="-fx-background-color: white; -fx-padding: 1px;">
                     </TilePane>

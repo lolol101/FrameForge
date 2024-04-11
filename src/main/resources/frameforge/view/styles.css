@@ -1,66 +1,62 @@
 /* styles.css */
 
 /*Main Page data: */
-.menu-button-profile {
-    -fx-background-color: lightblue;
-    -fx-border-color: transparent;
+
+.menu-button-main {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 4px;
 }
 
-.menu-button-profile .menu-item {
-    -fx-text-fill: -fx-text-background-color;
-    -fx-background-color: lightblue;
+.menu-button-main .menu-item {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: white;
 }
 
-.menu-button-profile .context-menu {
-    -fx-background-color: lightblue;
+.menu-button-main .menu-item:hover {
+    -fx-background-color: #4e795c;
+    -fx-text-fill: #d1e1d4;
 }
 
-.menu-button-leaderboard {
-    -fx-background-color: lightcoral;
-    -fx-border-color: transparent;
-}
-
-.menu-button-leaderboard .menu-item {
-    -fx-text-fill: -fx-text-background-color;
-    -fx-background-color: lightcoral;
-}
-
-.menu-button-leaderboard .context-menu {
-    -fx-background-color: lightcoral;
+.menu-button-main .context-menu {
+    -fx-background-color: transparent;
 }
 
 
 /*Registration & Login data: */
 
 .main-container {
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: #8bbbae;
     -fx-padding: 20px;
     -fx-spacing: 15px;
 }
 
 .title-label {
     -fx-font-size: 32px;
-    -fx-text-fill: #333333;
+    -fx-text-fill: #2d5335;
+    -fx-font-styles: bold;
 }
 
 .info-label {
     -fx-font-size: 14px;
-    -fx-text-fill: #555555;
+    -fx-text-fill: #2d5335;
 }
 
 .action-button {
-    -fx-background-color: #4CAF50;
-    -fx-text-fill: white;
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: #4e795c;
     -fx-font-weight: bold;
     -fx-padding: 10px 20px;
 }
 
 .action-button:hover {
-    -fx-background-color: lightgreen;
+    -fx-background-color: #4e795c;
+    -fx-text-fill: #d1e1d4;
 }
 
 .text-field {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #f7f7f7;
     -fx-border-color: #999999;
     -fx-border-width: 1px;
 }
