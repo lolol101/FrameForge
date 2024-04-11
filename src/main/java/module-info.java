@@ -10,6 +10,7 @@ module frameforge {
     requires com.fasterxml.jackson.databind;
     requires java.desktop;
     requires jdk.jdi;
+    requires javafx.swing;
 
     opens frameforge to javafx.fxml;
     exports frameforge;

@@ -81,12 +81,18 @@ public class MainPageController {
     private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
+
             double scrollPosition = scrollPane.getVvalue();
             if (scrollPosition == 1.0) {
                 sendRequestGetNextImage(); // TODO: switch to image butches
             }
         });
         sendRequestGetNextImage();
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         sendRequestGetNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
     }
 

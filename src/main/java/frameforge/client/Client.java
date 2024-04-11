@@ -6,12 +6,18 @@ import frameforge.model.LoginModel;
 import frameforge.model.MainPageModel;
 import frameforge.model.RegistrationModel;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
 public class Client {
     public final LoginModel loginModel;
     public final RegistrationModel regModel;
     public final MainPageModel mainPageModel;
     public SocketManager socketManager;
-
 
     private final ObjectMapper jsMapper;
 
@@ -66,7 +72,8 @@ public class Client {
                     break;
 
                 case reachedNextPostBox:
-                    // TODO: get images from server or locally
+                    System.out.println("restart");
+                    getMainPost();
                     break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
@@ -79,17 +86,43 @@ public class Client {
         ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
         ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
         switch (type) {
-            case ServerCommands.RESPONSE_TYPE.REGISTER_BACK:
-                if (status == ServerCommands.STATUS.OK) {
-                    // regModel.clientCommand.setValue(RegistrationModel.ClientCommands.close);
+            case REGISTER_BACK:
+                if (status == ServerCommands.STATUS.OK)
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
-                }
                 else if (status == ServerCommands.STATUS.USERNAME_EXIST) {
                     // TODO
                 }
                 break;
-            case ServerCommands.RESPONSE_TYPE.AUTHORIZATION_BACK:
+            case AUTHORIZATION_BACK:
                 // TODO
+                break;
+            case GET_MAIN_POST_BACK:
+                try {
+                    if (status == ServerCommands.STATUS.OK) {
+                        StringBuilder rawData = new StringBuilder();
+                        rawData.append(json.get("arrayPhotos").textValue());
+                        rawData.deleteCharAt(0);
+                        rawData.deleteCharAt(rawData.length() - 1);
+                        ArrayList<String> images = new ArrayList<>(List.of(rawData.toString().split(",")));
+                        rawData = new StringBuilder(json.get("extensions").textValue());
+                        rawData.deleteCharAt(0);
+                        rawData.deleteCharAt(rawData.length() - 1);
+                        ArrayList<String> extensions = new ArrayList<>(List.of(rawData.toString().split(",")));
+                        String id = json.get("_id").toString();
+                        for (int i = 0; i < images.size(); ++i) {
+                            byte[] decodedBytes = Base64.getDecoder().decode(images.get(i));
+                            BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(decodedBytes));
+                            ImageHandler imageHandler = new ImageHandler(bufImg, ImageHandler.ImgType.valueOf(json.get("imageType").textValue()), extensions.get(i));
+                            mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, imageHandler));
+                        }
+                        mainPageModel.currentPostId = id;
+                        mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.loadPost);
+                    }
+                    else if (status == ServerCommands.STATUS.ERROR)
+                        System.out.println("Getting main post error");
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
         }
     }
@@ -101,7 +134,6 @@ public class Client {
         json.put("type", ServerCommands.ACTIONS.REGISTRATION.toString());
         socketManager.sendingData.add(json);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
-        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
     }
 
     private void authorization() {
@@ -111,6 +143,13 @@ public class Client {
         json.put("type", ServerCommands.ACTIONS.AUTHORIZATION.toString());
         socketManager.sendingData.add(json);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
-        regModel.clientCommand.setValue(RegistrationModel.ClientCommands.zero);
+    }
+
+    private void getMainPost() {
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
+        json.put("typeImage", ImageHandler.ImgType.SCALED.toString());
+        socketManager.sendingData.add(json);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
     }
 }

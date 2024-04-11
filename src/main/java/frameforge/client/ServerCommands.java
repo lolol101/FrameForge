@@ -4,7 +4,7 @@ public class ServerCommands {
     public enum ACTIONS {
         REGISTRATION,
         AUTHORIZATION,
-        GET_MAIN_PAGE_POSTS_SET,
+        GET_MAIN_POST,
         SET_LIKE,
         SET_COMMENT,
         SUBSCRIBE
@@ -14,7 +14,7 @@ public class ServerCommands {
         REGISTER_BACK,
         AUTHORIZATION_BACK,
         MAKE_POST_BACK,
-        GET_MAIN_PAGE_POSTS_SET_BACK,
+        GET_MAIN_POST_BACK,
         SET_LIKE_BACK,
         SET_COMMENT_BACK,
         SUBSCRIBE_BACK

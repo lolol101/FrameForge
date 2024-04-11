@@ -24,6 +24,7 @@ public class SocketManager {
     public Queue<ObjectNode> sendingData;
     public Property<ClientCommands> clientCommand;
     public Property<SocketActions> socketAction;
+    public boolean jsonSent = false;
 
     public enum ClientCommands {
         sendJson,
@@ -61,20 +62,29 @@ public class SocketManager {
     public void sendJson() {
         ObjectNode json = sendingData.remove();
         try  {
+            socket.close();
+            connect("188.225.82.247", 8080);
             out.println(jsMapper.writeValueAsString(json));
-        } catch (Exception e) {
+            jsonSent = true;
+            acceptJson();
+        } catch
+        (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void acceptJson() {
         try {
-            String inData = in.readLine();
-            if (inData.isEmpty()) return;
-            ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
-            acceptedData.add(json);
-            Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
-        } catch (IOException e) {
+            if (jsonSent) {
+                String inData = in.readLine();
+                if (inData.isEmpty()) return;
+                jsonSent = false;
+                System.out.println(inData);
+                ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
+                acceptedData.add(json);
+                Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
+            }
+        } catch(IOException e){
             System.out.println(e.getMessage());
         }
     }
