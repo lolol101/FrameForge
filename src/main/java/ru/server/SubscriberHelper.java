@@ -101,6 +101,7 @@ public final class SubscriberHelper {
         @Override
         public void onNext(final Document t) {
             receivedDocs.add(t);
+            System.out.println("adding doc");
             subscription.request(1);
         }
 

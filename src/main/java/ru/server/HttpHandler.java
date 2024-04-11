@@ -27,6 +27,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import ru.server.ImageHandler.ImgType;
 import ru.server.SubscriberHelper.CountSubscriber;
 import ru.server.SubscriberHelper.DocumentSubscriber;
 import ru.server.SubscriberHelper.InsertSubscriber;
@@ -47,7 +48,7 @@ public class HttpHandler implements Runnable {
     private enum ACTIONS {
         REGISTRATION,
         AUTHORIZATION,
-        GET_MAIN_PAGE_POSTS_SET,
+        GET_MAIN_POST,
         SET_LIKE, 
         SET_COMMENT,
         SUBSCRIBE
@@ -57,7 +58,7 @@ public class HttpHandler implements Runnable {
         REGISTER_BACK, 
         AUTHORIZATION_BACK,
         MAKE_POST_BACK,
-        GET_MAIN_PAGE_POSTS_SET_BACK,
+        GET_MAIN_POST_BACK,
         SET_LIKE_BACK,
         SET_COMMENT_BACK,
         SUBSCRIBE_BACK
@@ -110,8 +111,10 @@ public class HttpHandler implements Runnable {
         //     ImageIO.write(bufImg, "JPG", new File(outPath));
         // }
         JsonNode req = getRequest();
+        System.out.println("after getReq");
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
         ObjectNode response = null;
+        System.out.println("before switch");
         switch (type) {
             case REGISTRATION:
                 response = register(req); 
@@ -119,8 +122,8 @@ public class HttpHandler implements Runnable {
             case AUTHORIZATION:
                 response = authorize(req);
                 break;
-            case GET_MAIN_PAGE_POSTS_SET:
-                response = getMainPagePostsSet(req);
+            case GET_MAIN_POST:
+                response = getMainPost(req);
                 break;
             case SET_LIKE:
                 response = setLike(req);
@@ -215,11 +218,54 @@ public class HttpHandler implements Runnable {
         return response;
     }
 
-    private ObjectNode getMainPagePostsSet(JsonNode req) {
+    private ObjectNode getMainPost(JsonNode req) 
+    throws IOException {
         ObjectNode response = jsMapper.createObjectNode();
-        response.put("type", RESPONSE_TYPE.GET_MAIN_PAGE_POSTS_SET_BACK.toString());
+        response.put("type", RESPONSE_TYPE.GET_MAIN_POST_BACK.toString());
+        response.put("status", STATUS.OK.toString());
 
+        MongoCollection<Document> posts = db.getCollection("posts");
+        ArrayList<Document> receivedDocs = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        posts.find()
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDocs));
+        
+        try {
+            latch.await();
+        } catch (Exception e) {}
+        if (receivedDocs.size() == 0) {
+            response.put("status", STATUS.ERROR.toString());
+            return response;
+        } 
+        Document post = receivedDocs.get(0);
+        ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
+        String get_username = post.getString("username");
+        ArrayList<String> get_photos_names = (ArrayList<String>)post.get("arrayPhotos");
+        ArrayList<String> get_comments = (ArrayList<String>)post.get("arrayComments");
+        Integer get_likes = post.getInteger("likes");
+        ArrayList<String> extensions = new ArrayList<String>();
 
+        for (int i = 0; i < get_photos_names.size(); i++) {
+            extensions.add(get_photos_names.get(i).split("\\.")[1]);
+        }
+
+        ArrayList<String> photosAsStrings = new ArrayList<String>();
+        String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
+        //String path = "/home/igorstovba/Documents/Test/";
+
+        for (int i = 0; i < get_photos_names.size(); i++) {
+            String tmp_path = path + get_photos_names.get(i);
+            ImageHandler imgHandler = new ImageHandler(tmp_path, typeImg, extensions.get(i));
+            ByteArrayOutputStream out = imgHandler.getByteArray();
+            String imgAsJson = Base64.getEncoder().encodeToString(out.toByteArray());
+            photosAsStrings.add(imgAsJson);
+        }
+
+        response.put("username", get_username);
+        response.put("likes", get_likes);
+        response.put("arrayPhotos", photosAsStrings.toString()); 
+        response.put("arrayComments", get_comments.toString());
+        response.put("extensions", extensions.toString());
 
         return response;
     }
@@ -251,6 +297,8 @@ public class HttpHandler implements Runnable {
 
         return response;
     }
+
+    
 
     private ObjectNode subscribe(JsonNode req) {
         ObjectNode response = jsMapper.createObjectNode();
