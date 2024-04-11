@@ -28,8 +28,10 @@ public class FrameForgeApplication extends Application {
             new Thread(new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (true)
+                    while (true) {
+                        Thread.sleep(1);
                         client.socketManager.acceptJson();
+                    }
                 }
             }).start();
         } catch (Exception e) {

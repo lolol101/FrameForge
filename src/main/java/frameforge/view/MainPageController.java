@@ -87,6 +87,11 @@ public class MainPageController {
             }
         });
         sendRequestGetNextImage();
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         sendRequestGetNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
     }
 
