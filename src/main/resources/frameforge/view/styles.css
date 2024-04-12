@@ -1,0 +1,67 @@
+/* styles.css */
+
+/*Main Page data: */
+
+.menu-button-main {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 4px;
+}
+
+.menu-button-main .menu-item {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: white;
+}
+
+.menu-button-main .menu-item:hover {
+    -fx-background-color: #4e795c;
+    -fx-text-fill: #d1e1d4;
+}
+
+.menu-button-main .context-menu {
+    -fx-background-color: transparent;
+}
+
+
+/*Registration & Login data: */
+
+.main-container {
+    -fx-background-color: #8bbbae;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+}
+
+.title-label {
+    -fx-font-size: 32px;
+    -fx-text-fill: #2d5335;
+    -fx-font-styles: bold;
+}
+
+.info-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2d5335;
+}
+
+.action-button {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: #4e795c;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+}
+
+.action-button:hover {
+    -fx-background-color: #4e795c;
+    -fx-text-fill: #d1e1d4;
+}
+
+.text-field {
+    -fx-background-color: #f7f7f7;
+    -fx-border-color: #999999;
+    -fx-border-width: 1px;
+}
+
+.checkbox {
+    -fx-font-size: 12px;
+    -fx-text-fill: #666666;
+}
