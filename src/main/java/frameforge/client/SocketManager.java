@@ -13,6 +13,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SocketManager {
     private Socket socket = null;
@@ -20,11 +22,11 @@ public class SocketManager {
     private PrintWriter out = null;
     private ObjectMapper jsMapper;
 
-    public Queue<ObjectNode> acceptedData;
-    public Queue<ObjectNode> sendingData;
-    public Property<ClientCommands> clientCommand;
-    public Property<SocketActions> socketAction;
-    public boolean jsonSent = false;
+    ExecutorService pool;
+    Queue<ObjectNode> acceptedData;
+    Queue<ObjectNode> sendingData;
+    Property<ClientCommands> clientCommand;
+    Property<SocketActions> socketAction;
 
     public enum ClientCommands {
         sendJson,
@@ -43,6 +45,7 @@ public class SocketManager {
             jsMapper = new ObjectMapper();
             clientCommand = new SimpleObjectProperty<>();
             socketAction = new SimpleObjectProperty<>();
+            pool = Executors.newFixedThreadPool(2);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -65,25 +68,20 @@ public class SocketManager {
             socket.close();
             connect("188.225.82.247", 8080);
             out.println(jsMapper.writeValueAsString(json));
-            jsonSent = true;
-            acceptJson();
-        } catch
-        (Exception e) {
+            pool.execute(this::acceptJson);
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void acceptJson() {
         try {
-            if (jsonSent) {
-                String inData = in.readLine();
-                if (inData.isEmpty()) return;
-                jsonSent = false;
-                System.out.println(inData);
-                ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
-                acceptedData.add(json);
-                Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
-            }
+            String inData = in.readLine();
+            if (inData == null || inData.isEmpty()) return;
+            System.out.println(inData);
+            ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
+            acceptedData.add(json);
+            Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
         } catch(IOException e){
             System.out.println(e.getMessage());
         }

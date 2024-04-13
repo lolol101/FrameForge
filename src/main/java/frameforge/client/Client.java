@@ -25,7 +25,6 @@ public class Client {
         loginModel = new LoginModel();
         regModel = new RegistrationModel();
         mainPageModel = new MainPageModel();
-
         jsMapper = new ObjectMapper();
         socketManager = new SocketManager();
     }
@@ -54,7 +53,7 @@ public class Client {
 
         socketManager.clientCommand.addListener((obs, oldCommand, newCommand) -> {
             if (newCommand == SocketManager.ClientCommands.sendJson)
-                socketManager.sendJson();
+                socketManager.pool.execute(socketManager::sendJson);
             socketManager.clientCommand.setValue(SocketManager.ClientCommands.zero);
         });
 
