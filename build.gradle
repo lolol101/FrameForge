@@ -32,6 +32,10 @@ dependencies {
     //mongodb-async
     implementation group: 'org.mongodb', name: 'mongodb-driver-reactivestreams', version: '4.11.1'
 
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.16.1'
+
+
 }
 
 tasks.named("test") {
