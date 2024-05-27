@@ -6,20 +6,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
-
-import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
-import com.google.gson.JsonArray;
 import com.mongodb.reactivestreams.client.*;
-
-import frameforge.server.Pair;
-import frameforge.server.ImageHandler.ImgType;
-import frameforge.server.SubscriberHelper.CountSubscriber;
-import frameforge.server.SubscriberHelper.DocumentSubscriber;
-import frameforge.server.SubscriberHelper.InsertSubscriber;
-import frameforge.server.SubscriberHelper.PrintSubscriber;
-
+import frameforge.server.SubscriberHelper.*;
 import com.mongodb.client.result.*;
 
 import static com.mongodb.client.model.Filters.*;
@@ -28,16 +18,14 @@ import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
-import static com.mongodb.client.model.Updates.set;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.math.*;
-import frameforge.serializable.ImageKeeper;
+import frameforge.serializable.JsonSerializable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.apache.commons.codec.binary.Hex;
+import frameforge.server.Constants.*;
 
 
 
@@ -51,38 +39,6 @@ public class HttpHandler implements Runnable {
     private static String pathToFullImgs = "/home/project/fullImages/";
     private static String pathToScaledImgs = "/home/project/scaledImages/";
     private static String pathToAvatarImgs = "/home/project/avatarImages/";
-
-    private enum ACTIONS {
-        REGISTRATION,
-        AUTHORIZATION,
-        GET_MAIN_POST,
-        SET_MAIN_POST,
-        GET_FULL_PHOTO,
-        SET_LIKE, 
-        SET_COMMENT,
-        SUBSCRIBE,
-        //EXTEND_TOKEN
-    };
-
-    private enum RESPONSE_TYPE {
-        REGISTER_BACK, 
-        AUTHORIZATION_BACK,
-        GET_MAIN_POST_BACK,
-        GET_FULL_PHOTO_BACK,
-        SET_MAIN_POST_BACK,
-        SET_LIKE_BACK,
-        SET_COMMENT_BACK,
-        SUBSCRIBE_BACK,
-        //EXTEND_TOKEN_BACK
-    };
-
-    private enum STATUS {
-        OK,
-        USERNAME_EXIST,
-        USERNAME_NOT_FOUND,
-        PASS_WRONG,
-        ERROR
-    };
 
     static {
         pathToFullImgs = "/home/project/fullImages/";
@@ -112,11 +68,11 @@ public class HttpHandler implements Runnable {
     }
 
     private void handleRequest() throws Exception {
-        ObjectNode req = deserialize(ObjectNode.class);
+        JsonSerializable msg = deserialize(JsonSerializable.class);
+        ObjectNode req = msg.getJson();
+        ArrayList<byte[]> keeper = msg.getImages();
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
-        ObjectNode response = null;
-        ImageKeeper keeper = null;
-        Pair<ObjectNode, ImageKeeper> pair = null;
+        JsonSerializable response = null;
         switch (type) {
             case REGISTRATION:
                 response = register(req); 
@@ -125,18 +81,15 @@ public class HttpHandler implements Runnable {
                 response = authorize(req);
                 break;
             case SET_MAIN_POST:
-                keeper = deserialize(ImageKeeper.class);
                 response = setMainPost(req, keeper);
                 break;
             case GET_MAIN_POST:
                 System.out.println("Case GET_MAIN_POST");
-                pair = getMainPost(req);
-                response = pair.a;
+                response = getMainPost(req);
                 break;
             case GET_FULL_PHOTO:
                 System.out.println("Case GET_FULL_PHOTO");
-                pair = getFullPhoto(req);
-                response = pair.a;
+                response = getFullPhoto(req);
                 break;
             case SET_LIKE:
                 response = setLike(req);
@@ -152,12 +105,7 @@ public class HttpHandler implements Runnable {
                 System.exit(1);
         }
         sendSerializableObject(response);
-        if (type == ACTIONS.GET_FULL_PHOTO || 
-        type == ACTIONS.GET_MAIN_POST) {
-            // System.out.println(pair.b.toString());
-            sendSerializableObject(pair.b);
-        }
-
+        
         //closeAll();
     }
 
@@ -193,9 +141,10 @@ public class HttpHandler implements Runnable {
         return byteArray;
     }
 
-    private Pair<ObjectNode, ImageKeeper> getFullPhoto(ObjectNode req)
+    private JsonSerializable getFullPhoto(ObjectNode req)
     throws IOException {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.GET_FULL_PHOTO_BACK.toString());
         response.put("status", STATUS.OK.toString());
         ObjectId postId = new ObjectId(req.get("postId").textValue());
@@ -212,21 +161,23 @@ public class HttpHandler implements Runnable {
         } catch (Exception e) {}
         if (receivedDoc.isEmpty()) {
             response.put("status", STATUS.ERROR.toString());
-            return new Pair<>(response, null);
+            ret.setJson(response);
+            return ret;
         }             
         Document post = receivedDoc.get(0);
         ArrayList<String> arrayPhotos = (ArrayList<String>)post.get("arrayPhotos");
         // String path = "/home/igorstovba/Documents/Test/"; // replace Path with pathToFullImgs
     
         byte[] bytes = getPhotoBytesFromPath(pathToFullImgs + arrayPhotos.get(pos));
-        ImageKeeper keeper = new ImageKeeper(bytes);
-        System.out.println(keeper.getImages().size());
-        return new Pair<>(response, keeper);
+        ret.setJson(response);
+        ret.setOnePhoto(bytes);
+        return ret;
     }
 
-    private ObjectNode register(ObjectNode req) {
+    private JsonSerializable register(ObjectNode req) {
         System.out.println("in register method");
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.REGISTER_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
@@ -242,7 +193,8 @@ public class HttpHandler implements Runnable {
         } catch (Exception e) {}
         if (count[0] > 0) {
             response.put("status", STATUS.USERNAME_EXIST.toString());
-            return response;
+            ret.setJson(response);
+            return ret;
         }
         String password = req.get("password").textValue();
         // String extension = req.get("extensionOfImage").textValue();
@@ -263,11 +215,13 @@ public class HttpHandler implements Runnable {
                             //.append("authorPhoto", pathToAvatar);
         users.insertOne(newUser)
             .subscribe(new InsertSubscriber<InsertOneResult>());
-        return response;
+        ret.setJson(response);
+        return ret;
     }
 
-    private ObjectNode authorize(ObjectNode req) {
+    private JsonSerializable authorize(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.AUTHORIZATION_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
@@ -285,19 +239,22 @@ public class HttpHandler implements Runnable {
         } catch (Exception e) {}
         if (receivedDocs.isEmpty()) {
             response.put("status", STATUS.USERNAME_NOT_FOUND.toString());
-            return response;
+            ret.setJson(response);
+            return ret;
         } 
         Document user = receivedDocs.get(0);
         if (!user.containsKey("password")
          || (password == user.get("password"))) {
             response.put("status", STATUS.PASS_WRONG.toString());
         }
-        return response;
+        ret.setJson(response);
+        return ret;
     }
 
-    private Pair<ObjectNode, ImageKeeper> getMainPost(ObjectNode req) 
+    private JsonSerializable getMainPost(ObjectNode req) 
     throws IOException {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.GET_MAIN_POST_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
@@ -312,7 +269,8 @@ public class HttpHandler implements Runnable {
         } catch (Exception e) {}
         if (receivedDocs.isEmpty()) {
             response.put("status", STATUS.ERROR.toString());
-            return new Pair<>(response, null);
+            ret.setJson(response);
+            return ret;
         } 
         Document post = receivedDocs.get(0);
         ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
@@ -332,12 +290,14 @@ public class HttpHandler implements Runnable {
             byte[] tmp = getPhotoBytesFromPath(path + fname);
             images.add(tmp);
         }
-        ImageKeeper keeper = new ImageKeeper(images);
-        return new Pair<>(response, keeper);
+        ret.setJson(response);
+        ret.setManyPhotos(images);
+        return ret;
     }
 
-    private ObjectNode setMainPost(ObjectNode req, ImageKeeper keeper) throws IOException, NoSuchAlgorithmException {
+    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> photos) throws IOException, NoSuchAlgorithmException {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_MAIN_POST_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
@@ -347,7 +307,6 @@ public class HttpHandler implements Runnable {
         ArrayNode arrayOfExtensions = req.withArrayProperty("extensionOfImage");
         
         // Putting photos in FS
-        ArrayList<byte[]> photos = keeper.getImages();
         ArrayList<String> namesPhotos = new ArrayList<>();
         for (int i = 0; i < photos.size(); ++i) {
             String ext = arrayOfExtensions.get(0).textValue();
@@ -361,8 +320,8 @@ public class HttpHandler implements Runnable {
                         .append("likes", 0);
         posts.insertOne(newPost)
             .subscribe(new InsertSubscriber<InsertOneResult>());
-        
-        return response;
+        ret.setJson(response);
+        return ret;
     }
 
     private String __putFileIntoFS(String ext, byte[] photo)
@@ -385,8 +344,9 @@ public class HttpHandler implements Runnable {
         return md5;
     }
 
-    private ObjectNode setLike(ObjectNode req) {
+    private JsonSerializable setLike(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
         response.put("status", STATUS.OK.toString());
         MongoCollection<Document> posts = db.getCollection("posts");
@@ -401,26 +361,28 @@ public class HttpHandler implements Runnable {
         //     eq("username", username), set("likes")
         // ).subscribe(new PrintSubscriber<String>());
 
-        return response;
+        return ret;
     }
 
-    private ObjectNode setComment(ObjectNode req) {
+    private JsonSerializable setComment(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_COMMENT_BACK.toString());
 
 
 
-        return response;
+        return ret;
     }
 
     
 
-    private ObjectNode subscribe(ObjectNode req) {
+    private JsonSerializable subscribe(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SUBSCRIBE_BACK.toString());
 
 
 
-        return response;
+        return ret;
     }
 }
