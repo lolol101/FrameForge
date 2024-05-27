@@ -195,6 +195,10 @@ public class MainPageController {
         viewModel.quit();
     }
 
+    @FXML private void sendRequestOpenPostCreationMenu() {
+        viewModel.openPostCreationMenu();
+    }
+
     private void sendRequestLikePost(String postID) {
 
     }
@@ -211,20 +215,20 @@ public class MainPageController {
 
     }
 
-    @FXML private void uploadImage() {
-        // TODO: update styles.css for upload button
-        FileChooser fileChooser = new FileChooser();
-
-        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
-
-        File file = fileChooser.showOpenDialog(null);
-
-        if (file != null) {
-            viewModel.uploadFile(file);
-        }
-    }
+//    @FXML private void uploadImage() {
+//        // TODO: update styles.css for upload button
+//        FileChooser fileChooser = new FileChooser();
+//
+//        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
+//        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+//        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+//
+//        File file = fileChooser.showOpenDialog(null);
+//
+//        if (file != null) {
+//            viewModel.uploadFile(file);
+//        }
+//    }
 
     public void openInView() throws IOException {
         System.out.println("mainPageView: open-in-view request received");

@@ -17,7 +17,7 @@
                 <Button fx:id="uploadImageButton"
                         text="Upload an image"
                         styleClass="menu-button-upload"
-                        onAction="#uploadImage"
+                        onAction="#sendRequestOpenPostCreationMenu"
                 />
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="menuButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"

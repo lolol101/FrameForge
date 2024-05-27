@@ -25,13 +25,18 @@ public class MainPageViewModel {
         return model.getLastLoadedImage();
     }
 
-    public void uploadFile(File file) {
+    public void uploadFile(File file) { // TODO: remove, is not used
         model.fileToUpload = file;
         model.viewAction.setValue(MainPageModel.ViewActions.uploadNewFile);
         System.out.println("mainPageViewModel: sending signal to upload a file " + model.fileToUpload.getName());
     }
 
     public void quit() {
+        System.out.println("mainPageViewModel: sending signal to open a login menu");
         model.viewAction.setValue(MainPageModel.ViewActions.returnToLoginBtnClicked);
+    }
+    public void openPostCreationMenu() {
+        System.out.println("mainPageViewModel: sending signal to open a post creation menu");
+        model.viewAction.setValue(MainPageModel.ViewActions.openPostCreationMenuBtnClicked);
     }
 }

@@ -36,6 +36,7 @@ public class MainPageModel {
     public enum ViewActions {
         reachedNextPostBox,
         returnToLoginBtnClicked,
+        openPostCreationMenuBtnClicked,
         uploadNewFile,
         zero
     }
