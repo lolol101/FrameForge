@@ -19,14 +19,10 @@ dependencies {
     implementation('net.synedra:validatorfx:0.4.0') { exclude(group: 'org.openjfx') }
     implementation('org.kordamp.ikonli:ikonli-javafx:12.3.1')
     implementation('eu.hansolo:tilesfx:11.48') { exclude(group: 'org.openjfx') }
-
     implementation 'org.jetbrains:annotations:16.0.2'
-
-
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
-
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
 }
 

@@ -1,17 +1,25 @@
 package frameforge.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.POJONode;
+import com.google.gson.JsonArray;
 import frameforge.model.LoginModel;
 import frameforge.model.MainPageModel;
 import frameforge.model.RegistrationModel;
+import frameforge.serializable.ImageKeeper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 public class Client {
     public final LoginModel loginModel;
@@ -25,7 +33,6 @@ public class Client {
         loginModel = new LoginModel();
         regModel = new RegistrationModel();
         mainPageModel = new MainPageModel();
-
         jsMapper = new ObjectMapper();
         socketManager = new SocketManager();
     }
@@ -72,8 +79,10 @@ public class Client {
                     break;
 
                 case reachedNextPostBox:
-                    System.out.println("restart");
                     getMainPost();
+                    break;
+                case uploadNewFile:
+                    makePost();
                     break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
@@ -82,7 +91,7 @@ public class Client {
 
     // Listeners:
     public void handleRequest() {
-        ObjectNode json = socketManager.acceptedData.remove();
+        ObjectNode json = (ObjectNode) socketManager.acceptedData.remove();
         ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
         ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
         switch (type) {
@@ -125,6 +134,14 @@ public class Client {
                     System.out.println(e.getMessage());
                 }
                 break;
+            case SET_MAIN_POST_BACK:
+                if (status == ServerCommands.STATUS.OK) {
+                    mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
+                    // TODO
+                } else if (status == ServerCommands.STATUS.ERROR) {
+                    // TODO
+                }
+                break;
         }
     }
 
@@ -152,5 +169,28 @@ public class Client {
         json.put("typeImage", ImageHandler.ImgType.SCALED.toString());
         socketManager.sendingData.add(json);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+    }
+
+    private void makePost() {
+        ObjectNode json = jsMapper.createObjectNode();
+        File imgFile = mainPageModel.fileToUpload.element();
+        ArrayList<String> extensions = new ArrayList<>();
+        extensions.add(imgFile.getName().
+                substring(imgFile.getName().indexOf(".") + 1));
+        ArrayNode arrNode1 = json.putArray("extensionOfImage");
+        for (var item : extensions)
+            arrNode1.add(item);
+        socketManager.sendingData.add(json);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        try {
+            BufferedImage image = ImageIO.read(mainPageModel.fileToUpload.remove());
+            ArrayList<byte[]> images = new ArrayList<>();
+            images.add(((DataBufferByte)(image.getRaster().getDataBuffer())).getData());
+            ImageKeeper imageKeeper = new ImageKeeper(images);
+            socketManager.sendingData.add(imageKeeper);
+            socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        } catch (IOException e) {
+            System.out.println("SET_MAIN_POST_BACK OI exp");
+        }
     }
 }

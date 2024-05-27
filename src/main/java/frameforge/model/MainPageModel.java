@@ -9,8 +9,7 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class MainPageModel {
     // TODO: command & action queues
@@ -19,7 +18,8 @@ public class MainPageModel {
 
     public String viewActionAdditionalInfo;
 
-    public File fileToUpload;
+    public Queue<File> waitingToUploadFiles;
+    public Queue<File> fileToUpload;
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
 
@@ -52,7 +52,7 @@ public class MainPageModel {
         currentPosts = new HashMap<>();
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
-
+        fileToUpload = new LinkedList<>();
         viewAction.setValue(ViewActions.zero);
         clientCommand.setValue(ClientCommands.zero);
     }

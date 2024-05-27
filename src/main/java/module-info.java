@@ -11,6 +11,7 @@ module frameforge {
     requires java.desktop;
     requires jdk.jdi;
     requires javafx.swing;
+    requires com.google.gson;
 
     opens frameforge to javafx.fxml;
     exports frameforge;

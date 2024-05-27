@@ -26,9 +26,9 @@ public class MainPageViewModel {
     }
 
     public void uploadFile(File file) {
-        model.fileToUpload = file;
+        model.fileToUpload.add(file);
         model.viewAction.setValue(MainPageModel.ViewActions.uploadNewFile);
-        System.out.println("mainPageViewModel: sending signal to upload a file " + model.fileToUpload.getName());
+        System.out.println("mainPageViewModel: sending signal to upload a file " + model.fileToUpload.element().getName());
     }
 
     public void quit() {

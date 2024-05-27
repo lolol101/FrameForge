@@ -17,8 +17,8 @@ public class SocketManager {
     private ObjectOutputStream out = null;
     private ObjectMapper jsMapper;
 
-    public Queue<ObjectNode> acceptedData;
-    public Queue<ObjectNode> sendingData;
+    public Queue<Object> acceptedData;
+    public Queue<Object> sendingData;
     public Property<ClientCommands> clientCommand;
     public Property<SocketActions> socketAction;
     public boolean jsonSent = false;
@@ -27,8 +27,6 @@ public class SocketManager {
         sendJson,
         zero
     }
-
-
 
     public enum SocketActions {
         acceptJson,
