@@ -6,18 +6,15 @@ import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class SocketManager {
     private Socket socket = null;
-    private BufferedReader in = null;
-    private PrintWriter out = null;
+    private ObjectInputStream in = null;
+    private ObjectOutputStream out = null;
     private ObjectMapper jsMapper;
 
     public Queue<ObjectNode> acceptedData;
@@ -30,6 +27,8 @@ public class SocketManager {
         sendJson,
         zero
     }
+
+
 
     public enum SocketActions {
         acceptJson,
@@ -51,8 +50,8 @@ public class SocketManager {
     public void connect(String ip, int port) {
         try {
             socket = new Socket(ip, port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -63,8 +62,9 @@ public class SocketManager {
         ObjectNode json = sendingData.remove();
         try  {
             socket.close();
-            connect("188.225.82.247", 8080);
-            out.println(jsMapper.writeValueAsString(json));
+            connect("147.45.247.99", 8080);
+            out.writeObject(json);
+            out.flush();
             jsonSent = true;
             acceptJson();
         } catch
@@ -76,15 +76,13 @@ public class SocketManager {
     public void acceptJson() {
         try {
             if (jsonSent) {
-                String inData = in.readLine();
+                ObjectNode inData = (ObjectNode) in.readObject();
                 if (inData.isEmpty()) return;
                 jsonSent = false;
-                System.out.println(inData);
-                ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
-                acceptedData.add(json);
+                acceptedData.add(inData);
                 Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
             }
-        } catch(IOException e){
+        } catch(IOException | ClassNotFoundException e){
             System.out.println(e.getMessage());
         }
     }
