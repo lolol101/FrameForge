@@ -6,8 +6,11 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
+import com.google.gson.JsonArray;
 import com.mongodb.reactivestreams.client.*;
 
 import frameforge.server.Pair;
@@ -27,6 +30,9 @@ import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
 import static com.mongodb.client.model.Updates.set;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.math.*;
 import frameforge.serializable.ImageKeeper;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -50,6 +56,7 @@ public class HttpHandler implements Runnable {
         REGISTRATION,
         AUTHORIZATION,
         GET_MAIN_POST,
+        SET_MAIN_POST,
         GET_FULL_PHOTO,
         SET_LIKE, 
         SET_COMMENT,
@@ -60,9 +67,9 @@ public class HttpHandler implements Runnable {
     private enum RESPONSE_TYPE {
         REGISTER_BACK, 
         AUTHORIZATION_BACK,
-        MAKE_POST_BACK,
         GET_MAIN_POST_BACK,
         GET_FULL_PHOTO_BACK,
+        SET_MAIN_POST_BACK,
         SET_LIKE_BACK,
         SET_COMMENT_BACK,
         SUBSCRIBE_BACK,
@@ -105,13 +112,11 @@ public class HttpHandler implements Runnable {
     }
 
     private void handleRequest() throws Exception {
-        System.out.println("in handleRequest method");
-        JsonNode req = deserialize(JsonNode.class);
-        System.out.println("after getReq");
+        ObjectNode req = deserialize(ObjectNode.class);
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
         ObjectNode response = null;
+        ImageKeeper keeper = null;
         Pair<ObjectNode, ImageKeeper> pair = null;
-        System.out.println("before switch");
         switch (type) {
             case REGISTRATION:
                 response = register(req); 
@@ -119,8 +124,14 @@ public class HttpHandler implements Runnable {
             case AUTHORIZATION:
                 response = authorize(req);
                 break;
+            case SET_MAIN_POST:
+                keeper = deserialize(ImageKeeper.class);
+                response = setMainPost(req, keeper);
+                break;
             case GET_MAIN_POST:
-                //response = getMainPost(req);
+                System.out.println("Case GET_MAIN_POST");
+                pair = getMainPost(req);
+                response = pair.a;
                 break;
             case GET_FULL_PHOTO:
                 System.out.println("Case GET_FULL_PHOTO");
@@ -143,7 +154,7 @@ public class HttpHandler implements Runnable {
         sendSerializableObject(response);
         if (type == ACTIONS.GET_FULL_PHOTO || 
         type == ACTIONS.GET_MAIN_POST) {
-            System.out.println(pair.b.toString());
+            // System.out.println(pair.b.toString());
             sendSerializableObject(pair.b);
         }
 
@@ -182,7 +193,7 @@ public class HttpHandler implements Runnable {
         return byteArray;
     }
 
-    private Pair<ObjectNode, ImageKeeper> getFullPhoto(JsonNode req)
+    private Pair<ObjectNode, ImageKeeper> getFullPhoto(ObjectNode req)
     throws IOException {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.GET_FULL_PHOTO_BACK.toString());
@@ -213,12 +224,7 @@ public class HttpHandler implements Runnable {
         return new Pair<>(response, keeper);
     }
 
-    // private JsonNode getRequest() throws IOException {
-    //     String json = in.readLine();
-    //     return jsMapper.readTree(json);
-    // }
-
-    private ObjectNode register(JsonNode req) {
+    private ObjectNode register(ObjectNode req) {
         System.out.println("in register method");
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.REGISTER_BACK.toString());
@@ -260,7 +266,7 @@ public class HttpHandler implements Runnable {
         return response;
     }
 
-    private ObjectNode authorize(JsonNode req) {
+    private ObjectNode authorize(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.AUTHORIZATION_BACK.toString());
         response.put("status", STATUS.OK.toString());
@@ -289,7 +295,7 @@ public class HttpHandler implements Runnable {
         return response;
     }
 
-    private ObjectNode getMainPost(JsonNode req) 
+    private Pair<ObjectNode, ImageKeeper> getMainPost(ObjectNode req) 
     throws IOException {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.GET_MAIN_POST_BACK.toString());
@@ -306,10 +312,10 @@ public class HttpHandler implements Runnable {
         } catch (Exception e) {}
         if (receivedDocs.isEmpty()) {
             response.put("status", STATUS.ERROR.toString());
-            return response;
+            return new Pair<>(response, null);
         } 
         Document post = receivedDocs.get(0);
-        //ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
+        ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
         //String get_username = post.getString("username");
         ArrayList<String> get_photos_names = (ArrayList<String>)post.get("arrayPhotos");
         //ArrayList<String> get_comments = (ArrayList<String>)post.get("arrayComments");
@@ -319,18 +325,67 @@ public class HttpHandler implements Runnable {
         
 
         ArrayList<byte[]> images = new ArrayList<>();
-        //String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
-        String path = "/home/igorstovba/Documents/Test/";  // replace Path
+        String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
+        // String path = "/home/igorstovba/Documents/Test/";  // replace Path
         
         for (String fname: get_photos_names) {
             byte[] tmp = getPhotoBytesFromPath(path + fname);
             images.add(tmp);
         }
         ImageKeeper keeper = new ImageKeeper(images);
+        return new Pair<>(response, keeper);
+    }
+
+    private ObjectNode setMainPost(ObjectNode req, ImageKeeper keeper) throws IOException, NoSuchAlgorithmException {
+        ObjectNode response = jsMapper.createObjectNode();
+        response.put("type", RESPONSE_TYPE.SET_MAIN_POST_BACK.toString());
+        response.put("status", STATUS.OK.toString());
+
+        MongoCollection<Document> posts = db.getCollection("posts");
+        
+        String username = req.get("username").textValue();
+        ArrayNode arrayOfExtensions = req.withArrayProperty("extensionOfImage");
+        
+        // Putting photos in FS
+        ArrayList<byte[]> photos = keeper.getImages();
+        ArrayList<String> namesPhotos = new ArrayList<>();
+        for (int i = 0; i < photos.size(); ++i) {
+            String ext = arrayOfExtensions.get(0).textValue();
+            namesPhotos.add(__putFileIntoFS(ext, photos.get(i)));
+        }
+
+        Document newPost = new Document()
+                        .append("username", username)
+                        .append("arrayPhotos", namesPhotos)
+                        .append("arrayComments", new ArrayList<String>())
+                        .append("likes", 0);
+        posts.insertOne(newPost)
+            .subscribe(new InsertSubscriber<InsertOneResult>());
+        
         return response;
     }
 
-    private ObjectNode setLike(JsonNode req) {
+    private String __putFileIntoFS(String ext, byte[] photo)
+    throws IOException, NoSuchAlgorithmException {
+        /*
+         * Format: FULL
+         */
+        String filename = "photo_" + __hashFromTime() + "." + ext;
+        String path = pathToFullImgs + filename; 
+        BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(photo));
+        ImageIO.write(bufImg, ext, new File(path));
+        return filename;
+    }
+
+    private String __hashFromTime() throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(String.valueOf(System.currentTimeMillis()).getBytes());
+        String md5 = new BigInteger(1, md.digest()).toString(16);
+
+        return md5;
+    }
+
+    private ObjectNode setLike(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
         response.put("status", STATUS.OK.toString());
@@ -349,7 +404,7 @@ public class HttpHandler implements Runnable {
         return response;
     }
 
-    private ObjectNode setComment(JsonNode req) {
+    private ObjectNode setComment(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.SET_COMMENT_BACK.toString());
 
@@ -360,7 +415,7 @@ public class HttpHandler implements Runnable {
 
     
 
-    private ObjectNode subscribe(JsonNode req) {
+    private ObjectNode subscribe(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.SUBSCRIBE_BACK.toString());
 
@@ -368,11 +423,4 @@ public class HttpHandler implements Runnable {
 
         return response;
     }
-
-    // private void sendJson(ObjectNode node)
-    //  throws IOException{        
-    //     String str = jsMapper.writeValueAsString(node);
-    //     out.println(str);
-    //     out.flush();
-    // }
 }
