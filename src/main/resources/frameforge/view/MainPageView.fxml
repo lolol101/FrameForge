@@ -14,6 +14,11 @@
     <top>
         <StackPane>
             <HBox alignment="CENTER" style="-fx-background-color: #4e795c">
+                <Button fx:id="uploadImageButton"
+                        text="Upload an image"
+                        styleClass="menu-button-upload"
+                        onAction="#uploadImage"
+                />
                 <Region HBox.hgrow="ALWAYS"/>
                 <MenuButton fx:id="menuButton" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"
                             styleClass="menu-button-main">

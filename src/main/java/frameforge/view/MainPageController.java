@@ -5,18 +5,18 @@ import frameforge.viewmodel.MainPageViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -29,6 +29,7 @@ public class MainPageController {
     // TODO: preferred width & height corrections
     @FXML private MenuButton menuButton; // TODO: set text to nickname
     @FXML private MenuButton leaderboardButton;
+    @FXML private Button uploadImageButton; // TODO: do I really need these buttons as class members?
     @FXML private TilePane tilePane;
     @FXML private ScrollPane scrollPane;
     private int loadedImageCount = 0;
@@ -108,6 +109,7 @@ public class MainPageController {
     }
 
     private void loadNextImageFromModel() {
+        // TODO: is it really async?
         Image image;
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
@@ -136,7 +138,7 @@ public class MainPageController {
 
             HBox buttonContainer = new HBox(20, likeButton, commentButton, shareButton, saveButton);
             buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
-            buttonContainer.setTranslateY(-10); // Position buttons below the image
+            buttonContainer.setTranslateY(-10); // Position buttons slightly above lower image border
 
             imagePane.setOnMouseEntered(event -> {
                 buttonContainer.setVisible(true);
@@ -191,6 +193,37 @@ public class MainPageController {
 
     @FXML private void sendRequestQuitToLogin() {
         viewModel.quit();
+    }
+
+    private void sendRequestLikePost(String postID) {
+
+    }
+
+    private void sendRequestSharePost(String postID) {
+
+    }
+
+    private void sendRequestCommentOnPost(String postID) {
+
+    }
+
+    private void sendRequestSavePost(String postID) {
+
+    }
+
+    @FXML private void uploadImage() {
+        // TODO: update styles.css for upload button
+        FileChooser fileChooser = new FileChooser();
+
+        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
+        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
+        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+
+        File file = fileChooser.showOpenDialog(null);
+
+        if (file != null) {
+            viewModel.uploadFile(file);
+        }
     }
 
     public void openInView() throws IOException {

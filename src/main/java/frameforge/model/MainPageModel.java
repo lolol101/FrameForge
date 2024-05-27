@@ -8,11 +8,18 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
+import java.io.File;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class MainPageModel {
+    // TODO: command & action queues
     public Property<MainPageModel.ClientCommands> clientCommand;
     public Property<MainPageModel.ViewActions> viewAction;
+
+    public String viewActionAdditionalInfo;
+
+    public File fileToUpload;
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
 
@@ -29,6 +36,7 @@ public class MainPageModel {
     public enum ViewActions {
         reachedNextPostBox,
         returnToLoginBtnClicked,
+        uploadNewFile,
         zero
     }
 
@@ -49,7 +57,11 @@ public class MainPageModel {
         clientCommand.setValue(ClientCommands.zero);
     }
 
+    int testPicNum = 0;
     public Pair<String, Image> getLastLoadedImage() throws NullPointerException {
-        return new Pair<>(currentPostId, SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null));
+        return new Pair<>(currentPostId, new Image(Objects.requireNonNull(getClass().getResource("pic_" + ++testPicNum + ".jpg")).toString()));
+//        return new Pair<>(currentPostId, SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null));
     }
+
+
 }

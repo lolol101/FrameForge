@@ -23,6 +23,12 @@
     -fx-background-color: transparent;
 }
 
+.menu-button-upload {
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 5px 10px;
+}
 
 /*Registration & Login data: */
 
