@@ -3,12 +3,10 @@ package frameforge.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.POJONode;
-import com.google.gson.JsonArray;
 import frameforge.model.LoginModel;
 import frameforge.model.MainPageModel;
 import frameforge.model.RegistrationModel;
-import frameforge.serializable.ImageKeeper;
+import frameforge.serializable.JsonSerializable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
+import javafx.scene.image.Image;
 
 public class Client {
     public final LoginModel loginModel;
@@ -60,13 +58,13 @@ public class Client {
         });
 
         socketManager.clientCommand.addListener((obs, oldCommand, newCommand) -> {
-            if (newCommand == SocketManager.ClientCommands.sendJson)
-                socketManager.sendJson();
+            if (newCommand == SocketManager.ClientCommands.sendData)
+                socketManager.sendData();
             socketManager.clientCommand.setValue(SocketManager.ClientCommands.zero);
         });
 
         socketManager.socketAction.addListener((obs, oldCommand, newCommand) -> {
-            if (newCommand == SocketManager.SocketActions.acceptJson)
+            if (newCommand == SocketManager.SocketActions.acceptData)
                 handleRequest();
             socketManager.socketAction.setValue(SocketManager.SocketActions.zero);
         });
@@ -91,7 +89,8 @@ public class Client {
 
     // Listeners:
     public void handleRequest() {
-        ObjectNode json = (ObjectNode) socketManager.acceptedData.remove();
+        JsonSerializable data = (JsonSerializable) socketManager.acceptedData.remove();
+        ObjectNode json = data.getJson();
         ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
         ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
         switch (type) {
@@ -107,32 +106,23 @@ public class Client {
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
                 break;
             case GET_MAIN_POST_BACK:
-                try {
-                    if (status == ServerCommands.STATUS.OK) {
-                        StringBuilder rawData = new StringBuilder();
-                        rawData.append(json.get("arrayPhotos").textValue());
-                        rawData.deleteCharAt(0);
-                        rawData.deleteCharAt(rawData.length() - 1);
-                        ArrayList<String> images = new ArrayList<>(List.of(rawData.toString().split(",")));
-                        rawData = new StringBuilder(json.get("extensions").textValue());
-                        rawData.deleteCharAt(0);
-                        rawData.deleteCharAt(rawData.length() - 1);
-                        ArrayList<String> extensions = new ArrayList<>(List.of(rawData.toString().split(",")));
-                        String id = json.get("_id").toString();
-                        for (int i = 0; i < images.size(); ++i) {
-                            byte[] decodedBytes = Base64.getDecoder().decode(images.get(i));
-                            BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(decodedBytes));
-                            ImageHandler imageHandler = new ImageHandler(bufImg, ImageHandler.ImgType.valueOf(json.get("imageType").textValue()), extensions.get(i));
-                            mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, imageHandler));
-                        }
-                        mainPageModel.currentPostId = id;
-                        mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.loadPost);
-                    }
-                    else if (status == ServerCommands.STATUS.ERROR)
-                        System.out.println("Getting main post error");
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                if (status == ServerCommands.STATUS.OK) {
+                    json.remove("status");
+                    json.remove("type");
+                    ArrayList<BufferedImage> images = new ArrayList<>(data.getImages().stream().map((byte[] b) -> {
+                            try {
+                                return ImageIO.read(new ByteArrayInputStream(b));
+                            } catch (IOException e) {
+                                System.out.println("GET_MAIN_POST_BACK exp");
+                            }
+                            return null;
+                        }).toList());
+
+                    String id = json.get("id").textValue();
+                    mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, images));
                 }
+                else if (status == ServerCommands.STATUS.ERROR)
+                    System.out.println("Getting main post error");
                 break;
             case SET_MAIN_POST_BACK:
                 if (status == ServerCommands.STATUS.OK) {
@@ -150,8 +140,10 @@ public class Client {
         json.put("username", regModel.username);
         json.put("password", regModel.password);
         json.put("type", ServerCommands.ACTIONS.REGISTRATION.toString());
-        socketManager.sendingData.add(json);
-        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        JsonSerializable data = new JsonSerializable();
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
     }
 
     private void authorization() {
@@ -159,38 +151,45 @@ public class Client {
         json.put("username", loginModel.username);
         json.put("password", loginModel.password);
         json.put("type", ServerCommands.ACTIONS.AUTHORIZATION.toString());
-        socketManager.sendingData.add(json);
-        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        JsonSerializable data = new JsonSerializable();
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
     }
 
     private void getMainPost() {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
-        json.put("typeImage", ImageHandler.ImgType.SCALED.toString());
-        socketManager.sendingData.add(json);
-        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+        json.put("typeImage", ImgType.SCALED.toString());
+        JsonSerializable data = new JsonSerializable();
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
     }
 
     private void makePost() {
+        JsonSerializable data = new JsonSerializable();
         ObjectNode json = jsMapper.createObjectNode();
         File imgFile = mainPageModel.fileToUpload.element();
         ArrayList<String> extensions = new ArrayList<>();
+        ArrayNode arrNode = json.putArray("extensionOfImage");
+
         extensions.add(imgFile.getName().
                 substring(imgFile.getName().indexOf(".") + 1));
-        ArrayNode arrNode1 = json.putArray("extensionOfImage");
         for (var item : extensions)
-            arrNode1.add(item);
-        socketManager.sendingData.add(json);
-        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+            arrNode.add(item);
+
         try {
             BufferedImage image = ImageIO.read(mainPageModel.fileToUpload.remove());
             ArrayList<byte[]> images = new ArrayList<>();
             images.add(((DataBufferByte)(image.getRaster().getDataBuffer())).getData());
-            ImageKeeper imageKeeper = new ImageKeeper(images);
-            socketManager.sendingData.add(imageKeeper);
-            socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);
+            data.setManyPhotos(images);
         } catch (IOException e) {
             System.out.println("SET_MAIN_POST_BACK OI exp");
         }
+
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
     }
 }

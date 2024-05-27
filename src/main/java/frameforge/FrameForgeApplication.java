@@ -30,7 +30,7 @@ public class FrameForgeApplication extends Application {
 //                protected Void call() throws Exception {
 //                    while (true) {
 //                        Thread.sleep(100);
-//                        client.socketManager.acceptJson();
+//                        client.socketManager.acceptData();
 //                    }
 //                }
 //            }).start();

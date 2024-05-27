@@ -2,6 +2,7 @@ package frameforge.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import frameforge.serializable.JsonSerializable;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
@@ -15,21 +16,20 @@ public class SocketManager {
     private Socket socket = null;
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
-    private ObjectMapper jsMapper;
 
     public Queue<Object> acceptedData;
     public Queue<Object> sendingData;
     public Property<ClientCommands> clientCommand;
     public Property<SocketActions> socketAction;
-    public boolean jsonSent = false;
+    public boolean dataSent = false;
 
     public enum ClientCommands {
-        sendJson,
+        sendData,
         zero
     }
 
     public enum SocketActions {
-        acceptJson,
+        acceptData,
         zero
     }
 
@@ -37,7 +37,6 @@ public class SocketManager {
         try {
             acceptedData = new LinkedList<>();
             sendingData = new LinkedList<>();
-            jsMapper = new ObjectMapper();
             clientCommand = new SimpleObjectProperty<>();
             socketAction = new SimpleObjectProperty<>();
         } catch (Exception e) {
@@ -56,29 +55,29 @@ public class SocketManager {
     }
 
     // Listeners:
-    public void sendJson() {
-        ObjectNode json = sendingData.remove();
+    public void sendData() {
+        Object data = sendingData.remove();
         try  {
             socket.close();
             connect("147.45.247.99", 8080);
-            out.writeObject(json);
+            out.writeObject(data);
             out.flush();
-            jsonSent = true;
-            acceptJson();
+            dataSent = true;
+            acceptData();
         } catch
         (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void acceptJson() {
+    public void acceptData() {
         try {
-            if (jsonSent) {
-                ObjectNode inData = (ObjectNode) in.readObject();
-                if (inData.isEmpty()) return;
-                jsonSent = false;
+            if (dataSent) {
+                JsonSerializable inData = (JsonSerializable) in.readObject();
+                if (inData == null) return;
+                dataSent = false;
                 acceptedData.add(inData);
-                Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
+                Platform.runLater(() -> socketAction.setValue(SocketActions.acceptData));
             }
         } catch(IOException | ClassNotFoundException e){
             System.out.println(e.getMessage());
