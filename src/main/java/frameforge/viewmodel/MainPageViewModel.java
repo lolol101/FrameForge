@@ -2,6 +2,7 @@ package frameforge.viewmodel;
 
 import frameforge.model.MainPageModel;
 import javafx.scene.image.Image;
+import javafx.util.Pair;
 
 public class MainPageViewModel {
     private MainPageModel model;
@@ -18,7 +19,7 @@ public class MainPageViewModel {
         return model;
     } // TODO: solve getter&setter abundance
 
-    public Image getNextImage() throws NullPointerException {
+    public Pair<String, Image> getNextImage() throws NullPointerException {
         return model.getLastLoadedImage();
     }
 

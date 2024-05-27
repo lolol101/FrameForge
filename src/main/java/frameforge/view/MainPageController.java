@@ -11,10 +11,14 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MainPageController {
     private Stage stage; // single stage instance shared with some other menus
@@ -75,6 +79,8 @@ public class MainPageController {
     public void passStageAndScene(Stage stage, Scene scene) {
         this.stage = stage;
         this.scene = scene;
+        // TODO: separate .css files
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
 
@@ -97,30 +103,79 @@ public class MainPageController {
     }
 
     private void sendRequestGetNextImage() {
-        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+//        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+        loadNextImageFromModel();
     }
 
     private void loadNextImageFromModel() {
-        Image image = null;
+        Image image;
         try {
-            image = getNextImage();
+            // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
+            // TODO: fix the bug with spaces between imagePanes growing over time (how? why?)
+            var nextIdAndImage = getNextImage();
+            image = nextIdAndImage.getValue();
             ImageView imageView = new ImageView(image);
             imageView.setPreserveRatio(true);
             imageView.setFitWidth(600);
 
-            double desiredWidth = 300;
-            double desiredHeight = 200;
-            double centerX = (image.getWidth() - desiredWidth) / 2;
-            double centerY = (image.getHeight() - desiredHeight) / 2;
-            Rectangle2D viewport = new Rectangle2D(centerX, centerY, desiredWidth, desiredHeight);
-            imageView.setViewport(viewport);
+            StackPane imagePane = new StackPane(imageView);
+            imagePane.setMaxWidth(imageView.getFitWidth());
+            imagePane.setMaxHeight(imageView.getFitHeight());
+//            imagePane.setPrefSize(600, 300); // Adjust size if needed
 
-            HBox imageContainer = new HBox();
-            imageContainer.setAlignment(Pos.CENTER);
-            imageContainer.getChildren().add(imageView);
+            Button likeButton = new Button("Like");
+            Button commentButton = new Button("Comment");
+            Button shareButton = new Button("Share");
+            Button saveButton = new Button("Save");
 
-            tilePane.getChildren().add(imageContainer);
-            tilePane.setAlignment(Pos.CENTER);
+            // TODO: styles.css color update
+            likeButton.getStyleClass().add("post-button");
+            commentButton.getStyleClass().add("post-button");
+            shareButton.getStyleClass().add("post-button");
+            saveButton.getStyleClass().add("post-button");
+
+            HBox buttonContainer = new HBox(20, likeButton, commentButton, shareButton, saveButton);
+            buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
+            buttonContainer.setTranslateY(-10); // Position buttons below the image
+
+            imagePane.setOnMouseEntered(event -> {
+                buttonContainer.setVisible(true);
+                System.out.println("mouse entered imagePane, show context actions");
+            });
+            imagePane.setOnMouseExited(event -> {
+                buttonContainer.setVisible(false);
+                System.out.println("mouse exited imagePane, hide context actions");
+            });
+
+            likeButton.setOnMouseEntered(event -> {
+                System.out.println("mouse entered likeButton");
+            });
+            likeButton.setOnMouseExited(event -> {
+                System.out.println("mouse exited likeButton");
+            });
+            commentButton.setOnMouseEntered(event -> {
+                System.out.println("mouse entered commentButton");
+            });
+            commentButton.setOnMouseExited(event -> {
+                System.out.println("mouse exited commentButton");
+            });
+            shareButton.setOnMouseEntered(event -> {
+                System.out.println("mouse entered shareButton");
+            });
+            shareButton.setOnMouseExited(event -> {
+                System.out.println("mouse exited shareButton");
+            });
+            saveButton.setOnMouseEntered(event -> {
+                System.out.println("mouse entered saveButton");
+            });
+            saveButton.setOnMouseExited(event -> {
+                System.out.println("mouse exited saveButton");
+            });
+
+            imagePane.getChildren().add(buttonContainer);
+            buttonContainer.setVisible(false);
+
+            tilePane.getChildren().add(imagePane);
 
             loadedImageCount++;
             System.out.println("Next image loaded");
@@ -129,7 +184,7 @@ public class MainPageController {
         }
     }
 
-    private Image getNextImage() {
+    private Pair<String, Image> getNextImage() {
         return viewModel.getNextImage();
         // TODO: work with image getters, names & anything else goes here
     }

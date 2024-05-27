@@ -65,3 +65,14 @@
     -fx-font-size: 12px;
     -fx-text-fill: #666666;
 }
+
+.post-button {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+}
+.post-button:hover {
+    -fx-background-color: #4e795c;
+}
