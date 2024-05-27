@@ -30,7 +30,7 @@
                maxWidth="200.0" prefHeight="18.0" prefWidth="300.0"
                promptText="Enter your preferred nickname"
                styleClass="text-field" />
-    <TextField fx:id="passwordTextField" alignment="CENTER"
+    <PasswordField fx:id="passwordTextField" alignment="CENTER"
                maxWidth="200.0" prefWidth="200"
                promptText="Enter your newly created password"
                styleClass="text-field" />

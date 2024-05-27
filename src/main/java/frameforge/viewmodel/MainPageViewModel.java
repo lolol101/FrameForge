@@ -2,6 +2,9 @@ package frameforge.viewmodel;
 
 import frameforge.model.MainPageModel;
 import javafx.scene.image.Image;
+import javafx.util.Pair;
+
+import java.io.File;
 
 public class MainPageViewModel {
     private MainPageModel model;
@@ -18,8 +21,14 @@ public class MainPageViewModel {
         return model;
     } // TODO: solve getter&setter abundance
 
-    public Image getNextImage() throws NullPointerException {
+    public Pair<String, Image> getNextImage() throws NullPointerException {
         return model.getLastLoadedImage();
+    }
+
+    public void uploadFile(File file) {
+        model.fileToUpload.add(file);
+        model.viewAction.setValue(MainPageModel.ViewActions.uploadNewFile);
+        System.out.println("mainPageViewModel: sending signal to upload a file " + model.fileToUpload.element().getName());
     }
 
     public void quit() {

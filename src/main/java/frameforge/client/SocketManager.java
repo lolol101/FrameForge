@@ -2,14 +2,12 @@ package frameforge.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import frameforge.serializable.JsonSerializable;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -18,23 +16,23 @@ import java.util.concurrent.Executors;
 
 public class SocketManager {
     private Socket socket = null;
-    private BufferedReader in = null;
-    private PrintWriter out = null;
-    private ObjectMapper jsMapper;
+    private ObjectInputStream in = null;
+    private ObjectOutputStream out = null;
 
     ExecutorService pool;
-    Queue<ObjectNode> acceptedData;
-    Queue<ObjectNode> sendingData;
-    Property<ClientCommands> clientCommand;
-    Property<SocketActions> socketAction;
+    public Queue<Object> acceptedData;
+    public Queue<Object> sendingData;
+    public Property<ClientCommands> clientCommand;
+    public Property<SocketActions> socketAction;
+    public boolean dataSent = false;
 
     public enum ClientCommands {
-        sendJson,
+        sendData,
         zero
     }
 
     public enum SocketActions {
-        acceptJson,
+        acceptData,
         zero
     }
 
@@ -42,7 +40,6 @@ public class SocketManager {
         try {
             acceptedData = new LinkedList<>();
             sendingData = new LinkedList<>();
-            jsMapper = new ObjectMapper();
             clientCommand = new SimpleObjectProperty<>();
             socketAction = new SimpleObjectProperty<>();
             pool = Executors.newFixedThreadPool(2);
@@ -54,35 +51,39 @@ public class SocketManager {
     public void connect(String ip, int port) {
         try {
             socket = new Socket(ip, port);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     // Listeners:
-    public void sendJson() {
-        ObjectNode json = sendingData.remove();
+    public void sendData() {
+        Object data = sendingData.remove();
         try  {
             socket.close();
-            connect("188.225.82.247", 8080);
-            out.println(jsMapper.writeValueAsString(json));
-            pool.execute(this::acceptJson);
-        } catch (Exception e) {
+            connect("147.45.247.99", 8080);
+            out.writeObject(data);
+            out.flush();
+            dataSent = true;
+            pool.execute(this::acceptData);
+        } catch
+        (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void acceptJson() {
+    public void acceptData() {
         try {
-            String inData = in.readLine();
-            if (inData == null || inData.isEmpty()) return;
-            System.out.println(inData);
-            ObjectNode json = (ObjectNode) jsMapper.readTree(inData);
-            acceptedData.add(json);
-            Platform.runLater(() -> socketAction.setValue(SocketActions.acceptJson));
-        } catch(IOException e){
+            if (dataSent) {
+                JsonSerializable inData = (JsonSerializable) in.readObject();
+                if (inData == null) return;
+                dataSent = false;
+                acceptedData.add(inData);
+                Platform.runLater(() -> socketAction.setValue(SocketActions.acceptData));
+            }
+        } catch(IOException | ClassNotFoundException e){
             System.out.println(e.getMessage());
         }
     }

@@ -5,6 +5,7 @@ import frameforge.view.LoginController;
 import frameforge.view.MainPageController;
 import frameforge.view.RegistrationController;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -21,7 +22,7 @@ public class FrameForgeApplication extends Application {
         Client client = new Client();
 
         client.connectListeners();
-        client.socketManager.connect("188.225.82.247", 8080);
+        client.socketManager.connect("147.45.247.99", 8080);
 
         stage.setTitle("frameforge");
 
