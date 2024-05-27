@@ -262,6 +262,7 @@ public class HttpHandler implements Runnable {
 
     private ObjectNode authorize(JsonNode req) {
         ObjectNode response = jsMapper.createObjectNode();
+        response.put("type", RESPONSE_TYPE.AUTHORIZATION_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
         MongoCollection<Document> users = db.getCollection("users");
