@@ -26,8 +26,6 @@ public class LoginModel {
     }
 
     public LoginModel() {
-        username = "";
-        password = "";
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
 

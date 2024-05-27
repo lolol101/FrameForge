@@ -22,11 +22,9 @@ public class RegistrationModel {
         show,
         close,
         zero
-    }
+    } // TODO: add reset command
 
     public RegistrationModel() {
-        username = ""; // TODO: is needed?
-        password = "";
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
     }
