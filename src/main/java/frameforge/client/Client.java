@@ -93,7 +93,7 @@ public class Client {
         ObjectNode json = data.getJson();
         ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
         ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
-        ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
+
         switch (type) {
             case REGISTER_BACK:
                 if (status == ServerCommands.STATUS.OK)
