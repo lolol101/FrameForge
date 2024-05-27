@@ -274,11 +274,11 @@ public class HttpHandler implements Runnable {
         } 
         Document post = receivedDocs.get(0);
         ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
-        //String get_username = post.getString("username");
-        ArrayList<String> get_photos_names = (ArrayList<String>)post.get("arrayPhotos");
-        //ArrayList<String> get_comments = (ArrayList<String>)post.get("arrayComments");
-        //Integer get_likes = post.getInteger("likes");
-        //ObjectId get_id = post.getObjectId("_id");
+        String username = post.getString("username");
+        ArrayList<String> photos_names = (ArrayList<String>)post.get("arrayPhotos");
+        ArrayList<String> comments = (ArrayList<String>)post.get("arrayComments");
+        Integer likes = post.getInteger("likes");
+        ObjectId id = post.getObjectId("_id");
 
         
 
@@ -286,10 +286,18 @@ public class HttpHandler implements Runnable {
         String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
         // String path = "/home/igorstovba/Documents/Test/";  // replace Path
         
-        for (String fname: get_photos_names) {
+        for (String fname: photos_names) {
             byte[] tmp = getPhotoBytesFromPath(path + fname);
             images.add(tmp);
         }
+        response.put("username",username);
+        response.put("likes", likes);
+        response.put("id", id.toString());
+        ArrayNode arrNode = response.putArray("comments");
+        for (var item: comments) 
+            arrNode.add(item);
+        
+
         ret.setJson(response);
         ret.setManyPhotos(images);
         return ret;
