@@ -6,6 +6,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.util.Pair;
 
 import java.util.HashMap;
 
@@ -48,7 +49,7 @@ public class MainPageModel {
         clientCommand.setValue(ClientCommands.zero);
     }
 
-    public Image getLastLoadedImage() throws NullPointerException {
-        return SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null);
+    public Pair<String, Image> getLastLoadedImage() throws NullPointerException {
+        return new Pair<>(currentPostId, SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null));
     }
 }

@@ -83,8 +83,8 @@ public class Client {
     // Listeners:
     public void handleRequest() {
         ObjectNode json = socketManager.acceptedData.remove();
-        ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
         ServerCommands.STATUS status = ServerCommands.STATUS.valueOf(json.get("status").textValue());
+        ServerCommands.RESPONSE_TYPE type = ServerCommands.RESPONSE_TYPE.valueOf(json.get("type").textValue());
         switch (type) {
             case REGISTER_BACK:
                 if (status == ServerCommands.STATUS.OK)
@@ -94,7 +94,8 @@ public class Client {
                 }
                 break;
             case AUTHORIZATION_BACK:
-                // TODO
+                if (status == ServerCommands.STATUS.OK)
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
                 break;
             case GET_MAIN_POST_BACK:
                 try {
@@ -138,8 +139,8 @@ public class Client {
 
     private void authorization() {
         ObjectNode json = jsMapper.createObjectNode();
-        json.put("username", regModel.username);
-        json.put("password", regModel.password);
+        json.put("username", loginModel.username);
+        json.put("password", loginModel.password);
         json.put("type", ServerCommands.ACTIONS.AUTHORIZATION.toString());
         socketManager.sendingData.add(json);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendJson);

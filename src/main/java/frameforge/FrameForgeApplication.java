@@ -22,7 +22,7 @@ public class FrameForgeApplication extends Application {
         Client client = new Client();
 
         client.connectListeners();
-        client.socketManager.connect("188.225.82.247", 8080);
+        client.socketManager.connect("147.45.247.99", 8080);
 
 //        try {
 //            new Thread(new Task<Void>() {
