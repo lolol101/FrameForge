@@ -1,4 +1,4 @@
-package ru.server;
+package frameforge.server;
 
 public class Pair<A,B> {
     public final A a;

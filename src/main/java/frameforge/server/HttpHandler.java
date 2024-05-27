@@ -1,15 +1,22 @@
-package ru.server;
+package frameforge.server;
 
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.io.*;
-import java.math.BigInteger;
 import java.net.*;
 import java.util.*;
 import java.util.concurrent.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import com.mongodb.reactivestreams.client.*;
+
+import frameforge.server.Pair;
+import frameforge.server.ImageHandler.ImgType;
+import frameforge.server.SubscriberHelper.CountSubscriber;
+import frameforge.server.SubscriberHelper.DocumentSubscriber;
+import frameforge.server.SubscriberHelper.InsertSubscriber;
+import frameforge.server.SubscriberHelper.PrintSubscriber;
+
 import com.mongodb.client.result.*;
 
 import static com.mongodb.client.model.Filters.*;
@@ -20,17 +27,11 @@ import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
 import static com.mongodb.client.model.Updates.set;
 
+import frameforge.serializable.ImageKeeper;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.apache.commons.codec.binary.Hex;
-
-import ru.server.ImageHandler.ImgType;
-import ru.server.SubscriberHelper.CountSubscriber;
-import ru.server.SubscriberHelper.DocumentSubscriber;
-import ru.server.SubscriberHelper.InsertSubscriber;
-import ru.server.SubscriberHelper.PrintSubscriber;
-import ru.server.Pair;
 
 
 
@@ -104,6 +105,7 @@ public class HttpHandler implements Runnable {
     }
 
     private void handleRequest() throws Exception {
+        System.out.println("in handleRequest method");
         JsonNode req = deserialize(JsonNode.class);
         System.out.println("after getReq");
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
@@ -203,9 +205,9 @@ public class HttpHandler implements Runnable {
         }             
         Document post = receivedDoc.get(0);
         ArrayList<String> arrayPhotos = (ArrayList<String>)post.get("arrayPhotos");
-        String path = "/home/igorstovba/Documents/Test/"; // replace Path with pathToFullImgs
+        // String path = "/home/igorstovba/Documents/Test/"; // replace Path with pathToFullImgs
     
-        byte[] bytes = getPhotoBytesFromPath(path + arrayPhotos.get(pos));
+        byte[] bytes = getPhotoBytesFromPath(pathToFullImgs + arrayPhotos.get(pos));
         ImageKeeper keeper = new ImageKeeper(bytes);
         System.out.println(keeper.getImages().size());
         return new Pair<>(response, keeper);
@@ -217,6 +219,7 @@ public class HttpHandler implements Runnable {
     // }
 
     private ObjectNode register(JsonNode req) {
+        System.out.println("in register method");
         ObjectNode response = jsMapper.createObjectNode();
         response.put("type", RESPONSE_TYPE.REGISTER_BACK.toString());
         response.put("status", STATUS.OK.toString());

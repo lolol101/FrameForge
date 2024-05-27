@@ -1,4 +1,4 @@
-package ru.server;
+package frameforge.serializable;
 
 import java.io.Serializable;
 import java.util.*;

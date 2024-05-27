@@ -1,4 +1,4 @@
-package ru.server;
+package frameforge.server;
 
 import java.util.concurrent.CountDownLatch;
 import org.bson.Document;
