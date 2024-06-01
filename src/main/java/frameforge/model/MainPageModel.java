@@ -1,16 +1,15 @@
 package frameforge.model;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import frameforge.client.ImageHandler;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class MainPageModel {
     // TODO: command & action queues
@@ -19,17 +18,18 @@ public class MainPageModel {
 
     public String viewActionAdditionalInfo;
 
-    public File fileToUpload;
+    public Queue<File> waitingToUploadFiles;
+    public Queue<File> fileToUpload;
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
 
     public static class Post {
-        public ImageHandler imageHandler;
+        public ArrayList<BufferedImage> images;
         public ObjectNode json;
 
-        public Post(ObjectNode json_, ImageHandler imageHandler_) {
-            json = json_;
-            imageHandler = imageHandler_;
+        public Post(ObjectNode json, ArrayList<BufferedImage> images) {
+            this.json = json;
+            this.images = images;
         }
     }
 
@@ -53,7 +53,7 @@ public class MainPageModel {
         currentPosts = new HashMap<>();
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
-
+        fileToUpload = new LinkedList<>();
         viewAction.setValue(ViewActions.zero);
         clientCommand.setValue(ClientCommands.zero);
     }

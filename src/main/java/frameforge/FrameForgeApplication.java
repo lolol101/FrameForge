@@ -24,20 +24,6 @@ public class FrameForgeApplication extends Application {
         client.connectListeners();
         client.socketManager.connect("147.45.247.99", 8080);
 
-//        try {
-//            new Thread(new Task<Void>() {
-//                @Override
-//                protected Void call() throws Exception {
-//                    while (true) {
-//                        Thread.sleep(100);
-//                        client.socketManager.acceptJson();
-//                    }
-//                }
-//            }).start();
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-
         stage.setTitle("frameforge");
 
         // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?
