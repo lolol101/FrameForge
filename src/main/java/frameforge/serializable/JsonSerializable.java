@@ -4,21 +4,20 @@ import java.io.Serializable;
 import java.util.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.awt.image.BufferedImage;
 
 public class JsonSerializable implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    private ArrayList<BufferedImage> images = null;
+    private ArrayList<byte[]> images = null;
     private ObjectNode json = null;
 
-    public void setOnePhoto(BufferedImage image) {
+    public void setOnePhoto(byte[] image) {
         images = new ArrayList<>();
         images.add(image);
     }
 
-    public void setManyPhotos(ArrayList<BufferedImage> images) {
+    public void setManyPhotos(ArrayList<byte[]> images) {
         this.images = images; 
     }
 
@@ -26,7 +25,7 @@ public class JsonSerializable implements Serializable {
         this.json = json;
     }
 
-    public ArrayList<BufferedImage> getImages() {
+    public ArrayList<byte[]> getImages() {
         return images;
     }
 
