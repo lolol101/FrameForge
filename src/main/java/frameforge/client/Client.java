@@ -5,25 +5,24 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import frameforge.model.LoginModel;
 import frameforge.model.MainPageModel;
+import frameforge.model.PostCreationModel;
 import frameforge.model.RegistrationModel;
 import frameforge.serializable.JsonSerializable;
+import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import javafx.scene.image.Image;
+import java.util.Objects;
 
 public class Client {
     public final LoginModel loginModel;
     public final RegistrationModel regModel;
     public final MainPageModel mainPageModel;
     public SocketManager socketManager;
+    public PostCreationModel postCreationModel;
 
     private final ObjectMapper jsMapper;
 
@@ -33,6 +32,7 @@ public class Client {
         mainPageModel = new MainPageModel();
         jsMapper = new ObjectMapper();
         socketManager = new SocketManager();
+        postCreationModel = new PostCreationModel();
     }
 
     public void connectListeners() {
@@ -67,7 +67,7 @@ public class Client {
             if (newCommand == SocketManager.SocketActions.acceptData)
                 handleRequest();
             socketManager.socketAction.setValue(SocketManager.SocketActions.zero);
-        });
+         });
 
         mainPageModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
             switch (newCommand) {
@@ -75,15 +75,27 @@ public class Client {
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
                     loginModel.clientCommand.setValue(LoginModel.ClientCommands.show);
                     break;
-
+                case openPostCreationMenuBtnClicked:
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
+                    postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.show);
                 case reachedNextPostBox:
                     getMainPost();
                     break;
-                case uploadNewFile:
-                    makePost();
-                    break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
+        });
+
+        postCreationModel.viewAction.addListener((obs, oldCommand, newCommand) -> {
+            switch (newCommand) {
+                case sendRequestCreatePost:
+                    makePost();
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
+                    break;
+                case sendRequestOpenMainPageMenu:
+                    postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.close);
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
+            }
+            postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.zero);
         });
     }
 
@@ -110,15 +122,7 @@ public class Client {
                 if (status == ServerCommands.STATUS.OK) {
                     json.remove("status");
                     json.remove("type");
-                    ArrayList<BufferedImage> images = new ArrayList<>(data.getImages().stream().map((byte[] b) -> {
-                            try {
-                                return ImageIO.read(new ByteArrayInputStream(b));
-                            } catch (IOException e) {
-                                System.out.println("GET_MAIN_POST_BACK exp");
-                            }
-                            return null;
-                        }).toList());
-
+                    ArrayList<byte[]> images = new ArrayList<>(data.getImages());
                     String id = json.get("id").textValue();
                     mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, images));
                 }
@@ -161,7 +165,7 @@ public class Client {
     private void getMainPost() {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
-        json.put("typeImage", ImgType.SCALED.toString());
+        json.put("typeImage", ServerCommands.ImgType.SCALED.toString());
         JsonSerializable data = new JsonSerializable();
         data.setJson(json);
         socketManager.sendingData.add(data);
@@ -171,24 +175,33 @@ public class Client {
     private void makePost() {
         JsonSerializable data = new JsonSerializable();
         ObjectNode json = jsMapper.createObjectNode();
-        File imgFile = mainPageModel.fileToUpload.element();
-        ArrayList<String> extensions = new ArrayList<>();
+        json.put("username", loginModel.username);
+        json.put("type", ServerCommands.ACTIONS.SET_MAIN_POST.toString());
+
         ArrayNode arrNode = json.putArray("extensionOfImage");
 
-        extensions.add(imgFile.getName().
-                substring(imgFile.getName().indexOf(".") + 1));
-        for (var item : extensions)
-            arrNode.add(item);
+        ArrayList<byte[]> byteImages = new ArrayList<>(postCreationModel.attachedFiles.stream().map((File file) -> {
+            try {
+                String extension = file.getName().
+                        substring(file.getName().indexOf(".") + 1);
+                return new Pair<>(ImageIO.read(file), extension);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+        }).filter(Objects::nonNull).map((Pair<BufferedImage, String> p) -> {
+            arrNode.add(p.getValue());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                ImageIO.write(p.getKey(), p.getValue(), baos);
+                return baos.toByteArray();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return null;
+            }
+        }).toList());
 
-        try {
-            BufferedImage image = ImageIO.read(mainPageModel.fileToUpload.remove());
-            ArrayList<byte[]> images = new ArrayList<>();
-            images.add(((DataBufferByte)(image.getRaster().getDataBuffer())).getData());
-            data.setManyPhotos(images);
-        } catch (IOException e) {
-            System.out.println("SET_MAIN_POST_BACK OI exp");
-        }
-
+        data.setManyPhotos(byteImages);
         data.setJson(json);
         socketManager.sendingData.add(data);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);

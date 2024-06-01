@@ -6,28 +6,23 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class MainPageModel {
     // TODO: command & action queues
     public Property<MainPageModel.ClientCommands> clientCommand;
     public Property<MainPageModel.ViewActions> viewAction;
 
-    public String viewActionAdditionalInfo;
-
-    public Queue<File> waitingToUploadFiles;
-    public Queue<File> fileToUpload;
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
 
     public static class Post {
-        public ArrayList<BufferedImage> images;
+        public ArrayList<byte[]> images;
         public ObjectNode json;
 
-        public Post(ObjectNode json, ArrayList<BufferedImage> images) {
+        public Post(ObjectNode json, ArrayList<byte[]> images) {
             this.json = json;
             this.images = images;
         }
@@ -37,7 +32,6 @@ public class MainPageModel {
         reachedNextPostBox,
         returnToLoginBtnClicked,
         openPostCreationMenuBtnClicked,
-        uploadNewFile,
         zero
     }
 
@@ -53,7 +47,6 @@ public class MainPageModel {
         currentPosts = new HashMap<>();
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
-        fileToUpload = new LinkedList<>();
         viewAction.setValue(ViewActions.zero);
         clientCommand.setValue(ClientCommands.zero);
     }

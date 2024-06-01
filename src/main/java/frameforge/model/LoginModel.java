@@ -28,7 +28,6 @@ public class LoginModel {
     public LoginModel() {
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
-
         viewAction.setValue(ViewActions.zero);
         clientCommand.setValue(ClientCommands.zero);
     }

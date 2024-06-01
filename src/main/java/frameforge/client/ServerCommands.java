@@ -6,19 +6,23 @@ public class ServerCommands {
         AUTHORIZATION,
         GET_MAIN_POST,
         SET_MAIN_POST,
+        GET_FULL_PHOTO,
         SET_LIKE,
         SET_COMMENT,
-        SUBSCRIBE
+        SUBSCRIBE,
+        //EXTEND_TOKEN
     };
 
     public enum RESPONSE_TYPE {
         REGISTER_BACK,
         AUTHORIZATION_BACK,
-        SET_MAIN_POST_BACK,
         GET_MAIN_POST_BACK,
+        GET_FULL_PHOTO_BACK,
+        SET_MAIN_POST_BACK,
         SET_LIKE_BACK,
         SET_COMMENT_BACK,
-        SUBSCRIBE_BACK
+        SUBSCRIBE_BACK,
+        //EXTEND_TOKEN_BACK
     };
 
     public enum STATUS {
@@ -26,6 +30,10 @@ public class ServerCommands {
         USERNAME_EXIST,
         USERNAME_NOT_FOUND,
         PASS_WRONG,
-        ERROR,
+        ERROR
+    };
+
+    public enum ImgType {
+        SCALED, FULL
     };
 }

@@ -3,6 +3,7 @@ package frameforge;
 import frameforge.client.Client;
 import frameforge.view.LoginController;
 import frameforge.view.MainPageController;
+import frameforge.view.PostCreationController;
 import frameforge.view.RegistrationController;
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -16,6 +17,7 @@ public class FrameForgeApplication extends Application {
     RegistrationController registrationView;
     LoginController loginView;
     MainPageController mainPageView;
+    PostCreationController postCreationView;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -25,6 +27,7 @@ public class FrameForgeApplication extends Application {
         client.socketManager.connect("147.45.247.99", 8080);
 
         stage.setTitle("frameforge");
+
 
         // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?
         //  Will be easier with better inheritance in *Controller classes
@@ -45,6 +48,12 @@ public class FrameForgeApplication extends Application {
         mainPageView = fxmlLoaderMain.getController();
         mainPageView.setModel(client.mainPageModel);
         mainPageView.passStageAndScene(stage, sceneMain);
+
+        FXMLLoader fxmlLoaderPost = new FXMLLoader(getClass().getResource("view/PostCreation.fxml"));
+        Scene scenePost = new Scene(fxmlLoaderPost.load(), 640, 480);
+        postCreationView = fxmlLoaderPost.getController();
+        postCreationView.setModel(client.postCreationModel);
+        postCreationView.passStageAndScene(stage, scenePost);
 
         stage.setScene(sceneRegistration);
         stage.show();
