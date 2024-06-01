@@ -52,7 +52,7 @@ public class HttpHandler implements Runnable {
     @Override
     public void run() {
         try {
-            System.out.println("start handleRequest");
+            System.out.println("start run");
             this.out = new ObjectOutputStream(socket.getOutputStream());
             this.in = new ObjectInputStream(socket.getInputStream());
             handleRequest();
@@ -68,11 +68,14 @@ public class HttpHandler implements Runnable {
     }
 
     private void handleRequest() throws Exception {
+        System.err.println("Start handle request");
         JsonSerializable msg = deserialize(JsonSerializable.class);
+        System.err.println("Deserialized is done");
         ObjectNode req = msg.getJson();
-        ArrayList<byte[]> keeper = msg.getImages();
+        ArrayList<BufferedImage> keeper = msg.getImages();
         ACTIONS type = ACTIONS.valueOf(req.get("type").textValue());
         JsonSerializable response = null;
+        System.err.println("Before switch");
         switch (type) {
             case REGISTRATION:
                 response = register(req); 
@@ -81,6 +84,7 @@ public class HttpHandler implements Runnable {
                 response = authorize(req);
                 break;
             case SET_MAIN_POST:
+                System.out.println("Case SET_MAIN_POST");
                 response = setMainPost(req, keeper);
                 break;
             case GET_MAIN_POST:
@@ -127,18 +131,18 @@ public class HttpHandler implements Runnable {
         out.flush();
     }
 
-    private byte[] getPhotoBytesFromPath(String path)
+    private BufferedImage getPhotoBytesFromPath(String path)
     throws IOException {
         System.out.println("path: " + path);
         BufferedImage image = ImageIO.read(new File(path));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        String[] tmp = path.split("\\.");
-        String ext = tmp[tmp.length-1];
-        ImageIO.write(image, ext, baos);
-        baos.flush();
-        byte[] byteArray = baos.toByteArray();
-        baos.close();
-        return byteArray;
+        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // String[] tmp = path.split("\\.");
+        // String ext = tmp[tmp.length-1];
+        // ImageIO.write(image, ext, baos);
+        // baos.flush();
+        // byte[] byteArray = baos.toByteArray();
+        // baos.close();
+        return image;
     }
 
     private JsonSerializable getFullPhoto(ObjectNode req)
@@ -168,7 +172,7 @@ public class HttpHandler implements Runnable {
         ArrayList<String> arrayPhotos = (ArrayList<String>)post.get("arrayPhotos");
         // String path = "/home/igorstovba/Documents/Test/"; // replace Path with pathToFullImgs
     
-        byte[] bytes = getPhotoBytesFromPath(pathToFullImgs + arrayPhotos.get(pos));
+        BufferedImage bytes = getPhotoBytesFromPath(pathToFullImgs + arrayPhotos.get(pos));
         ret.setJson(response);
         ret.setOnePhoto(bytes);
         return ret;
@@ -282,12 +286,12 @@ public class HttpHandler implements Runnable {
 
         
 
-        ArrayList<byte[]> images = new ArrayList<>();
+        ArrayList<BufferedImage> images = new ArrayList<>();
         String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
         // String path = "/home/igorstovba/Documents/Test/";  // replace Path
         
         for (String fname: photos_names) {
-            byte[] tmp = getPhotoBytesFromPath(path + fname);
+            BufferedImage tmp = getPhotoBytesFromPath(path + fname);
             images.add(tmp);
         }
         response.put("username",username);
@@ -303,7 +307,7 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> photos) throws IOException, NoSuchAlgorithmException {
+    private JsonSerializable setMainPost(ObjectNode req, ArrayList<BufferedImage> photos) throws IOException, NoSuchAlgorithmException {
         ObjectNode response = jsMapper.createObjectNode();
         JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_MAIN_POST_BACK.toString());
@@ -317,7 +321,7 @@ public class HttpHandler implements Runnable {
         // Putting photos in FS
         ArrayList<String> namesPhotos = new ArrayList<>();
         for (int i = 0; i < photos.size(); ++i) {
-            String ext = arrayOfExtensions.get(0).textValue();
+            String ext = arrayOfExtensions.get(i).textValue();
             namesPhotos.add(__putFileIntoFS(ext, photos.get(i)));
         }
 
@@ -332,15 +336,16 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private String __putFileIntoFS(String ext, byte[] photo)
+    private String __putFileIntoFS(String ext, BufferedImage photo)
     throws IOException, NoSuchAlgorithmException {
         /*
          * Format: FULL
          */
+        System.err.println("start __putFileIntoFs");
         String filename = "photo_" + __hashFromTime() + "." + ext;
         String path = pathToFullImgs + filename; 
-        BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(photo));
-        ImageIO.write(bufImg, ext, new File(path));
+        // String path = "/home/igorstovba/Documents/Test/" + filename;
+        ImageIO.write(photo, ext, new File(path));
         return filename;
     }
 
