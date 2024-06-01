@@ -1,7 +1,6 @@
 package frameforge.viewmodel;
 
 import frameforge.model.PostCreationModel;
-import frameforge.model.RegistrationModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.stage.FileChooser;

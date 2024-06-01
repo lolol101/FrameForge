@@ -6,7 +6,6 @@ import frameforge.view.MainPageController;
 import frameforge.view.PostCreationController;
 import frameforge.view.RegistrationController;
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;

@@ -23,7 +23,7 @@ public class ServerCommands {
         SET_COMMENT_BACK,
         SUBSCRIBE_BACK,
         //EXTEND_TOKEN_BACK
-    };
+    }
 
     public enum STATUS {
         OK,
@@ -31,9 +31,9 @@ public class ServerCommands {
         USERNAME_NOT_FOUND,
         PASS_WRONG,
         ERROR
-    };
+    }
 
     public enum ImgType {
         SCALED, FULL
-    };
+    }
 }
