@@ -6,18 +6,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public class MainPageController {
@@ -114,9 +115,10 @@ public class MainPageController {
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
             // TODO: fix the bug with spaces between imagePanes growing over time (how? why?)
-            var nextIdAndImage = getNextImage();
-            image = nextIdAndImage.getValue();
-            ImageView imageView = new ImageView(image);
+            Pair<String, List<Image>> nextIdAndImage = getNextImage();
+            List<Image> images = nextIdAndImage.getValue();
+//            image = nextIdAndImage.getValue().getFirst();
+            ImageView imageView = new ImageView(images.getFirst());
             imageView.setPreserveRatio(true);
             imageView.setFitWidth(600);
 
@@ -130,22 +132,48 @@ public class MainPageController {
             Button shareButton = new Button("Share");
             Button saveButton = new Button("Save");
 
+
             // TODO: styles.css color update
             likeButton.getStyleClass().add("post-button");
             commentButton.getStyleClass().add("post-button");
             shareButton.getStyleClass().add("post-button");
             saveButton.getStyleClass().add("post-button");
 
-            HBox buttonContainer = new HBox(20, likeButton, commentButton, shareButton, saveButton);
-            buttonContainer.setAlignment(Pos.BOTTOM_CENTER);
-            buttonContainer.setTranslateY(-10); // Position buttons slightly above lower image border
+            Button nextImageButton = new Button("->"); // TODO: switch to free-use icons
+            nextImageButton.getStyleClass().add("post-button");
+            Button previousImageButton = new Button("<-"); // TODO: switch to free-use icons
+            previousImageButton.getStyleClass().add("post-button");
+
+            // TODO: position image switch buttons on mid-height
+            // TODO: set them visible if courser is on the sides of image
+//            Region region = new Region();
+//            HBox.setHgrow(region, Priority.ALWAYS);
+//            HBox switchButtonContainer = new HBox(previousImageButton, region, nextImageButton);
+//            switchButtonContainer.setAlignment(Pos.CENTER);
+//            imagePane.getChildren().add(switchButtonContainer);
+
+            nextImageButton.setOnAction(event -> {
+                int currentImageIndex = images.indexOf(imageView.getImage());
+                int nextImageIndex = (currentImageIndex + 1) % images.size();
+                imageView.setImage(images.get(nextImageIndex));
+            });
+            previousImageButton.setOnAction(event -> {
+                int currentImageIndex = images.indexOf(imageView.getImage());
+                int nextImageIndex = (currentImageIndex - 1) % images.size();
+                if (nextImageIndex < 0) nextImageIndex += images.size();
+                imageView.setImage(images.get(nextImageIndex));
+            });
+
+            HBox contextButtonContainer = new HBox(20, previousImageButton, likeButton, commentButton, shareButton, saveButton, nextImageButton);
+            contextButtonContainer.setAlignment(Pos.BOTTOM_CENTER);
+            contextButtonContainer.setTranslateY(-10); // Position buttons slightly above lower image border
 
             imagePane.setOnMouseEntered(event -> {
-                buttonContainer.setVisible(true);
+                contextButtonContainer.setVisible(true);
                 System.out.println("mouse entered imagePane, show context actions");
             });
             imagePane.setOnMouseExited(event -> {
-                buttonContainer.setVisible(false);
+                contextButtonContainer.setVisible(false);
                 System.out.println("mouse exited imagePane, hide context actions");
             });
 
@@ -174,19 +202,19 @@ public class MainPageController {
                 System.out.println("mouse exited saveButton");
             });
 
-            imagePane.getChildren().add(buttonContainer);
-            buttonContainer.setVisible(false);
+            imagePane.getChildren().add(contextButtonContainer);
+            contextButtonContainer.setVisible(false);
 
             tilePane.getChildren().add(imagePane);
 
             loadedImageCount++;
-            System.out.println("Next image loaded");
+            System.out.println("Next post loaded");
         } catch (NullPointerException e) {
-            System.err.println("error when trying to load an image: please check path settings and model methods inerrancy");
+            System.err.println("error when trying to load an image: please check path settings and model methods' errors");
         }
     }
 
-    private Pair<String, Image> getNextImage() {
+    private Pair<String, List<Image>> getNextImage() {
         return viewModel.getNextImage();
         // TODO: work with image getters, names & anything else goes here
     }
@@ -214,21 +242,6 @@ public class MainPageController {
     private void sendRequestSavePost(String postID) {
 
     }
-
-//    @FXML private void uploadImage() {
-//        // TODO: update styles.css for upload button
-//        FileChooser fileChooser = new FileChooser();
-//
-//        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
-//        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
-//        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
-//
-//        File file = fileChooser.showOpenDialog(null);
-//
-//        if (file != null) {
-//            viewModel.uploadFile(file);
-//        }
-//    }
 
     public void openInView() throws IOException {
         System.out.println("mainPageView: open-in-view request received");

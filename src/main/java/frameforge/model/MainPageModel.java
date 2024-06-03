@@ -8,7 +8,7 @@ import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.List;
 
 public class MainPageModel {
     // TODO: command & action queues
@@ -52,10 +52,23 @@ public class MainPageModel {
     }
 
     int testPicNum = 0;
-    public Pair<String, Image> getLastLoadedImage() throws NullPointerException {
-        return new Pair<>(currentPostId, new Image(Objects.requireNonNull(getClass().getResource("pic_" + ++testPicNum + ".jpg")).toString()));
+    public Pair<String, List<Image>> getLastLoadedPostData() throws NullPointerException {
+        List<Image> images = new ArrayList<>();
+//        for (int i = 0; i < 3; i++) {
+//            images.add(
+//                    new Image(Objects.requireNonNull(
+//                            getClass()
+//                            .getResource("pic_" + ++testPicNum + ".jpg"))
+//                            .toString()
+//                    ));
+//        }
+        ArrayList<byte[]> imageDatas = currentPosts.get(currentPostId).images;
+        for (var imageBytes : imageDatas) {
+            // TODO: add byte[] -> Image conversion here
+        }
+        return new Pair<>(currentPostId, images);
 //        return new Pair<>(currentPostId, SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null));
-    }
+    } // returns a pair of post ID in string form and array of images to load; subsequent operations with post use passed ID as key
 
 
 }
