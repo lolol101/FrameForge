@@ -1,5 +1,4 @@
 package frameforge.server;
-//package ru.server;
 
 import java.io.*;
 import java.net.*;
@@ -8,12 +7,12 @@ import org.bson.Document;
 import com.mongodb.ConnectionString;
 import com.mongodb.reactivestreams.client.*;
 
+import frameforge.recsystem.Recommender;
 import frameforge.server.*;
 import frameforge.server.SubscriberHelper.PrintSubscriber;
 
-import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.*;
+
 
 public class HttpServer {
 
@@ -21,8 +20,9 @@ public class HttpServer {
     private static int port = 8080;
     private ServerSocket serverSocket;
     private ConnectionString connString = new ConnectionString("mongodb://localhost:27017");
-    private MongoClient mongoClient;
+    private static MongoClient mongoClient;
     private static MongoDatabase mongoDatabase;
+    private static Recommender recommender;
 
     public static void main(String[] args) {
         HttpServer server = new HttpServer();
@@ -30,6 +30,8 @@ public class HttpServer {
         server.connToDB("project");
         //server.configureDB();
         HttpHandler.db = mongoDatabase;
+        recommender = Recommender.getInstance(mongoDatabase);
+        HttpHandler.recommender = recommender;
         server.start();
     }
 
@@ -46,7 +48,7 @@ public class HttpServer {
         mongoClient = MongoClients.create(connString);
     }
 
-    public void connToDB(String DbName) {
+    public static void connToDB(String DbName) {
         mongoDatabase = mongoClient.getDatabase(DbName);
     }
 
@@ -54,6 +56,7 @@ public class HttpServer {
         mongoDatabase.createCollection("users");
         mongoDatabase.createCollection("posts");
         mongoDatabase.createCollection("albums");
+        mongoDatabase.createCollection("stats");
 
         MongoCollection<Document> users = mongoDatabase.getCollection("users");
         IndexOptions options1 = new IndexOptions().unique(true);

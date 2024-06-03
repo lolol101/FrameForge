@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.*;
 import com.mongodb.reactivestreams.client.*;
 import frameforge.server.SubscriberHelper.*;
 import com.mongodb.client.result.*;
+import java.awt.Image;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
@@ -21,6 +22,8 @@ import static com.mongodb.client.model.Updates.*;
 
 import java.security.*;
 import java.math.*;
+
+import frameforge.recsystem.Recommender;
 import frameforge.serializable.JsonSerializable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -35,13 +38,16 @@ public class HttpHandler implements Runnable {
     private ObjectOutputStream out;
     private ObjectInputStream in;
     public static MongoDatabase db;
+    public static Recommender recommender;
     private static ObjectMapper jsMapper = new ObjectMapper();
+
     private static String pathToFullImgs;
     private static String pathToScaledImgs;
     private static String pathToAvatarImgs;
+    private static String localPath;
 
     static {
-        //pathToFullImgs = "/home/igorstovba/Documents/Test/";
+        localPath = "/home/igorstovba/Documents/Test/";
         pathToFullImgs = "/home/project/fullImages/";
         pathToScaledImgs = "/home/project/scaledImages/";
         pathToAvatarImgs = "/home/project/avatarImages/";
@@ -91,7 +97,7 @@ public class HttpHandler implements Runnable {
                 break;
             case GET_FULL_PHOTO:
                 System.out.println("Case GET_FULL_PHOTO");
-                // response = getFullPhoto(req);
+                response = getFullPhoto(req);
                 break;
             case SET_LIKE:
                 response = setLike(req);
@@ -129,53 +135,38 @@ public class HttpHandler implements Runnable {
         out.flush();
     }
 
-    private BufferedImage getPhotoBytesFromPath(String path)
+    private JsonSerializable getFullPhoto(ObjectNode req)
     throws IOException {
-        System.out.println("path: " + path);
-        BufferedImage image = ImageIO.read(new File(path));
-        // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        // String[] tmp = path.split("\\.");
-        // String ext = tmp[tmp.length-1];
-        // ImageIO.write(image, ext, baos);
-        // baos.flush();
-        // byte[] byteArray = baos.toByteArray();
-        // baos.close();
-        return image;
-    }
+        ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
+        response.put("type", RESPONSE_TYPE.GET_FULL_PHOTO_BACK.toString());
+        response.put("status", STATUS.OK.toString());
+        ObjectId postId = new ObjectId(req.get("postId").textValue());
+        Integer pos = Integer.valueOf(req.get("pos").textValue());
 
-    // private JsonSerializable getFullPhoto(ObjectNode req)
-    // throws IOException {
-    //     ObjectNode response = jsMapper.createObjectNode();
-    //     JsonSerializable ret = new JsonSerializable();
-    //     response.put("type", RESPONSE_TYPE.GET_FULL_PHOTO_BACK.toString());
-    //     response.put("status", STATUS.OK.toString());
-    //     ObjectId postId = new ObjectId(req.get("postId").textValue());
-    //     Integer pos = Integer.valueOf(req.get("pos").textValue());
-
-    //     MongoCollection<Document> posts = db.getCollection("posts");
-    //     CountDownLatch latch = new CountDownLatch(1);
-    //     ArrayList<Document> receivedDoc = new ArrayList<>();
-    //     Bson filter = eq("_id", postId);
-    //     posts.find(filter)
-    //         .subscribe(new DocumentSubscriber<Document>(latch, receivedDoc));
-    //     try {
-    //         latch.await();
-    //     } catch (Exception e) {}
-    //     if (receivedDoc.isEmpty()) {
-    //         response.put("status", STATUS.ERROR.toString());
-    //         ret.setJson(response);
-    //         return ret;
-    //     }             
-    //     Document post = receivedDoc.get(0);
-    //     ArrayList<String> arrayPhotos = (ArrayList<String>)post.get("arrayPhotos");
-    //     // String path = "/home/igorstovba/Documents/Test/"; // replace Path with pathToFullImgs
-    
-    //     BufferedImage bytes = getPhotoBytesFromPath(pathToFullImgs + arrayPhotos.get(pos));
+        MongoCollection<Document> posts = db.getCollection("posts");
+        CountDownLatch latch = new CountDownLatch(1);
+        ArrayList<Document> receivedDoc = new ArrayList<>();
+        Bson filter = eq("_id", postId);
+        posts.find(filter)
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDoc));
+        try {
+            latch.await();
+        } catch (Exception e) {}
+        if (receivedDoc.isEmpty()) {
+            response.put("status", STATUS.ERROR.toString());
+            ret.setJson(response);
+            return ret;
+        }             
+        Document post = receivedDoc.get(0);
+        ArrayList<String> arrayPhotos = (ArrayList<String>)post.get("arrayPhotos");
+        String filename = arrayPhotos.get(pos); 
+        BufferedImage bytes = ImageIO.read(new File(pathToFullImgs + filename));
         
-    //     ret.setJson(response);
-    //     ret.setOnePhoto(bytes);
-    //     return ret;
-    // }
+        ret.setJson(response);
+        ret.setOnePhoto(convertBufferImageToByteArray(bytes, getExtensionFomFilename(filename)));
+        return ret;
+    }
 
     private JsonSerializable register(ObjectNode req) {
         System.out.println("in register method");
@@ -216,6 +207,8 @@ public class HttpHandler implements Runnable {
                             .append("username", username)
                             .append("password", password);
                             //.append("authorPhoto", pathToAvatar);
+        //Recommender init user
+        recommender.initUserByUsername(username);
         users.insertOne(newUser)
             .subscribe(new InsertSubscriber<InsertOneResult>());
         ret.setJson(response);
@@ -283,14 +276,13 @@ public class HttpHandler implements Runnable {
         Integer likes = post.getInteger("likes");
         ObjectId id = post.getObjectId("_id");
 
-        
+        // TODO get relevany post from Recommender
 
         ArrayList<byte[]> images = new ArrayList<>();
         String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
-        // String path = "/home/igorstovba/Documents/Test/";  // replace Path
         
         for (String fname: photos_names) {
-            BufferedImage tmp = getPhotoBytesFromPath(path + fname);
+            BufferedImage tmp = ImageIO.read(new File(path + fname));
             String ext = getExtensionFomFilename(fname);
             byte[] b = convertBufferImageToByteArray(tmp, ext);
             images.add(b);
@@ -308,7 +300,7 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> photos) throws IOException, NoSuchAlgorithmException {
+    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> byteArrays) throws IOException, NoSuchAlgorithmException {
         ObjectNode response = jsMapper.createObjectNode();
         JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_MAIN_POST_BACK.toString());
@@ -319,11 +311,16 @@ public class HttpHandler implements Runnable {
         String username = req.get("username").textValue();
         ArrayNode arrayOfExtensions = req.withArrayProperty("extensionOfImage");
         
-        // Putting photos in FS
+        ArrayList<BufferedImage> images = new ArrayList<>();
+        for (byte[] byteArray: byteArrays) {
+            images.add(ImageIO.read(new ByteArrayInputStream(byteArray)));
+        }
+        // Writing FULL and SCALED vs on FS
         ArrayList<String> namesPhotos = new ArrayList<>();
-        for (int i = 0; i < photos.size(); ++i) {
+        for (int i = 0; i < byteArrays.size(); ++i) {
             String ext = arrayOfExtensions.get(i).textValue();
-            namesPhotos.add(__putFileIntoFS(ext, photos.get(i)));
+            saveImage(images.get(i), ext, ImgType.FULL);
+            saveImage(images.get(i), ext, ImgType.SCALED);
         }
 
         Document newPost = new Document()
@@ -337,26 +334,36 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private String __putFileIntoFS(String ext, byte[] photo)
-    throws IOException, NoSuchAlgorithmException {
-        /*
-         * Format: FULL
-         */
-        System.err.println("start __putFileIntoFs");
-        String filename = "photo_" + __hashFromTime() + "." + ext;
-        String path = pathToFullImgs + filename; 
-        // String path = "/home/igorstovba/Documents/Test/" + filename;
-        BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(photo));
-        ImageIO.write(bufImg, ext, new File(path));
+    public static BufferedImage resizeImage(
+    BufferedImage originalImage, int width, int height) {
+        Image resultingImage = originalImage.getScaledInstance(width, height, Image.SCALE_FAST);
+        BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        resizedImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return resizedImage;
+    }
+
+    private String saveImage(BufferedImage bufImage, String ext, ImgType type)
+    throws NoSuchAlgorithmException {
+        String filename = "photo_" + hashFromTime() + "." + ext;
+        String path = ((type == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs) + filename; 
+        writeImageIntoFS(path, bufImage, ext);
         return filename;
     }
 
-    private String __hashFromTime() throws NoSuchAlgorithmException {
+    private boolean writeImageIntoFS(String path, BufferedImage bufImage, String ext) {
+        boolean status = true;
+        try {
+            ImageIO.write(bufImage, ext, new File(path));
+        } catch (IOException e) {
+            status = false;
+        }
+        return status;
+    }
+
+    private String hashFromTime() throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(String.valueOf(System.currentTimeMillis()).getBytes());
-        String md5 = new BigInteger(1, md.digest()).toString(16);
-
-        return md5;
+        return new BigInteger(1, md.digest()).toString(16);
     }
 
     private JsonSerializable setLike(ObjectNode req) {
@@ -365,6 +372,9 @@ public class HttpHandler implements Runnable {
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
         response.put("status", STATUS.OK.toString());
         MongoCollection<Document> posts = db.getCollection("posts");
+
+        String username = req.get("username").textValue();
+        ArrayList<String> tags = new ArrayList<>();
         
         //update single document
         // collection.updateOne(
@@ -375,6 +385,10 @@ public class HttpHandler implements Runnable {
         // posts.updateOne(
         //     eq("username", username), set("likes")
         // ).subscribe(new PrintSubscriber<String>());
+
+
+        //TODO update stat in Recommender
+        recommender.updateStatByUsername(username, tags);
 
         return ret;
     }
@@ -400,14 +414,13 @@ public class HttpHandler implements Runnable {
 
         return ret;
     }
-    public static byte[] convertBufferImageToByteArray(BufferedImage bufferedImage, String ext) throws IOException {
+    public byte[] convertBufferImageToByteArray(BufferedImage bufferedImage, String ext) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, ext, baos);
-        byte[] byteArr = baos.toByteArray();
-        return byteArr;
+        return baos.toByteArray();
     }
 
-    public static String getExtensionFomFilename(String fname) {
+    public String getExtensionFomFilename(String fname) {
         String[] tmp = fname.split("\\.");
         return tmp[tmp.length-1];
     }

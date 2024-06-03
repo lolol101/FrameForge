@@ -1,6 +1,47 @@
 package frameforge.server;
 
+import java.util.*;
+
 public class Constants {
+
+    public static Map<String, Integer> tagToIndex = new HashMap<>();
+    public static Map<Integer, String> indexToTag = new HashMap<>();
+    public static final List<String> TAGS = new ArrayList<>(Arrays.asList("Cars",
+                                                                        "Nature",
+                                                                        "Animals",
+                                                                        "Abstract",
+                                                                        "Music",
+                                                                        "Art",
+                                                                        "Technic",
+                                                                        "Fantasy",
+                                                                        "Aesthetics",
+                                                                        "Clothes",
+                                                                        "Anime",
+                                                                        "People",
+                                                                        "Realism",
+                                                                        "Space",
+                                                                        "Games",
+                                                                        "Martial art",
+                                                                        "Design",
+                                                                        "Utopia",
+                                                                        "Journey",
+                                                                        "Animation",
+                                                                        "Movie",
+                                                                        "Relaxation",
+                                                                        "Mood",
+                                                                        "Geometry",
+                                                                        "Sadness",
+                                                                        "Joy",
+                                                                        "Madness",
+                                                                        "Other"
+                                                                        ));
+
+    static {
+        for (int i = 0; i < TAGS.size(); ++i) {
+            tagToIndex.put(TAGS.get(i), i);
+            indexToTag.put(i, TAGS.get(i));
+        }
+    } 
     public enum ACTIONS {
         REGISTRATION,
         AUTHORIZATION,
@@ -35,5 +76,5 @@ public class Constants {
 
     public enum ImgType {
         SCALED, FULL
-    };
+    };       
 }
