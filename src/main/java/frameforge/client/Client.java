@@ -1,28 +1,27 @@
 package frameforge.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import frameforge.model.LoginModel;
-import frameforge.model.MainPageModel;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import frameforge.serializable.JsonSerializable;
 import frameforge.model.PostCreationModel;
 import frameforge.model.RegistrationModel;
-import frameforge.serializable.JsonSerializable;
-import javafx.util.Pair;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import frameforge.model.MainPageModel;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.awt.image.BufferedImage;
+import frameforge.model.LoginModel;
+import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.Objects;
+import javafx.util.Pair;
+import java.io.File;
 
 public class Client {
-    public final LoginModel loginModel;
-    public final RegistrationModel regModel;
-    public final MainPageModel mainPageModel;
-    public SocketManager socketManager;
     public PostCreationModel postCreationModel;
+    public final MainPageModel mainPageModel;
+    public final RegistrationModel regModel;
+    public final LoginModel loginModel;
+    public SocketManager socketManager;
 
     private final ObjectMapper jsMapper;
 
@@ -125,6 +124,8 @@ public class Client {
                     ArrayList<byte[]> images = new ArrayList<>(data.getImages());
                     String id = json.get("id").textValue();
                     mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, images));
+                    mainPageModel.currentPostId = id;
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.loadPost);
                 }
                 else if (status == ServerCommands.STATUS.ERROR)
                     System.out.println("Getting main post error");
@@ -165,7 +166,7 @@ public class Client {
     private void getMainPost() {
         ObjectNode json = jsMapper.createObjectNode();
         json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
-        json.put("typeImage", ServerCommands.ImgType.SCALED.toString());
+        json.put("typeImage", ServerCommands.ImgType.FULL.toString());
         JsonSerializable data = new JsonSerializable();
         data.setJson(json);
         socketManager.sendingData.add(data);

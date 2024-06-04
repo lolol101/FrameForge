@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import static java.lang.Thread.sleep;
+
 public class MainPageController {
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
@@ -97,7 +99,7 @@ public class MainPageController {
         });
         sendRequestGetNextImage();
         try {
-            Thread.sleep(100);
+            sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -105,8 +107,8 @@ public class MainPageController {
     }
 
     private void sendRequestGetNextImage() {
-//        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
-        loadNextImageFromModel();
+        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+//        loadNextImageFromModel();
     }
 
     private void loadNextImageFromModel() {

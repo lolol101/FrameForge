@@ -1,18 +1,17 @@
 package frameforge.client;
 
-import javafx.application.Platform;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
+import javafx.beans.property.Property;
+import javafx.application.Platform;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.util.LinkedList;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Queue;
 
 public class SocketManager {
     private Socket socket = null;

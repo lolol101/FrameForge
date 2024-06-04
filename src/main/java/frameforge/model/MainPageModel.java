@@ -3,9 +3,14 @@ package frameforge.model;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,21 +59,16 @@ public class MainPageModel {
     int testPicNum = 0;
     public Pair<String, List<Image>> getLastLoadedPostData() throws NullPointerException {
         List<Image> images = new ArrayList<>();
-//        for (int i = 0; i < 3; i++) {
-//            images.add(
-//                    new Image(Objects.requireNonNull(
-//                            getClass()
-//                            .getResource("pic_" + ++testPicNum + ".jpg"))
-//                            .toString()
-//                    ));
-//        }
-        ArrayList<byte[]> imageDatas = currentPosts.get(currentPostId).images;
-        for (var imageBytes : imageDatas) {
-            // TODO: add byte[] -> Image conversion here
+        ArrayList<byte[]> imageData = currentPosts.get(currentPostId).images;
+        for (var imageBytes : imageData) {
+            try {
+                images.add(SwingFXUtils.toFXImage(ImageIO.read(new ByteArrayInputStream(imageBytes)), null));
+            } catch (IOException e) {
+                System.out.println("bytes -> image Main Page Model exception");
+            }
         }
         return new Pair<>(currentPostId, images);
-//        return new Pair<>(currentPostId, SwingFXUtils.toFXImage(currentPosts.get(currentPostId).imageHandler.img, null));
-    } // returns a pair of post ID in string form and array of images to load; subsequent operations with post use passed ID as key
+    }
 
 
 }
