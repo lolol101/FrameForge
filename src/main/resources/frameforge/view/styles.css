@@ -82,3 +82,15 @@
 .post-button:hover {
     -fx-background-color: #4e795c;
 }
+
+/* Post Creation Data*/
+.uploaded-files-tilepane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 2;
+    -fx-padding: 10;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+    -fx-tile-alignment: center;
+    -fx-pref-columns: 1
+}

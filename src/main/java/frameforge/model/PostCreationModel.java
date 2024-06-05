@@ -14,6 +14,12 @@ public class PostCreationModel {
 
     public String postDescription;
     public List<File> attachedFiles;
+
+    public void reset() {
+        postDescription = "";
+        attachedFiles.clear();
+    }
+
     public enum ViewActions {
         sendRequestCreatePost,
         sendRequestOpenMainPageMenu,

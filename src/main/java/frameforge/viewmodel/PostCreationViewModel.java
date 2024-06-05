@@ -13,6 +13,9 @@ import static frameforge.model.PostCreationModel.ViewActions.sendRequestOpenMain
 public class PostCreationViewModel {
     private PostCreationModel model; // TODO: is it OK if files are passed directly through controller method through viewModel to model, and aren't stored in model?
     public StringProperty postDescriptionProperty; // TODO:
+
+    static int maxFileCountInSinglePost = 5;
+    static int maxFileSizeInKilobytes = 5*1024;
     // TODO: move FileChooser from Controller here. Or not?
 
     public PostCreationViewModel(PostCreationModel model) {
@@ -28,7 +31,8 @@ public class PostCreationViewModel {
         return model;
     } // TODO: solve getter&setter abundance
 
-    public void addImageToPost() {
+    public File addImageToPost() throws PostCreationException {
+        // TODO: mention it doesn't need to be async: client handles async upload
         FileChooser fileChooser = new FileChooser();
 
 //        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
@@ -38,14 +42,28 @@ public class PostCreationViewModel {
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
-            model.attachedFiles.add(file);
-            // TODO: add list of selected files or something
+            if (model.attachedFiles.size() >= maxFileCountInSinglePost) {
+                throw new PostCreationException("too many files added");
+            } else if (file.length() / 1024 > maxFileSizeInKilobytes) {
+                throw new PostCreationException("chosen file too big");
+            } else {
+                model.attachedFiles.add(file);
+                return file;
+            }
         }
+        return null;
     }
-    // TODO: add removeImage method
-    // TODO: file arrayList cleanup/reset when switching to main menu
+
+    public void removeFile(File file) throws PostCreationException {
+        if (model.attachedFiles.contains(file)) {
+            model.attachedFiles.remove(file);
+        } else {
+            throw new PostCreationException("attempting to remove non-added file, please debug");
+        }
+
+    }
     public void createPost() {
-        // TODO: file counter check goes here: no empty posts!
+        // TODO: add file counter check here: no empty posts!
         if (!model.attachedFiles.isEmpty()) {
             System.out.println("postCreationViewModel: createPost request passed");
             model.postDescription = postDescriptionProperty.getValue();
@@ -57,5 +75,9 @@ public class PostCreationViewModel {
 
     public void SwitchToMainPage() {
         model.viewAction.setValue(sendRequestOpenMainPageMenu);
+    }
+
+    public void reset() {
+        model.reset();
     }
 }

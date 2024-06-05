@@ -25,6 +25,11 @@
             styleClass="action-button"
             text="Back to main menu"
     />
+    <HBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
+        <VBox fx:id="uploadedFilesVBox" alignment="CENTER"
+                          style="-fx-background-color: #ffffff; -fx-padding: 5px;">
+        </VBox>
+    </HBox>
     <Button fx:id="addAnotherImageBtn" onAction="#onBtnAddFile"
             mnemonicParsing="false" focusTraversable="false"
             styleClass="action-button"
@@ -32,6 +37,7 @@
     />
     <TextArea fx:id="postDescription"
               maxWidth="300"
+              prefHeight="100"
               focusTraversable="false"
     />
     <Button fx:id="createPostBtn" onAction="#onBtnCreatePost"
