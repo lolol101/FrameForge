@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javax.swing.text.View;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PostCreationModel {
@@ -43,11 +44,34 @@ public class PostCreationModel {
         clientCommand = new SimpleObjectProperty<>();
         chosenTags = new ArrayList<>();
 
-        allowedTags = new ArrayList<>();
-        allowedTags.add("clen");
-        allowedTags.add("tren");
-        allowedTags.add("anavar");
-        allowedTags.add("anabolics");
-        allowedTags.add("androsterone");
+        allowedTags = new ArrayList<>(new ArrayList<>(Arrays.asList("Cars",
+                "Nature",
+                "Animals",
+                "Abstract",
+                "Music",
+                "Art",
+                "Technic",
+                "Fantasy",
+                "Aesthetics",
+                "Clothes",
+                "Anime",
+                "People",
+                "Realism",
+                "Space",
+                "Games",
+                "Martial art",
+                "Design",
+                "Utopia",
+                "Journey",
+                "Animation",
+                "Movie",
+                "Relaxation",
+                "Mood",
+                "Geometry",
+                "Sadness",
+                "Joy",
+                "Madness",
+                "Other"
+        )));
     }
 }

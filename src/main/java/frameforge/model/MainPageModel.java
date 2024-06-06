@@ -27,6 +27,10 @@ public class MainPageModel {
         public ArrayList<byte[]> images;
         public ObjectNode json;
 
+        public static enum REACTION {
+            LIKE, DISLIKE
+        }
+
         public Post(ObjectNode json, ArrayList<byte[]> images) {
             this.json = json;
             this.images = images;
@@ -57,7 +61,6 @@ public class MainPageModel {
         clientCommand.setValue(ClientCommands.zero);
     }
 
-    int testPicNum = 0;
     public Pair<String, List<Image>> getLastLoadedPostData() throws NullPointerException {
         List<Image> images = new ArrayList<>();
         ArrayList<byte[]> imageData = currentPosts.get(currentPostId).images;

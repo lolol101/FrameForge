@@ -80,6 +80,10 @@ public class Client {
                 case reachedNextPostBox:
                     getMainPost();
                     break;
+                case likeOrDislikePost:
+                    String id = mainPageModel.likedPost;
+                    setReactionOnPost(id);
+                    break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
         });
@@ -88,6 +92,7 @@ public class Client {
             switch (newCommand) {
                 case sendRequestCreatePost:
                     makePost();
+                    postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.close);
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
                     break;
                 case sendRequestOpenMainPageMenu:
@@ -121,6 +126,7 @@ public class Client {
                 if (status == ServerCommands.STATUS.OK) {
                     json.remove("status");
                     json.remove("type");
+                    json.put("reaction", MainPageModel.Post.REACTION.DISLIKE.toString());
                     ArrayList<byte[]> images = new ArrayList<>(data.getImages());
                     String id = json.get("id").textValue();
                     mainPageModel.currentPosts.put(id, new MainPageModel.Post(json, images));
@@ -164,7 +170,8 @@ public class Client {
     }
 
     private void getMainPost() {
-        ObjectNode json = jsMapper.createObjectNode();
+         ObjectNode json = jsMapper.createObjectNode();
+        json.put("username", loginModel.username);
         json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
         json.put("typeImage", ServerCommands.ImgType.FULL.toString());
         JsonSerializable data = new JsonSerializable();
@@ -179,7 +186,11 @@ public class Client {
         json.put("username", loginModel.username);
         json.put("type", ServerCommands.ACTIONS.SET_MAIN_POST.toString());
 
-        ArrayNode arrNode = json.putArray("extensionOfImage");
+        ArrayNode tagsNode = json.putArray("tags");
+        ArrayNode extensionsNode = json.putArray("extensionOfImage");
+
+        for (var tag : postCreationModel.chosenTags)
+            tagsNode.add(tag);
 
         ArrayList<byte[]> byteImages = new ArrayList<>(postCreationModel.attachedFiles.stream().map((File file) -> {
             try {
@@ -191,7 +202,7 @@ public class Client {
                 return null;
             }
         }).filter(Objects::nonNull).map((Pair<BufferedImage, String> p) -> {
-            arrNode.add(p.getValue());
+            extensionsNode.add(p.getValue());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
                 ImageIO.write(p.getKey(), p.getValue(), baos);
@@ -203,6 +214,23 @@ public class Client {
         }).toList());
 
         data.setManyPhotos(byteImages);
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
+    }
+
+    private void setReactionOnPost(String id) {
+        JsonSerializable data = new JsonSerializable();
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("username", loginModel.username);
+        MainPageModel.Post.REACTION reaction = MainPageModel.Post.
+                REACTION.valueOf(mainPageModel.currentPosts.get(id).json.get("reaction").textValue());
+        json.put("type", ServerCommands.ACTIONS.SET_LIKE.toString());
+        mainPageModel.currentPosts.get(id).json.put("reaction", (reaction ==
+                MainPageModel.Post.REACTION.LIKE ? MainPageModel.Post.REACTION.DISLIKE.toString()
+                : MainPageModel.Post.REACTION.LIKE.toString()));
+        json.put("reaction",mainPageModel.currentPosts.get(id).json.get("reaction").textValue());
+        json.put("id", mainPageModel.likedPost);
         data.setJson(json);
         socketManager.sendingData.add(data);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
