@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import com.mongodb.reactivestreams.client.*;
 import frameforge.server.SubscriberHelper.*;
+
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.*;
 import java.awt.Image;
 
@@ -19,6 +21,7 @@ import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
+import static com.mongodb.client.model.Updates.set;
 
 import java.security.*;
 import java.math.*;
@@ -191,24 +194,12 @@ public class HttpHandler implements Runnable {
             return ret;
         }
         String password = req.get("password").textValue();
-        // String extension = req.get("extensionOfImage").textValue();
-        // String img = req.get("authorPhoto").textValue();
-        // byte[] decodedBytes = Base64.getDecoder().decode(img);
-        // String pathToAvatar = pathToAvatarImgs + username + "." + extension;  
-        // try {
-        //     BufferedImage bufImg = ImageIO.read(new ByteArrayInputStream(decodedBytes));
-        //     ImageIO.write(bufImg, extension, new File(pathToAvatar));
-        // } catch (IOException e) {
-        //     response.put("status", STATUS.ERROR.toString());
-        //     return response;
-        // }
         
         Document newUser = new Document()
                             .append("username", username)
                             .append("password", password);
-                            //.append("authorPhoto", pathToAvatar);
-        //Recommender init user
-        recommender.initUserByUsername(username);
+    
+        recommender.initUserByUsername(username); // Recommender init user
         users.insertOne(newUser)
             .subscribe(new InsertSubscriber<InsertOneResult>());
         ret.setJson(response);
@@ -254,29 +245,25 @@ public class HttpHandler implements Runnable {
         response.put("type", RESPONSE_TYPE.GET_MAIN_POST_BACK.toString());
         response.put("status", STATUS.OK.toString());
 
-        MongoCollection<Document> posts = db.getCollection("posts");
-        ArrayList<Document> receivedDocs = new ArrayList<>();
-        CountDownLatch latch = new CountDownLatch(1);
-        posts.find()
-            .subscribe(new DocumentSubscriber<Document>(latch, receivedDocs));
+        ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
+        String username = req.get("username").textValue();
+
+        // get the most relevant post from Recommender
+        ArrayList<Document> receivedDoc = getTheMostRevelantPost(username);
         
-        try {
-            latch.await();
-        } catch (Exception e) {}
-        if (receivedDocs.isEmpty()) {
+        if (receivedDoc.isEmpty()) {
             response.put("status", STATUS.ERROR.toString());
             ret.setJson(response);
             return ret;
         } 
-        Document post = receivedDocs.get(0);
-        ImgType typeImg = ImgType.valueOf(req.get("typeImage").textValue());
-        String username = post.getString("username");
+        Document post = receivedDoc.get(0);
+        String usernamePost = post.getString("username");
         ArrayList<String> photos_names = (ArrayList<String>)post.get("arrayPhotos");
-        ArrayList<String> comments = (ArrayList<String>)post.get("arrayComments");
+        ArrayList<String> commentsPost = (ArrayList<String>)post.get("arrayComments");
+        // ArrayList<String> tagsPost = (ArrayList<String>)post.get("tags");
+
         Integer likes = post.getInteger("likes");
         ObjectId id = post.getObjectId("_id");
-
-        // TODO get relevany post from Recommender
 
         ArrayList<byte[]> images = new ArrayList<>();
         String path = (typeImg == ImgType.FULL) ? pathToFullImgs : pathToScaledImgs;
@@ -287,11 +274,11 @@ public class HttpHandler implements Runnable {
             byte[] b = convertBufferImageToByteArray(tmp, ext);
             images.add(b);
         }
-        response.put("username",username);
+        response.put("username",usernamePost);
         response.put("likes", likes);
         response.put("id", id.toString());
         ArrayNode arrNode = response.putArray("comments");
-        for (var item: comments) 
+        for (var item: commentsPost) 
             arrNode.add(item);
         
 
@@ -300,7 +287,29 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> byteArrays) throws IOException, NoSuchAlgorithmException {
+    private ArrayList<Document> getTheMostRevelantPost(String username) {
+        /*
+         * Try to return the post among top-three (???) tags. If it fails, 
+         * any post will be returned, since there is no suitable posts in Database
+         */
+        Integer top = 3;
+        List<String> tags = recommender.getTopNTagsByUsername(username, top);
+        Document query = new Document("tags", new Document("$in", tags));
+        MongoCollection<Document> posts = db.getCollection("posts");
+        ArrayList<Document> receivedDocs = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        posts.find(query)
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDocs));
+        
+        try {
+            latch.await();
+        } catch (Exception e) {}
+
+        return receivedDocs;
+    }
+
+    private JsonSerializable setMainPost(ObjectNode req, ArrayList<byte[]> byteArrays)
+     throws IOException, NoSuchAlgorithmException {
         ObjectNode response = jsMapper.createObjectNode();
         JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_MAIN_POST_BACK.toString());
@@ -310,11 +319,15 @@ public class HttpHandler implements Runnable {
         
         String username = req.get("username").textValue();
         ArrayNode arrayOfExtensions = req.withArrayProperty("extensionOfImage");
-        
+        ArrayNode tagsPostNode = req.withArrayProperty("tags");
+        ArrayList<String> tagsPostArray = new ArrayList<>();
+        for (int i = 0; i < tagsPostNode.size(); ++i) 
+            tagsPostArray.add(tagsPostNode.get(i).textValue());
+
         ArrayList<BufferedImage> images = new ArrayList<>();
-        for (byte[] byteArray: byteArrays) {
+        for (byte[] byteArray: byteArrays)
             images.add(ImageIO.read(new ByteArrayInputStream(byteArray)));
-        }
+
         // Writing FULL and SCALED vs on FS
         ArrayList<String> namesPhotos = new ArrayList<>();
         for (int i = 0; i < byteArrays.size(); ++i) {
@@ -327,6 +340,7 @@ public class HttpHandler implements Runnable {
                         .append("username", username)
                         .append("arrayPhotos", namesPhotos)
                         .append("arrayComments", new ArrayList<String>())
+                        .append("tags", tagsPostArray)
                         .append("likes", 0);
         posts.insertOne(newPost)
             .subscribe(new InsertSubscriber<InsertOneResult>());
@@ -367,28 +381,43 @@ public class HttpHandler implements Runnable {
     }
 
     private JsonSerializable setLike(ObjectNode req) {
+        /*
+         * Increases counter of likes in post 
+         * Increases stat in recommender system for user who liked the post
+         */
         ObjectNode response = jsMapper.createObjectNode();
         JsonSerializable ret = new JsonSerializable();
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
         response.put("status", STATUS.OK.toString());
         MongoCollection<Document> posts = db.getCollection("posts");
 
+        CountDownLatch latch = new CountDownLatch(1);
         String username = req.get("username").textValue();
-        ArrayList<String> tags = new ArrayList<>();
-        
-        //update single document
-        // collection.updateOne(
-        //     eq("_id", new ObjectId("57506d62f57802807471dd41")),
-        //     combine(set("stars", 1), set("contact.phone", "228-555-9999"), currentDate("lastModified"))
-        // ).subscribe(new ObservableSubscriber<UpdateResult>());
+        REACTION reaction = REACTION.valueOf(req.get("reaction").textValue());
+        ObjectId postId = new ObjectId(req.get("id").textValue());
 
-        // posts.updateOne(
-        //     eq("username", username), set("likes")
-        // ).subscribe(new PrintSubscriber<String>());
+        ArrayList<Document> receivedDoc = new ArrayList<>();
+        // get tags from post
+        posts.find(Filters.eq("_id", postId))
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDoc));
+        try {
+            latch.await();
+        } catch (Exception e) {
+            System.err.println("EXCEPTION setLike");
+        }
+        Document doc = receivedDoc.get(0);
+        ArrayList<String> tagsPost = (ArrayList<String>)doc.get("tags");
+        int delta = (reaction == REACTION.LIKE) ? 1 : -1;
+        Integer counterLikes = (Integer) doc.get("likes") + delta;
 
+        //update document
+        posts.updateOne(
+            eq("_id", postId),
+            set("likes", counterLikes))
+        .subscribe(new SubscriberHelper.PrintSubscriber<>(new CountDownLatch(0)));
 
-        //TODO update stat in Recommender
-        recommender.updateStatByUsername(username, tags);
+        // We don't wait here 
+        recommender.updateStatByUsername(username, tagsPost, reaction); // Update stat in Recommender for user
 
         return ret;
     }
@@ -402,8 +431,6 @@ public class HttpHandler implements Runnable {
 
         return ret;
     }
-
-    
 
     private JsonSerializable subscribe(ObjectNode req) {
         ObjectNode response = jsMapper.createObjectNode();

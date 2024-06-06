@@ -76,5 +76,9 @@ public class Constants {
 
     public enum ImgType {
         SCALED, FULL
-    };       
+    };  
+    
+    public enum REACTION {
+        LIKE, DISLIKE
+    };
 }
