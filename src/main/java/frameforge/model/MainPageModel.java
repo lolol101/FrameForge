@@ -21,7 +21,7 @@ public class MainPageModel {
 
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
-    public boolean liked;
+    public String likedPost;
 
     public static class Post {
         public ArrayList<byte[]> images;
@@ -37,6 +37,7 @@ public class MainPageModel {
         reachedNextPostBox,
         returnToLoginBtnClicked,
         openPostCreationMenuBtnClicked,
+        likeOrDislikePost,
         zero
     }
 

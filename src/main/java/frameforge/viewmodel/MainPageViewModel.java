@@ -35,7 +35,8 @@ public class MainPageViewModel {
     }
 
     public void like(String postID) {
-        model.liked = !model.liked;
+        model.likedPost = postID;
+        model.viewAction.setValue(MainPageModel.ViewActions.likeOrDislikePost);
         System.out.println("picture like is clicked");
     }
 }
