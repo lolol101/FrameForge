@@ -33,4 +33,9 @@ public class MainPageViewModel {
         System.out.println("mainPageViewModel: sending signal to open a post creation menu");
         model.viewAction.setValue(MainPageModel.ViewActions.openPostCreationMenuBtnClicked);
     }
+
+    public void like(String postID) {
+        model.liked = !model.liked;
+        System.out.println("picture like is clicked");
+    }
 }

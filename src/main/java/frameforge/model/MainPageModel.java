@@ -8,7 +8,6 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ public class MainPageModel {
 
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
+    public boolean liked;
 
     public static class Post {
         public ArrayList<byte[]> images;

@@ -179,6 +179,8 @@ public class MainPageController {
                 System.out.println("mouse exited imagePane, hide context actions");
             });
 
+            likeButton.setOnAction(event -> sendRequestLikePost(nextIdAndImage.getKey()));
+
             likeButton.setOnMouseEntered(event -> {
                 System.out.println("mouse entered likeButton");
             });
@@ -230,7 +232,7 @@ public class MainPageController {
     }
 
     private void sendRequestLikePost(String postID) {
-
+        viewModel.like(postID);
     }
 
     private void sendRequestSharePost(String postID) {
