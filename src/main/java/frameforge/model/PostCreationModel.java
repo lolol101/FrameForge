@@ -15,9 +15,14 @@ public class PostCreationModel {
     public String postDescription;
     public List<File> attachedFiles;
 
+    public List<String> chosenTags;
+
+    public List<String> allowedTags; // TODO: arrange file & hierarchy placement with Nikita; static?
+
     public void reset() {
         postDescription = "";
         attachedFiles.clear();
+        chosenTags.clear();
     }
 
     public enum ViewActions {
@@ -36,5 +41,13 @@ public class PostCreationModel {
         attachedFiles = new ArrayList<>();
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
+        chosenTags = new ArrayList<>();
+
+        allowedTags = new ArrayList<>();
+        allowedTags.add("clen");
+        allowedTags.add("tren");
+        allowedTags.add("anavar");
+        allowedTags.add("anabolics");
+        allowedTags.add("androsterone");
     }
 }

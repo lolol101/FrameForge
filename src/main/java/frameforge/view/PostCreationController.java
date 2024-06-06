@@ -6,17 +6,16 @@ import frameforge.viewmodel.PostCreationViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import static frameforge.model.PostCreationModel.ClientCommands;
 
@@ -25,6 +24,9 @@ public class PostCreationController {
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
 
     @FXML private VBox uploadedFilesVBox;
+    @FXML private VBox tagsVBox;
+//    @FXML private TextField tagEntryTextField; // TODO: switch type
+    @FXML private TilePane chosenTagsTilePane;
 
     private ArrayList<String> chosenFileNames;
 
@@ -83,6 +85,11 @@ public class PostCreationController {
 
     @FXML public void initialize() {
         addListeners();
+        System.out.println(this.getClass() + " attempting to create autoCompleteEntryChooser with list of suggestions: " + this.viewModel.getModel().allowedTags);
+        new AutoCompleteEntryChooser(tagsVBox, new TextField(),
+                this.viewModel.getModel().allowedTags, this::sendRequestAddTag);
+        // TODO: where to put? What to do with it? I don't need to address an object of this class
+
     }
 
     public void passStageAndScene(Stage stage, Scene scene) {
@@ -142,6 +149,28 @@ public class PostCreationController {
         }
     }
 
+    // TODO: functions like that shouldn't be part of view! Make chosen tags & file list 4 bidirectionally bounded lists in view & viewmodel
+    private void sendRequestAddTag(String tag) {
+        if (tag != null){
+            viewModel.addTag(tag); // TODO: change, remove, update, this shouldn't be here
+
+            Label fileName = new Label(tag);
+            Button removeTagBtn = new Button("X");
+            removeTagBtn.setFocusTraversable(false);
+            HBox tagBox = new HBox(fileName, removeTagBtn);
+
+            removeTagBtn.setOnAction(event -> {
+                sendRequestRemoveTag(tag);
+                chosenTagsTilePane.getChildren().remove(tagBox);
+                System.out.println(viewModel.getModel().chosenTags); // TODO: remove line
+            });
+            chosenTagsTilePane.getChildren().add(tagBox);
+        }
+    }
+
+    private void sendRequestRemoveTag(String tag) {
+        viewModel.removeTag(tag);
+    }
     private void sendRequestCreatePost() {
         viewModel.createPost();
     }

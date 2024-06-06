@@ -29,7 +29,7 @@ public class PostCreationViewModel {
 
     public PostCreationModel getModel() {
         return model;
-    } // TODO: solve getter&setter abundance
+    } // TODO: solve getter & setter abundance
 
     public File addImageToPost() throws PostCreationException {
         // TODO: mention it doesn't need to be async: client handles async upload
@@ -60,7 +60,14 @@ public class PostCreationViewModel {
         } else {
             throw new PostCreationException("attempting to remove non-added file, please debug");
         }
+    }
 
+    public void addTag(String tag) {
+        model.chosenTags.add(tag);
+    }
+
+    public void removeTag(String tag) {
+        model.chosenTags.remove(tag);
     }
     public void createPost() {
         // TODO: add file counter check here: no empty posts!
