@@ -332,8 +332,9 @@ public class HttpHandler implements Runnable {
         ArrayList<String> namesPhotos = new ArrayList<>();
         for (int i = 0; i < byteArrays.size(); ++i) {
             String ext = arrayOfExtensions.get(i).textValue();
-            saveImage(images.get(i), ext, ImgType.FULL);
+            String filename = saveImage(images.get(i), ext, ImgType.FULL);
             saveImage(images.get(i), ext, ImgType.SCALED);
+            namesPhotos.add(filename);
         }
 
         Document newPost = new Document()
