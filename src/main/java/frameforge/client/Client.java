@@ -1,20 +1,29 @@
 package frameforge.client;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import frameforge.serializable.JsonSerializable;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import frameforge.model.LoginModel;
+import frameforge.model.MainPageModel;
 import frameforge.model.PostCreationModel;
 import frameforge.model.RegistrationModel;
-import frameforge.model.MainPageModel;
-import java.io.ByteArrayOutputStream;
-import java.awt.image.BufferedImage;
-import frameforge.model.LoginModel;
-import javax.imageio.ImageIO;
-import java.util.ArrayList;
-import java.util.Objects;
+import frameforge.serializable.JsonSerializable;
 import javafx.util.Pair;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class Client {
     public PostCreationModel postCreationModel;
@@ -147,7 +156,27 @@ public class Client {
         }
     }
 
+    private String createHashString(String str) {
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[16];
+        random.nextBytes(salt);
+        KeySpec spec = new PBEKeySpec(str.toCharArray(), salt, 65536, 128);
+        String hash;
+        try {
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            hash = new String(factory.generateSecret(spec).getEncoded(), StandardCharsets.UTF_8);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+        return hash;
+    }
+
     private void registration() {
+        regModel.password = createHashString(regModel.password);
+        if (regModel.password == null) {
+            // TODO
+        }
         ObjectNode json = jsMapper.createObjectNode();
         json.put("username", regModel.username);
         json.put("password", regModel.password);
@@ -159,6 +188,10 @@ public class Client {
     }
 
     private void authorization() {
+        loginModel.password = createHashString(loginModel.password);
+        if (loginModel.password == null) {
+            // TODO
+        }
         ObjectNode json = jsMapper.createObjectNode();
         json.put("username", loginModel.username);
         json.put("password", loginModel.password);
