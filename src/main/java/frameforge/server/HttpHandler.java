@@ -14,15 +14,9 @@ import frameforge.server.SubscriberHelper.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.*;
 import java.awt.Image;
-
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Accumulators.*;
-import static com.mongodb.client.model.Aggregates.*;
-import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
 import static com.mongodb.client.model.Updates.set;
-
 import java.security.*;
 import java.math.*;
 
@@ -85,9 +79,11 @@ public class HttpHandler implements Runnable {
         JsonSerializable response = null;
         switch (type) {
             case REGISTRATION:
+                System.out.println("Case REGISTRATION");
                 response = register(req); 
                 break;
             case AUTHORIZATION:
+                System.out.println("Case AUTHORIZATION");
                 response = authorize(req);
                 break;
             case SET_MAIN_POST:
@@ -103,9 +99,11 @@ public class HttpHandler implements Runnable {
                 response = getFullPhoto(req);
                 break;
             case SET_LIKE:
+                System.out.println("Case SET_LIKE");
                 response = setLike(req);
                 break;
             case SET_COMMENT:
+                System.out.println("Case SET_COMMENT");
                 response = setComment(req);
                 break;
             case SUBSCRIBE:
@@ -113,11 +111,11 @@ public class HttpHandler implements Runnable {
                 break;
             default:
                 System.out.println("Unsuppoted type");
-                System.exit(1);
+                // System.exit(1);
         }
         sendSerializableObject(response);
         
-        //closeAll();
+        closeAll();
     }
 
     private <T> T deserialize(Class<T> clazz)
@@ -256,12 +254,12 @@ public class HttpHandler implements Runnable {
             ret.setJson(response);
             return ret;
         } 
-        Document post = receivedDoc.get(0);
+        int randIndex = randomRangeRandom(1, receivedDoc.size()) - 1;
+
+        Document post = receivedDoc.get(randIndex);
         String usernamePost = post.getString("username");
         ArrayList<String> photos_names = (ArrayList<String>)post.get("arrayPhotos");
         ArrayList<String> commentsPost = (ArrayList<String>)post.get("arrayComments");
-        // ArrayList<String> tagsPost = (ArrayList<String>)post.get("tags");
-
         Integer likes = post.getInteger("likes");
         ObjectId id = post.getObjectId("_id");
 
@@ -286,6 +284,12 @@ public class HttpHandler implements Runnable {
         ret.setManyPhotos(images);
         return ret;
     }
+
+    private int randomRangeRandom(int start, int end) {
+        Random random = new Random();
+        return random.nextInt((end - start) + 1) + start;
+    }
+    
 
     private ArrayList<Document> getTheMostRevelantPost(String username) {
         /*
