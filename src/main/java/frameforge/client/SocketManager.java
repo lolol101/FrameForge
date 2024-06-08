@@ -17,8 +17,10 @@ public class SocketManager {
     private Socket socket = null;
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
+    private String ip;
+    private int port;
 
-    ExecutorService pool;
+    public ExecutorService pool;
     public Queue<Object> acceptedData;
     public Queue<Object> sendingData;
     public Property<ClientCommands> clientCommand;
@@ -49,6 +51,8 @@ public class SocketManager {
 
     public void connect(String ip, int port) {
         try {
+            this.ip = ip;
+            this.port = port;
             socket = new Socket(ip, port);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
@@ -61,7 +65,7 @@ public class SocketManager {
     public void sendData() {
         Object data = sendingData.remove();
         try  {
-            connect("147.45.247.99", 8080);
+            connect(ip, port);
             out.writeObject(data);
             out.flush();
             dataSent = true;
