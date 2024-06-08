@@ -44,7 +44,7 @@ public class PostCreationController {
     // TODO: static logger method to interface
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
-        System.out.println("postCreationView: changeListener fired on client command reception");
+        System.out.println("postCreationView: changeListener fired on client command reception: oldCommand=" + oldCommand + ", newCommand=" + newCommand);
         switch (newCommand) {
             case show -> {
                 try {
@@ -189,5 +189,12 @@ public class PostCreationController {
     public void hideInView() {
         System.out.println("postCreationView: close-in-view request received");
         viewModel.reset();
+        resetUI();
+
+    }
+
+    private void resetUI() {
+        uploadedFilesVBox.getChildren().clear();
+        chosenTagsTilePane.getChildren().clear();
     }
 }

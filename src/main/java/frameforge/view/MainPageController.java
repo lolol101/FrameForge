@@ -38,7 +38,7 @@ public class MainPageController {
     private int loadedImageCount = 0;
 
     private final ChangeListener<MainPageModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
-        System.out.println("mainPageView: changeListener fired on client command reception");
+        System.out.println("mainPageView: changeListener fired on client command reception: oldCommand=" + oldCommand + ", newCommand=" + newCommand);
         switch (newCommand) {
             case show -> {
                 try {
@@ -119,7 +119,6 @@ public class MainPageController {
             // TODO: fix the bug with spaces between imagePanes growing over time (how? why?)
             Pair<String, List<Image>> nextIdAndImage = getNextImage();
             List<Image> images = nextIdAndImage.getValue();
-//            image = nextIdAndImage.getValue().getFirst();
             ImageView imageView = new ImageView(images.getFirst());
             imageView.setPreserveRatio(true);
             imageView.setFitWidth(600);

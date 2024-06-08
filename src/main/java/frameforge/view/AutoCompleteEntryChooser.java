@@ -26,19 +26,19 @@ public class AutoCompleteEntryChooser {
         possibleSuggestions = suggestionsList;
         this.contextActionWithChosenEntry = contextActionWithChosenEntry;
 
-        System.out.println(this.getClass() + " possibleSuggestions: " + possibleSuggestions);
+//        System.out.println(this.getClass() + " possibleSuggestions: " + possibleSuggestions);
 
         suggestionsListView.setVisible(false);
         textField.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-            System.out.println("formatter debug: newText is " + newText);
+//            System.out.println("formatter debug: newText is " + newText);
             if (newText.isEmpty()) {
                 suggestionsListView.setVisible(false);
                 return change;
             }
-            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
+//            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
             suggestions.clear();
-            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
+//            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
             suggestions.addAll(getSuggestions(newText));
             suggestionsListView.setVisible(!suggestions.isEmpty());
             System.out.println(this.getClass() + ": " + suggestions);
@@ -62,13 +62,15 @@ public class AutoCompleteEntryChooser {
 
     List<String> getSuggestions(String newText) {
         List<String> result = new ArrayList<>();
-        System.out.println("debug: trying to suggest possible tags to add from " + possibleSuggestions);
+//        System.out.println("debug: trying to suggest possible tags to add from " + possibleSuggestions);
         for (var s : possibleSuggestions) {
-            System.out.println(s + " is suitable?");
+//            System.out.println(s + " is suitable?");
             if (s.startsWith(newText)) {
                 result.add(s);
-                System.out.println("Yes!");
-            } else System.out.println("No!");
+//                System.out.println("Yes!");
+            }
+//            else System.out.println("No!");
+
         }
         return result;
     }
