@@ -86,6 +86,7 @@ public class Client {
                 case openPostCreationMenuBtnClicked:
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.close);
                     postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.show);
+                    break;
                 case reachedNextPostBox:
                     getMainPost();
                     break;
@@ -108,7 +109,7 @@ public class Client {
                     postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.close);
                     mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.show);
             }
-            postCreationModel.clientCommand.setValue(PostCreationModel.ClientCommands.zero);
+            postCreationModel.viewAction.setValue(PostCreationModel.ViewActions.zero);
         });
     }
 

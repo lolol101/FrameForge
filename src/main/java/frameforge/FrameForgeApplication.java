@@ -54,7 +54,7 @@ public class FrameForgeApplication extends Application {
         postCreationView.setModel(client.postCreationModel);
         postCreationView.passStageAndScene(stage, scenePost);
 
-        stage.setScene(sceneRegistration);
+        stage.setScene(sceneLogin);
         stage.show();
     }
 

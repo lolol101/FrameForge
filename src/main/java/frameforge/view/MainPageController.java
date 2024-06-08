@@ -127,6 +127,7 @@ public class MainPageController {
             StackPane imagePane = new StackPane(imageView);
             imagePane.setMaxWidth(imageView.getFitWidth());
             imagePane.setMaxHeight(imageView.getFitHeight());
+            // TODO: change imageView
 //            imagePane.setPrefSize(600, 300); // Adjust size if needed
 
             Button likeButton = new Button("Like");
