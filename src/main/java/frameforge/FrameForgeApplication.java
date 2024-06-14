@@ -25,7 +25,8 @@ public class FrameForgeApplication extends Application {
         client.connectListeners();
         client.socketManager.connect("212.113.122.236", 8080);
 
-        stage.setTitle("frameforge");
+        stage.setTitle("Frameforge");
+        stage.getIcons().add(new Image(Objects.requireNonNull(FrameForgeApplication.class.getResourceAsStream("icon.svg"))));
 
 
         // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?

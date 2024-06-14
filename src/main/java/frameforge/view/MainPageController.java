@@ -94,6 +94,7 @@ public class MainPageController {
 
             double scrollPosition = scrollPane.getVvalue();
             if (scrollPosition == 1.0) {
+                System.out.println("Reached end of scrollPane, attempting to load next butch of images");
                 sendRequestGetNextImage(); // TODO: switch to image butches
             }
         });
@@ -113,21 +114,43 @@ public class MainPageController {
 
     private void loadNextImageFromModel() {
         // TODO: is it really async?
-        Image image;
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
-            // TODO: fix the bug with spaces between imagePanes growing over time (how? why?)
             Pair<String, List<Image>> nextIdAndImage = getNextImage();
             List<Image> images = nextIdAndImage.getValue();
             ImageView imageView = new ImageView(images.getFirst());
             imageView.setPreserveRatio(true);
-            imageView.setFitWidth(600);
+
+            double imageViewWidth = 600; // TODO: to static const?
+            double imageViewHeight = 400;
+
+            setFitCustom(imageView, imageViewWidth, imageViewHeight);
 
             StackPane imagePane = new StackPane(imageView);
-            imagePane.setMaxWidth(imageView.getFitWidth());
-            imagePane.setMaxHeight(imageView.getFitHeight());
-            // TODO: change imageView
-//            imagePane.setPrefSize(600, 300); // Adjust size if needed
+            imagePane.setPrefSize(imageViewWidth, imageViewHeight);
+            imagePane.setStyle("-fx-background-color: #d1e1d4;");
+
+            Button nextImageButton = new Button("->"); // TODO: switch to free-use icons
+            nextImageButton.getStyleClass().add("post-button");
+            Button previousImageButton = new Button("<-"); // TODO: switch to free-use icons
+            previousImageButton.getStyleClass().add("post-button");
+
+            // TODO: position image switch buttons on mid-height
+            // TODO: set them visible if courser is on the sides of image
+
+            nextImageButton.setOnAction(event -> {
+                int currentImageIndex = images.indexOf(imageView.getImage());
+                int nextImageIndex = (currentImageIndex + 1) % images.size();
+                imageView.setImage(images.get(nextImageIndex));
+                setFitCustom(imageView, imageViewWidth, imageViewHeight);
+            });
+            previousImageButton.setOnAction(event -> {
+                int currentImageIndex = images.indexOf(imageView.getImage());
+                int nextImageIndex = (currentImageIndex - 1) % images.size();
+                if (nextImageIndex < 0) nextImageIndex += images.size();
+                imageView.setImage(images.get(nextImageIndex));
+                setFitCustom(imageView, imageViewWidth, imageViewHeight);
+            });
 
             Button likeButton = new Button("Like");
             Button commentButton = new Button("Comment");
@@ -140,31 +163,6 @@ public class MainPageController {
             commentButton.getStyleClass().add("post-button");
             shareButton.getStyleClass().add("post-button");
             saveButton.getStyleClass().add("post-button");
-
-            Button nextImageButton = new Button("->"); // TODO: switch to free-use icons
-            nextImageButton.getStyleClass().add("post-button");
-            Button previousImageButton = new Button("<-"); // TODO: switch to free-use icons
-            previousImageButton.getStyleClass().add("post-button");
-
-            // TODO: position image switch buttons on mid-height
-            // TODO: set them visible if courser is on the sides of image
-//            Region region = new Region();
-//            HBox.setHgrow(region, Priority.ALWAYS);
-//            HBox switchButtonContainer = new HBox(previousImageButton, region, nextImageButton);
-//            switchButtonContainer.setAlignment(Pos.CENTER);
-//            imagePane.getChildren().add(switchButtonContainer);
-
-            nextImageButton.setOnAction(event -> {
-                int currentImageIndex = images.indexOf(imageView.getImage());
-                int nextImageIndex = (currentImageIndex + 1) % images.size();
-                imageView.setImage(images.get(nextImageIndex));
-            });
-            previousImageButton.setOnAction(event -> {
-                int currentImageIndex = images.indexOf(imageView.getImage());
-                int nextImageIndex = (currentImageIndex - 1) % images.size();
-                if (nextImageIndex < 0) nextImageIndex += images.size();
-                imageView.setImage(images.get(nextImageIndex));
-            });
 
             HBox contextButtonContainer = new HBox(20, previousImageButton, likeButton, commentButton, shareButton, saveButton, nextImageButton);
             contextButtonContainer.setAlignment(Pos.BOTTOM_CENTER);
@@ -181,38 +179,13 @@ public class MainPageController {
 
             likeButton.setOnAction(event -> sendRequestLikePost(nextIdAndImage.getKey()));
 
-            likeButton.setOnMouseEntered(event -> {
-                System.out.println("mouse entered likeButton");
-            });
-            likeButton.setOnMouseExited(event -> {
-                System.out.println("mouse exited likeButton");
-            });
-            commentButton.setOnMouseEntered(event -> {
-                System.out.println("mouse entered commentButton");
-            });
-            commentButton.setOnMouseExited(event -> {
-                System.out.println("mouse exited commentButton");
-            });
-            shareButton.setOnMouseEntered(event -> {
-                System.out.println("mouse entered shareButton");
-            });
-            shareButton.setOnMouseExited(event -> {
-                System.out.println("mouse exited shareButton");
-            });
-            saveButton.setOnMouseEntered(event -> {
-                System.out.println("mouse entered saveButton");
-            });
-            saveButton.setOnMouseExited(event -> {
-                System.out.println("mouse exited saveButton");
-            });
-
             imagePane.getChildren().add(contextButtonContainer);
             contextButtonContainer.setVisible(false);
 
             tilePane.getChildren().add(imagePane);
 
             loadedImageCount++;
-            System.out.println("Next post loaded");
+            System.out.println("Next post loaded"); // TODO: from out to err
         } catch (NullPointerException e) {
             System.err.println("error when trying to load an image: please check path settings and model methods' errors");
         }
