@@ -112,6 +112,17 @@ public class MainPageController {
 //        loadNextImageFromModel();
     }
 
+    private void setFitCustom(ImageView imageView, double width, double height) {
+        Image image = imageView.getImage();
+        if (image != null) {
+            if (image.getHeight() / image.getWidth() > height / width) {
+                imageView.setFitHeight(height);
+            } else {
+                imageView.setFitWidth(width);
+            }
+        }
+    }
+
     private void loadNextImageFromModel() {
         // TODO: is it really async?
         try {
