@@ -104,11 +104,15 @@ public class MainPageController {
         scrollPane.setOnScroll(event -> {
             double scrollPosition = scrollPane.getVvalue();
             if (scrollPosition >= 0.95) {
+                System.out.println("Reached end of scrollPane");
                 if (!isLoadingMore) {
                     isLoadingMore = true;
-                    System.out.println("Reached end of scrollPane, attempting to load next batch of images");
-                    sendRequestGetNextImage()
-                            .thenRun(() -> isLoadingMore = false);
+                    sendRequestGetNextImage();
+                    isLoadingMore = false;
+//                            .thenApplyAsync(result -> {
+//                                isLoadingMore = false;
+//                                return null;
+//                            });
                 }
             }
         });
@@ -121,16 +125,13 @@ public class MainPageController {
         sendRequestGetNextImage(); // TODO: update this method after choosing optimal number of posts to load first
     }
 
-    private CompletableFuture<Void> sendRequestGetNextImage() { // TODO: check if it works at all
+    private void sendRequestGetNextImage() { // TODO: check if it works at all
 //        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
         loadNextImageButchFromModel();
-        return CompletableFuture.supplyAsync(() -> {
-            loadNextImageButchFromModel();
-            return null;
-        }).thenAccept(ignored -> {
-            // Update the scrollPane's content and possibly its size
-            // ...
-        });
+//        return CompletableFuture.runAsync(() -> {
+//            loadNextImageButchFromModel();
+//            System.out.println("Future is completed!");
+//        });
     }
 
     private void setFitCustom(ImageView imageView, double width, double height) { // TODO: is needed?
@@ -216,7 +217,6 @@ public class MainPageController {
 
             imagePane.setOnMouseClicked(event -> {
                 System.out.println("Clicked on an image!");
-//                ImageView fullSizeImageView = new ImageView(imageView.getImage());
                 Image imageToLoad = imageView.getImage();
                 fullSizeImageView.setImage(imageToLoad);
 
