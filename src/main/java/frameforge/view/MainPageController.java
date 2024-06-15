@@ -5,6 +5,7 @@ import frameforge.viewmodel.MainPageViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -16,19 +17,22 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static java.lang.Thread.sleep;
 
 public class MainPageController {
     @FXML public HBox fullSizePane; // TODO: edit position & qualifiers
-    public HBox scrollMode;
-    public HBox leaderBoardBox; // TODO: switch after testing
+    @FXML public ImageView fullSizeImageView;
+    @FXML public HBox scrollMode;
+    @FXML public HBox leaderBoardBox; // TODO: switch after testing
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
 
@@ -53,7 +57,7 @@ public class MainPageController {
                 }
             }
             case close -> hideInView();
-            case loadPost -> loadNextImageFromModel();
+            case loadPost -> loadNextImageButchFromModel();
         }
         viewModel.getModel().clientCommand.setValue(MainPageModel.ClientCommands.zero);
     };
@@ -93,14 +97,18 @@ public class MainPageController {
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
 
+    boolean isLoadingMore = false;
     private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
             double scrollPosition = scrollPane.getVvalue();
-            System.out.println("scrollPosition is " + scrollPosition);
-            if (scrollPosition == 1.0) {
-                System.out.println("Reached end of scrollPane, attempting to load next butch of images");
-                sendRequestGetNextImage(); // TODO: switch to image butches
+            if (scrollPosition >= 0.95) {
+                if (!isLoadingMore) {
+                    isLoadingMore = true;
+                    System.out.println("Reached end of scrollPane, attempting to load next batch of images");
+                    sendRequestGetNextImage()
+                            .thenRun(() -> isLoadingMore = false);
+                }
             }
         });
         sendRequestGetNextImage();
@@ -112,9 +120,16 @@ public class MainPageController {
         sendRequestGetNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
     }
 
-    private void sendRequestGetNextImage() {
-        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
-//        loadNextImageFromModel();
+    private CompletableFuture<Void> sendRequestGetNextImage() {
+//        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+        loadNextImageButchFromModel();
+        return CompletableFuture.supplyAsync(() -> {
+            loadNextImageButchFromModel();
+            return null;
+        }).thenAccept(ignored -> {
+            // Update the scrollPane's content and possibly its size
+            // ...
+        });
     }
 
     private void setFitCustom(ImageView imageView, double width, double height) {
@@ -128,7 +143,7 @@ public class MainPageController {
         }
     }
 
-    private void loadNextImageFromModel() {
+    private void loadNextImageButchFromModel() {
         // TODO: is it really async?
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
@@ -200,16 +215,33 @@ public class MainPageController {
 
             imagePane.setOnMouseClicked(event -> {
                 System.out.println("Clicked on an image!");
-                fullSizePane.setVisible(true);
+//                ImageView fullSizeImageView = new ImageView(imageView.getImage());
+                Image imageToLoad = imageView.getImage();
+                fullSizeImageView.setImage(imageToLoad);
 
-                ImageView fullSizeImageView = new ImageView(imageView.getImage());
-                System.out.println(stage.getWidth() + " " + stage.getHeight());
-                setFitCustom(fullSizeImageView, stage.getWidth(), stage.getHeight());
+                Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+                double screenWidth = screenBounds.getWidth();
+                double screenHeight = screenBounds.getHeight();
 
-                fullSizePane.setPrefSize(fullSizeImageView.getFitWidth(), fullSizeImageView.getFitHeight());
+                double imageWidth = imageToLoad.getWidth();
+                double imageHeight = imageToLoad.getHeight();
+
+                double aspectRatio = imageWidth / imageHeight;
+                double optimalWidth = screenWidth * 0.9; // TODO: magic number 0.9 to class constants
+                double optimalHeight = optimalWidth / aspectRatio;
+
+                if (optimalHeight > screenHeight * 0.9) {
+                    optimalHeight = screenHeight * 0.9;
+                    optimalWidth = optimalHeight * aspectRatio;
+                }
+
+                fullSizeImageView.setFitWidth(optimalWidth);
+                fullSizeImageView.setFitHeight(optimalHeight);
+
+                fullSizePane.setPrefSize(optimalWidth, optimalHeight);
                 fullSizePane.getChildren().clear();
                 fullSizePane.getChildren().add(fullSizeImageView);
-                fullSizePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+                fullSizePane.setVisible(true);
             });
 
             fullSizePane.setOnMouseClicked(event -> {
@@ -227,7 +259,7 @@ public class MainPageController {
             tilePane.getChildren().add(imagePane);
 
             loadedImageCount++;
-            System.out.println("Next post loaded"); // TODO: from out to err
+            System.err.println("Next post loaded");
         } catch (NullPointerException e) {
             System.err.println("error when trying to load an image: please check path settings and model methods' errors");
         }
@@ -283,6 +315,7 @@ public class MainPageController {
 
 
             TextArea test = new TextArea("Testing leaderboard");
+            leaderBoardBox.getChildren().clear();
             leaderBoardBox.getChildren().add(test);
 
         } else {

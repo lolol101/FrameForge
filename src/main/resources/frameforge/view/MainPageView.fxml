@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.*?>
 
 <?import java.net.URL?>
+<?import javafx.scene.image.ImageView?>
 <BorderPane prefHeight="600.0" prefWidth="800.0"
             xmlns="http://javafx.com/javafx/17.0.2-ea"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -52,7 +53,9 @@
                 </ScrollPane>
             </HBox>
             <HBox fx:id="leaderBoardBox" visible="false" />
-            <HBox fx:id="fullSizePane" visible="false" />
+            <HBox fx:id="fullSizePane" visible="false" alignment="CENTER" style="-fx-background-color: rgba(0, 0, 0, 0.5);">
+                <ImageView fx:id="fullSizeImageView" preserveRatio="true"/>
+            </HBox>
         </StackPane>
 
     </center>
