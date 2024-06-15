@@ -1,5 +1,6 @@
 package frameforge.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
@@ -20,33 +21,30 @@ public class AutoCompleteEntryChooser {
 
     AutoCompleteEntryChooser(VBox vbox, TextField textField, List<String> suggestionsList, Consumer<String> contextActionWithChosenEntry) {
         // TODO: pass existing @FXML ListView instead to have better control on element placement in VBox
+
+
         suggestions = FXCollections.observableList(new ArrayList<>());
         suggestions.addAll(suggestionsList);
         suggestionsListView = new ListView<>(suggestions);
         possibleSuggestions = suggestionsList;
         this.contextActionWithChosenEntry = contextActionWithChosenEntry;
 
-//        System.out.println(this.getClass() + " possibleSuggestions: " + possibleSuggestions);
-
         suggestionsListView.setVisible(false);
         textField.setTextFormatter(new TextFormatter<>(change -> {
             String newText = change.getControlNewText();
-//            System.out.println("formatter debug: newText is " + newText);
             if (newText.isEmpty()) {
                 suggestionsListView.setVisible(false);
                 return change;
             }
-//            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
             suggestions.clear();
-//            System.out.println("attempting to choose possibleSuggestions: " + possibleSuggestions);
             suggestions.addAll(getSuggestions(newText));
             suggestionsListView.setVisible(!suggestions.isEmpty());
             System.out.println(this.getClass() + ": " + suggestions);
             return change;
         }));
 
-        textField.textProperty().addListener((observable, oldValue, newValue) -> {
-        }); // TODO: is needed?
+        final int LIST_CELL_HEIGHT = 24; // TODO: move to appropriate place
+        suggestionsListView.prefHeightProperty().bind(Bindings.size(suggestions).multiply(LIST_CELL_HEIGHT));
 
         suggestionsListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -57,20 +55,15 @@ public class AutoCompleteEntryChooser {
             }
         });
 
-        vbox.getChildren().addAll(textField, suggestionsListView);
+        vbox.getChildren().add(suggestionsListView); // TODO: clean up suggestionsListView usage and placement
     }
 
     List<String> getSuggestions(String newText) {
         List<String> result = new ArrayList<>();
-//        System.out.println("debug: trying to suggest possible tags to add from " + possibleSuggestions);
         for (var s : possibleSuggestions) {
-//            System.out.println(s + " is suitable?");
             if (s.startsWith(newText)) {
                 result.add(s);
-//                System.out.println("Yes!");
             }
-//            else System.out.println("No!");
-
         }
         return result;
     }

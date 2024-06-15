@@ -94,3 +94,30 @@
     -fx-tile-alignment: center;
     -fx-pref-columns: 1
 }
+
+.rounded-hbox {
+  -fx-background-radius: 10;
+  -fx-background-color: #f0f0f0;
+}
+
+.rounded-label {
+  -fx-background-radius: 10;
+  -fx-background-color: #ffffff;
+  -fx-padding: 5px 10px;
+  -fx-font-size: 14px;
+  -fx-text-fill: #333;
+}
+
+.symbol-button {
+    -fx-background-radius: 5;
+    -fx-background-color: #d1e1d4;
+    -fx-text-fill: #4e795c;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 5px 8px;
+}
+
+.symbol-button:hover {
+    -fx-background-color: #4e795c;
+    -fx-text-fill: #d1e1d4;
+}

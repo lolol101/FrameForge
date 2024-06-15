@@ -5,6 +5,7 @@ import frameforge.viewmodel.PostCreationException;
 import frameforge.viewmodel.PostCreationViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -36,6 +37,8 @@ public class PostCreationController {
     @FXML private Button createPostBtn;
 
     @FXML private Button switchToMainMenuBtn;
+
+    @FXML private TextField suggestionsTextField;
 
     private PostCreationViewModel viewModel;
 
@@ -86,7 +89,7 @@ public class PostCreationController {
     @FXML public void initialize() {
         addListeners();
         System.out.println(this.getClass() + " attempting to create autoCompleteEntryChooser with list of suggestions: " + this.viewModel.getModel().allowedTags);
-        new AutoCompleteEntryChooser(tagsVBox, new TextField(),
+        new AutoCompleteEntryChooser(tagsVBox, suggestionsTextField,
                 this.viewModel.getModel().allowedTags, this::sendRequestAddTag);
         // TODO: where to put? What to do with it? I don't need to address an object of this class
 
@@ -123,14 +126,19 @@ public class PostCreationController {
 
             if (addedFile != null){
                 Label fileName = new Label(addedFile.getName());
+                fileName.getStyleClass().add("rounded-label");
+
                 Button removeFileBtn = new Button("X");
                 removeFileBtn.setFocusTraversable(false);
+                removeFileBtn.getStyleClass().add("symbol-button");
+
                 HBox fileBox = new HBox(fileName, removeFileBtn);
+                fileBox.getStyleClass().add("rounded-hbox");
+                fileBox.setPadding(new Insets(5));
 
                 removeFileBtn.setOnAction(event -> {
                     sendRequestRemoveFile(addedFile);
                     uploadedFilesVBox.getChildren().remove(fileBox);
-//                System.out.println(uploadedFilesTilePane.getChildren());
                 });
                 // TODO: button style
 
@@ -154,10 +162,16 @@ public class PostCreationController {
         if (tag != null){
             viewModel.addTag(tag); // TODO: change, remove, update, this shouldn't be here
 
-            Label fileName = new Label(tag);
+            Label tagName = new Label(tag);
+            tagName.getStyleClass().add("rounded-label");
+
             Button removeTagBtn = new Button("X");
             removeTagBtn.setFocusTraversable(false);
-            HBox tagBox = new HBox(fileName, removeTagBtn);
+            removeTagBtn.getStyleClass().add("symbol-button");
+
+            HBox tagBox = new HBox(tagName, removeTagBtn);
+            tagBox.getStyleClass().add("rounded-hbox");
+            tagBox.setPadding(new Insets(5));
 
             removeTagBtn.setOnAction(event -> {
                 sendRequestRemoveTag(tag);

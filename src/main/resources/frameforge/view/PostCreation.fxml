@@ -5,51 +5,64 @@
 
 <?import java.net.URL?>
 <?import javafx.scene.text.Font?>
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="frameforge.view.PostCreationController"
-      alignment="CENTER"
-      prefHeight="400.0" prefWidth="600.0"
-      styleClass="main-container">
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="frameforge.view.PostCreationController"
+            prefHeight="400.0" prefWidth="600.0"
+            styleClass="main-container">
     <stylesheets>
         <URL value="@styles.css" />
     </stylesheets>
-    <Label alignment="TOP_CENTER" prefHeight="27.0" prefWidth="200.0"
-           wrapText="true" text="Create Post" textAlignment="CENTER" styleClass="title-label">
-        <font>
-            <Font size="27.0" />
-        </font>
-    </Label>
-    <Button fx:id="switchToMainMenuBtn" onAction="#onBtnSwitchToMain"
-            mnemonicParsing="false" focusTraversable="false"
-            styleClass="action-button"
-            text="Back to main menu"
-    />
-    <HBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
-        <VBox fx:id="uploadedFilesVBox" alignment="CENTER"
-                          style="-fx-background-color: #ffffff; -fx-padding: 5px;">
-        </VBox>
-    </HBox>
-    <VBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
-        <VBox fx:id="tagsVBox" alignment="CENTER"
-              style="-fx-background-color: #ffffff; -fx-padding: 5px;">
-            <TilePane fx:id="chosenTagsTilePane"
+    <top>
+        <VBox alignment="CENTER" spacing="10">
+            <Label alignment="TOP_CENTER" prefHeight="27.0" prefWidth="200.0"
+                   wrapText="true" text="Create Post" textAlignment="CENTER" styleClass="title-label">
+                <font>
+                    <Font size="27.0" />
+                </font>
+            </Label>
+            <Button fx:id="switchToMainMenuBtn" onAction="#onBtnSwitchToMain"
+                    mnemonicParsing="false" focusTraversable="false"
+                    styleClass="action-button"
+                    text="Back to main menu"
             />
         </VBox>
-    </VBox>
-    <Button fx:id="addAnotherImageBtn" onAction="#onBtnAddFile"
-            mnemonicParsing="false" focusTraversable="false"
-            styleClass="action-button"
-            text="Add another image"
-    />
-    <TextArea fx:id="postDescription"
-              maxWidth="300"
-              prefHeight="100"
-              focusTraversable="false"
-    />
-    <Button fx:id="createPostBtn" onAction="#onBtnCreatePost"
-            mnemonicParsing="false" focusTraversable="false"
-            styleClass="action-button"
-            text="Create post"
-    />
-</VBox>
+    </top>
+    <center>
+        <VBox>
+            <VBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
+                <VBox fx:id="tagsVBox" alignment="CENTER">
+                    <TilePane fx:id="chosenTagsTilePane" style="-fx-background-color: #ffffff; -fx-padding: 5px;"
+                    />
+                    <TextField fx:id="suggestionsTextField"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </center>
+    <bottom>
+        <VBox alignment="CENTER" spacing="10">
+            <HBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
+                <VBox fx:id="uploadedFilesVBox" alignment="CENTER"
+                      style="-fx-background-color: #8bbbae; -fx-padding: 5px;">
+                </VBox>
+            </HBox>
+            <Button fx:id="addAnotherImageBtn" onAction="#onBtnAddFile"
+                    mnemonicParsing="false" focusTraversable="false"
+                    styleClass="action-button"
+                    text="Add another image"
+            />
+            <TextArea fx:id="postDescription"
+                      maxWidth="300"
+                      prefHeight="100"
+                      focusTraversable="false"
+                      promptText="Enter your post description."
+            />
+            <Button fx:id="createPostBtn" onAction="#onBtnCreatePost"
+                    mnemonicParsing="false" focusTraversable="false"
+                    styleClass="action-button"
+                    text="Create post"
+                    alignment="BOTTOM_CENTER"
+            />
+        </VBox>
+    </bottom>
+</BorderPane>

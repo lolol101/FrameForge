@@ -93,6 +93,7 @@ public class MainPageController {
         this.stage = stage;
         this.scene = scene;
         // TODO: separate .css files
+        // TODO: is it required to add this to scene?
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
@@ -117,10 +118,10 @@ public class MainPageController {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        sendRequestGetNextImage(); // TODO: remove after fixing no-scroll bug with not enough images
+        sendRequestGetNextImage(); // TODO: update this method after choosing optimal number of posts to load first
     }
 
-    private CompletableFuture<Void> sendRequestGetNextImage() {
+    private CompletableFuture<Void> sendRequestGetNextImage() { // TODO: check if it works at all
 //        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
         loadNextImageButchFromModel();
         return CompletableFuture.supplyAsync(() -> {
@@ -132,7 +133,7 @@ public class MainPageController {
         });
     }
 
-    private void setFitCustom(ImageView imageView, double width, double height) {
+    private void setFitCustom(ImageView imageView, double width, double height) { // TODO: is needed?
         Image image = imageView.getImage();
         if (image != null) {
             if (image.getHeight() / image.getWidth() > height / width) {
