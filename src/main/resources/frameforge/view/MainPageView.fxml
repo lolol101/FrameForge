@@ -30,28 +30,31 @@
                     </items>
                 </MenuButton>
             </HBox>
-            <MenuButton fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
+            <Button fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
                         text="Leaderboard"
-                        styleClass="menu-button-main">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="View Top 100"/>
-                    <MenuItem mnemonicParsing="false" text="My rating history"/>
-                </items>
-            </MenuButton>
+                        styleClass="menu-button-upload"
+                        onAction="#toggleLeaderboardMode">
+            </Button>
         </StackPane>
     </top>
     <center>
-        <HBox alignment="CENTER"
-              style="-fx-background-color: #8bbbae;">
-            <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="700.0"
-                        style="-fx-background-color: #8bbbae">
-                <HBox alignment="CENTER" style="-fx-background-color: #d1e1d4">
-                    <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
-                              style="-fx-background-color: #d1e1d4; -fx-padding: 1px;">
-                    </TilePane>
-                </HBox>
-            </ScrollPane>
-        </HBox>
+        <StackPane style="-fx-background-color: #8bbbae;">
+            <HBox alignment="CENTER"
+                  style="-fx-background-color: #8bbbae;"
+                  fx:id="scrollMode">
+                <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="700.0"
+                            style="-fx-background-color: #8bbbae">
+                    <HBox alignment="CENTER" style="-fx-background-color: #d1e1d4">
+                        <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
+                                  style="-fx-background-color: #d1e1d4; -fx-padding: 1px;">
+                        </TilePane>
+                    </HBox>
+                </ScrollPane>
+            </HBox>
+            <HBox fx:id="leaderBoardBox" visible="false" />
+            <HBox fx:id="fullSizePane" visible="false" />
+        </StackPane>
+
     </center>
     <bottom>
         <Region style="-fx-background-color: green;" BorderPane.alignment="CENTER"/>

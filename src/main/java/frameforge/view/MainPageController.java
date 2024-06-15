@@ -9,8 +9,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
@@ -24,6 +26,9 @@ import java.util.Objects;
 import static java.lang.Thread.sleep;
 
 public class MainPageController {
+    @FXML public HBox fullSizePane; // TODO: edit position & qualifiers
+    public HBox scrollMode;
+    public HBox leaderBoardBox; // TODO: switch after testing
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
 
@@ -31,7 +36,7 @@ public class MainPageController {
 
     // TODO: preferred width & height corrections
     @FXML private MenuButton menuButton; // TODO: set text to nickname
-    @FXML private MenuButton leaderboardButton;
+    @FXML private Button leaderboardButton;
     @FXML private Button uploadImageButton; // TODO: do I really need these buttons as class members?
     @FXML private TilePane tilePane;
     @FXML private ScrollPane scrollPane;
@@ -91,8 +96,8 @@ public class MainPageController {
     private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
-
             double scrollPosition = scrollPane.getVvalue();
+            System.out.println("scrollPosition is " + scrollPosition);
             if (scrollPosition == 1.0) {
                 System.out.println("Reached end of scrollPane, attempting to load next butch of images");
                 sendRequestGetNextImage(); // TODO: switch to image butches
@@ -177,7 +182,7 @@ public class MainPageController {
 
             HBox contextButtonContainer = new HBox(20, previousImageButton, likeButton, commentButton, shareButton, saveButton, nextImageButton);
             contextButtonContainer.setAlignment(Pos.BOTTOM_CENTER);
-            contextButtonContainer.setTranslateY(-10); // Position buttons slightly above lower image border
+            contextButtonContainer.setTranslateY(-10); // a tad higher than image border
 
             imagePane.setOnMouseEntered(event -> {
                 contextButtonContainer.setVisible(true);
@@ -192,6 +197,32 @@ public class MainPageController {
 
             imagePane.getChildren().add(contextButtonContainer);
             contextButtonContainer.setVisible(false);
+
+            imagePane.setOnMouseClicked(event -> {
+                System.out.println("Clicked on an image!");
+                fullSizePane.setVisible(true);
+
+                ImageView fullSizeImageView = new ImageView(imageView.getImage());
+                System.out.println(stage.getWidth() + " " + stage.getHeight());
+                setFitCustom(fullSizeImageView, stage.getWidth(), stage.getHeight());
+
+                fullSizePane.setPrefSize(fullSizeImageView.getFitWidth(), fullSizeImageView.getFitHeight());
+                fullSizePane.getChildren().clear();
+                fullSizePane.getChildren().add(fullSizeImageView);
+                fullSizePane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.5);");
+            });
+
+            fullSizePane.setOnMouseClicked(event -> {
+                if (!event.getTarget().equals(imageView)) {
+                    fullSizePane.setVisible(false);
+                }
+            });
+
+            scene.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ESCAPE) {
+                    fullSizePane.setVisible(false);
+                }
+            });
 
             tilePane.getChildren().add(imagePane);
 
@@ -243,4 +274,21 @@ public class MainPageController {
     public void hideInView() {
         System.out.println("mainPageView: close-in-view request received");
     }
+
+    public void toggleLeaderboardMode() {
+        if (scrollMode.isVisible()) {
+            scrollMode.setVisible(false);
+            leaderBoardBox.setVisible(true);
+            leaderboardButton.setText("Resume scrolling");
+
+
+            TextArea test = new TextArea("Testing leaderboard");
+            leaderBoardBox.getChildren().add(test);
+
+        } else {
+            scrollMode.setVisible(true);
+            leaderBoardBox.setVisible(false);
+            leaderboardButton.setText("Leaderboard");
+        }
+    } // TODO: make it send requests
 }
