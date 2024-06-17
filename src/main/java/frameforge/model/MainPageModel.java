@@ -3,16 +3,10 @@ package frameforge.model;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class MainPageModel {
     // TODO: command & action queues
@@ -27,7 +21,7 @@ public class MainPageModel {
         public ArrayList<byte[]> images;
         public ObjectNode json;
 
-        public static enum REACTION {
+        public enum REACTION {
             LIKE, DISLIKE
         }
 
@@ -37,11 +31,30 @@ public class MainPageModel {
         }
     }
 
+    public static class Person { // TODO: move Post & Person to appropriate places
+        public Integer likeCount;
+        public String username;
+        public Person(String username, Integer likeCount) {
+            this.likeCount = likeCount;
+            this.username = username;
+        }
+
+        public Integer getLikeCount() {
+            return likeCount;
+        }
+        public String getUsername() {
+            return username;
+        }
+    }
+
+    List<Person> leaderboardMembers;
+
     public enum ViewActions {
         reachedNextPostBox,
         returnToLoginBtnClicked,
         openPostCreationMenuBtnClicked,
         likeOrDislikePost,
+        openLeaderboard,
         zero
     }
 
@@ -57,6 +70,7 @@ public class MainPageModel {
         currentPosts = new HashMap<>();
         viewAction = new SimpleObjectProperty<>();
         clientCommand = new SimpleObjectProperty<>();
+        leaderboardMembers = new ArrayList<>();
         viewAction.setValue(ViewActions.zero);
         clientCommand.setValue(ClientCommands.zero);
     }
@@ -74,5 +88,11 @@ public class MainPageModel {
         return new Pair<>(currentPostId, images);
     }
 
-
+    public List<Person> getLeaderboardMembers() {
+        leaderboardMembers.add(new Person("tst1", 100));
+        leaderboardMembers.add(new Person("tst2", 120));
+        leaderboardMembers.add(new Person("tst3", 101));
+        leaderboardMembers.sort(Comparator.comparing(p -> p.likeCount)); // TODO: is there no better way?
+        return leaderboardMembers;
+    }
 }

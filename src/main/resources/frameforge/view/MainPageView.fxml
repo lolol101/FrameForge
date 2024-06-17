@@ -52,7 +52,11 @@
                     </HBox>
                 </ScrollPane>
             </HBox>
-            <HBox fx:id="leaderBoardBox" visible="false" />
+            <HBox fx:id="leaderBoardBox" visible="false" alignment="CENTER">
+                <VBox fx:id="leaderBoardContainer">
+
+                </VBox>
+            </HBox>
             <HBox fx:id="fullSizePane" visible="false" alignment="CENTER" style="-fx-background-color: rgba(0, 0, 0, 0.5);">
                 <ImageView fx:id="fullSizeImageView" preserveRatio="true"/>
             </HBox>

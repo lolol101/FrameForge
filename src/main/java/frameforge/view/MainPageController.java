@@ -7,16 +7,15 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -24,26 +23,35 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 import static java.lang.Thread.sleep;
 
 public class MainPageController {
-    @FXML public HBox fullSizePane; // TODO: edit position & qualifiers
-    @FXML public ImageView fullSizeImageView;
-    @FXML public HBox scrollMode;
-    @FXML public HBox leaderBoardBox; // TODO: switch after testing
+    @FXML
+    public HBox fullSizePane; // TODO: edit position & qualifiers
+    @FXML
+    public ImageView fullSizeImageView;
+    @FXML
+    public HBox scrollMode;
+    @FXML
+    public HBox leaderBoardBox; // TODO: switch after testing
+    @FXML public VBox leaderBoardContainer;
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
 
     private MainPageViewModel viewModel;
 
     // TODO: preferred width & height corrections
-    @FXML private MenuButton menuButton; // TODO: set text to nickname
-    @FXML private Button leaderboardButton;
-    @FXML private Button uploadImageButton; // TODO: do I really need these buttons as class members?
-    @FXML private TilePane tilePane;
-    @FXML private ScrollPane scrollPane;
+    @FXML
+    private MenuButton menuButton; // TODO: set text to nickname
+    @FXML
+    private Button leaderboardButton;
+    @FXML
+    private Button uploadImageButton; // TODO: do I really need these buttons as class members?
+    @FXML
+    private TilePane tilePane;
+    @FXML
+    private ScrollPane scrollPane;
     private int loadedImageCount = 0;
 
     private final ChangeListener<MainPageModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
@@ -99,6 +107,7 @@ public class MainPageController {
     }
 
     boolean isLoadingMore = false;
+
     private void addScrollListener() {
         // TODO: redo
         scrollPane.setOnScroll(event -> {
@@ -109,10 +118,6 @@ public class MainPageController {
                     isLoadingMore = true;
                     sendRequestGetNextImage();
                     isLoadingMore = false;
-//                            .thenApplyAsync(result -> {
-//                                isLoadingMore = false;
-//                                return null;
-//                            });
                 }
             }
         });
@@ -128,10 +133,6 @@ public class MainPageController {
     private void sendRequestGetNextImage() { // TODO: check if it works at all
 //        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
         loadNextImageButchFromModel();
-//        return CompletableFuture.runAsync(() -> {
-//            loadNextImageButchFromModel();
-//            System.out.println("Future is completed!");
-//        });
     }
 
     private void setFitCustom(ImageView imageView, double width, double height) { // TODO: is needed?
@@ -146,7 +147,7 @@ public class MainPageController {
     }
 
     private void loadNextImageButchFromModel() {
-        // TODO: is it really async?
+        // TODO: rewrite to use CompletableFuture!
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
             Pair<String, List<Image>> nextIdAndImage = getNextImage();
@@ -211,6 +212,7 @@ public class MainPageController {
             });
 
             likeButton.setOnAction(event -> sendRequestLikePost(nextIdAndImage.getKey()));
+            saveButton.setOnAction(event -> sendRequestSavePic(nextIdAndImage.getKey(), images.indexOf(imageView.getImage())));
 
             imagePane.getChildren().add(contextButtonContainer);
             contextButtonContainer.setVisible(false);
@@ -271,11 +273,13 @@ public class MainPageController {
         // TODO: work with image getters, names & anything else goes here
     }
 
-    @FXML private void sendRequestQuitToLogin() {
+    @FXML
+    private void sendRequestQuitToLogin() {
         viewModel.quit();
     }
 
-    @FXML private void sendRequestOpenPostCreationMenu() {
+    @FXML
+    private void sendRequestOpenPostCreationMenu() {
         viewModel.openPostCreationMenu();
     }
 
@@ -291,8 +295,13 @@ public class MainPageController {
 
     }
 
-    private void sendRequestSavePost(String postID) {
+    private void sendRequestSavePic(String postID, Integer picNum) {
+        // TODO: move to model and add signals
+        handleSignalSavePic(postID, picNum); // TODO: remove when connecting to client
+    }
 
+    private void handleSignalSavePic(String postID, Integer picNum) {
+        viewModel.savePic(postID, picNum);
     }
 
     public void openInView() throws IOException {
@@ -314,11 +323,31 @@ public class MainPageController {
             leaderBoardBox.setVisible(true);
             leaderboardButton.setText("Resume scrolling");
 
+            // TODO: signals for leaderboard and normal mode
+            int place = 1;
+            for (var person : viewModel.getLeaderboard()) {
+                HBox personContainer = new HBox();
 
-            TextArea test = new TextArea("Testing leaderboard");
+                Label placeLabel = new Label(Integer.toString(place));
+                place++;
+                placeLabel.setFont(Font.font(14));
+
+                Label usernameLabel = new Label(person.getUsername());
+                usernameLabel.setFont(Font.font(14));
+
+                Label likeCountLabel = new Label("Likes: " + person.getLikeCount());
+                likeCountLabel.setFont(Font.font(14));
+
+                personContainer.getChildren().addAll(placeLabel, usernameLabel, likeCountLabel);
+
+                personContainer.setSpacing(10);
+                personContainer.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 10px;"); // TODO: use styles.css
+
+                leaderBoardContainer.getChildren().add(personContainer);
+            }
+
             leaderBoardBox.getChildren().clear();
-            leaderBoardBox.getChildren().add(test);
-
+            leaderBoardBox.getChildren().add(leaderBoardContainer);
         } else {
             scrollMode.setVisible(true);
             leaderBoardBox.setVisible(false);
