@@ -54,8 +54,7 @@ public class MainPageModel {
         returnToLoginBtnClicked,
         openPostCreationMenuBtnClicked,
         likeOrDislikePost,
-        openLeaderboard,
-        zero
+        toggleLeaderboardRequest, zero
     }
 
     public enum ClientCommands {
@@ -63,6 +62,7 @@ public class MainPageModel {
         close,
         loadPost,
         deletePost,
+        toggleLeaderBoard,
         zero
     }
 

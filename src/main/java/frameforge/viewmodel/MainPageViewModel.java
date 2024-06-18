@@ -77,4 +77,8 @@ public class MainPageViewModel {
             }
         }
     }
+
+    public void toggleLeaderboard() {
+        model.viewAction.setValue(MainPageModel.ViewActions.toggleLeaderboardRequest);
+    }
 }

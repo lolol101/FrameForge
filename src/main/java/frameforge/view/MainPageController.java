@@ -43,16 +43,11 @@ public class MainPageController {
 
     // TODO: preferred width & height corrections
     @FXML
-    private MenuButton menuButton; // TODO: set text to nickname
-    @FXML
     private Button leaderboardButton;
-    @FXML
-    private Button uploadImageButton; // TODO: do I really need these buttons as class members?
     @FXML
     private TilePane tilePane;
     @FXML
     private ScrollPane scrollPane;
-    private int loadedImageCount = 0;
 
     private final ChangeListener<MainPageModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("mainPageView: changeListener fired on client command reception: oldCommand=" + oldCommand + ", newCommand=" + newCommand);
@@ -66,6 +61,7 @@ public class MainPageController {
             }
             case close -> hideInView();
             case loadPost -> loadNextImageButchFromModel();
+            case toggleLeaderBoard -> toggleLeaderboardMode();
         }
         viewModel.getModel().clientCommand.setValue(MainPageModel.ClientCommands.zero);
     };
@@ -131,8 +127,8 @@ public class MainPageController {
     }
 
     private void sendRequestGetNextImage() { // TODO: check if it works at all
-//        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
-        loadNextImageButchFromModel();
+        viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
+//        loadNextImageButchFromModel();
     }
 
     private void setFitCustom(ImageView imageView, double width, double height) { // TODO: is needed?
@@ -261,7 +257,6 @@ public class MainPageController {
 
             tilePane.getChildren().add(imagePane);
 
-            loadedImageCount++;
             System.err.println("Next post loaded");
         } catch (NullPointerException e) {
             System.err.println("error when trying to load an image: please check path settings and model methods' errors");
@@ -317,13 +312,17 @@ public class MainPageController {
         System.out.println("mainPageView: close-in-view request received");
     }
 
+
+    public void sendRequestToggleLeaderBoardMode() {
+        viewModel.toggleLeaderboard();
+    }
+
     public void toggleLeaderboardMode() {
         if (scrollMode.isVisible()) {
             scrollMode.setVisible(false);
             leaderBoardBox.setVisible(true);
             leaderboardButton.setText("Resume scrolling");
 
-            // TODO: signals for leaderboard and normal mode
             int place = 1;
             for (var person : viewModel.getLeaderboard()) {
                 HBox personContainer = new HBox();
@@ -353,5 +352,5 @@ public class MainPageController {
             leaderBoardBox.setVisible(false);
             leaderboardButton.setText("Leaderboard");
         }
-    } // TODO: make it send requests
+    }
 }

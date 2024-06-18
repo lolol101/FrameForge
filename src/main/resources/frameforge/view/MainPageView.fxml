@@ -34,7 +34,7 @@
             <Button fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
                         text="Leaderboard"
                         styleClass="menu-button-upload"
-                        onAction="#toggleLeaderboardMode">
+                        onAction="#sendRequestToggleLeaderBoardMode">
             </Button>
         </StackPane>
     </top>
