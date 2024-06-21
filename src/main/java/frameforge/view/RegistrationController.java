@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static frameforge.model.RegistrationModel.ClientCommands;
+
 public class RegistrationController {
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
@@ -25,7 +27,7 @@ public class RegistrationController {
 
     private RegistrationViewModel viewModel;
 
-    private final ChangeListener<RegistrationModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
+    private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("regView: changeListener fired on client command reception");
         switch (newCommand) {
             case show -> {
@@ -37,7 +39,7 @@ public class RegistrationController {
             }
             case close -> hideInView();
         }
-        viewModel.getModel().clientCommand.setValue(RegistrationModel.ClientCommands.zero);
+        viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
 
     public RegistrationController() {

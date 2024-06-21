@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static frameforge.model.LoginModel.ClientCommands;
+
 public class LoginController {
     private Stage stage; // single stage instance shared with some other menus
     private Scene scene; // unique scene used to avoid repeated loading of the same menu
@@ -24,7 +26,7 @@ public class LoginController {
     // TODO: current textArea usage sucks! Blend into background, set text alignment, correct text position
     private LoginViewModel viewModel;
 
-    private final ChangeListener<LoginModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
+    private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("logView: changeListener fired on client command reception");
         switch (newCommand) {
             case show -> {
@@ -36,7 +38,7 @@ public class LoginController {
             }
             case close -> hideInView();
         }
-        viewModel.getModel().clientCommand.setValue(LoginModel.ClientCommands.zero);
+        viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
 
     public LoginController() {

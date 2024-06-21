@@ -29,14 +29,10 @@
         </VBox>
     </top>
     <center>
-        <VBox>
-            <VBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
-                <VBox fx:id="tagsVBox" alignment="CENTER">
-                    <TilePane fx:id="chosenTagsTilePane" style="-fx-background-color: #ffffff; -fx-padding: 5px;"
-                    />
-                    <TextField fx:id="suggestionsTextField"/>
-                </VBox>
-            </VBox>
+        <VBox fx:id="tagsVBox" alignment="CENTER">
+            <TilePane fx:id="chosenTagsTilePane" style="-fx-background-color: #8bbbae;"
+            />
+            <TextField fx:id="suggestionsTextField"/>
         </VBox>
     </center>
     <bottom>

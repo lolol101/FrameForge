@@ -26,6 +26,8 @@ import java.util.Objects;
 
 import static java.lang.Thread.sleep;
 
+import static frameforge.model.MainPageModel.ClientCommands;
+
 public class MainPageController {
     @FXML
     public HBox fullSizePane; // TODO: edit position & qualifiers
@@ -49,7 +51,7 @@ public class MainPageController {
     @FXML
     private ScrollPane scrollPane;
 
-    private final ChangeListener<MainPageModel.ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
+    private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("mainPageView: changeListener fired on client command reception: oldCommand=" + oldCommand + ", newCommand=" + newCommand);
         switch (newCommand) {
             case show -> {
@@ -60,10 +62,10 @@ public class MainPageController {
                 }
             }
             case close -> hideInView();
-            case loadPost -> loadNextImageButchFromModel();
+            case loadPost -> loadNextImageBatchFromModel();
             case toggleLeaderBoard -> toggleLeaderboardMode();
         }
-        viewModel.getModel().clientCommand.setValue(MainPageModel.ClientCommands.zero);
+        viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
 
     public MainPageController() {
@@ -142,7 +144,7 @@ public class MainPageController {
         }
     }
 
-    private void loadNextImageButchFromModel() {
+    private void loadNextImageBatchFromModel() {
         // TODO: rewrite to use CompletableFuture!
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
@@ -184,17 +186,15 @@ public class MainPageController {
 
             Button likeButton = new Button("Like");
             Button commentButton = new Button("Comment");
-            Button shareButton = new Button("Share");
             Button saveButton = new Button("Save");
 
 
             // TODO: styles.css color update
             likeButton.getStyleClass().add("post-button");
             commentButton.getStyleClass().add("post-button");
-            shareButton.getStyleClass().add("post-button");
             saveButton.getStyleClass().add("post-button");
 
-            HBox contextButtonContainer = new HBox(20, previousImageButton, likeButton, commentButton, shareButton, saveButton, nextImageButton);
+            HBox contextButtonContainer = new HBox(20, previousImageButton, likeButton, commentButton, saveButton, nextImageButton);
             contextButtonContainer.setAlignment(Pos.BOTTOM_CENTER);
             contextButtonContainer.setTranslateY(-10); // a tad higher than image border
 
@@ -280,10 +280,6 @@ public class MainPageController {
 
     private void sendRequestLikePost(String postID) {
         viewModel.like(postID);
-    }
-
-    private void sendRequestSharePost(String postID) {
-
     }
 
     private void sendRequestCommentOnPost(String postID) {

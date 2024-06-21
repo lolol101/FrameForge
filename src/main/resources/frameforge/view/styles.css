@@ -98,6 +98,7 @@
 .rounded-hbox {
   -fx-background-radius: 10;
   -fx-background-color: #f0f0f0;
+  -fx-padding: 5;
 }
 
 .rounded-label {

@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -59,7 +60,7 @@ public class PostCreationController {
             case close -> hideInView();
             // TODO: case reset
         }
-        viewModel.getModel().clientCommand.setValue(PostCreationModel.ClientCommands.zero);
+        viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
 
     public PostCreationController() {
@@ -134,7 +135,8 @@ public class PostCreationController {
 
                 HBox fileBox = new HBox(fileName, removeFileBtn);
                 fileBox.getStyleClass().add("rounded-hbox");
-                fileBox.setPadding(new Insets(5));
+                fileBox.setMinWidth(Region.USE_PREF_SIZE);
+                fileBox.setMaxWidth(Region.USE_PREF_SIZE);
 
                 removeFileBtn.setOnAction(event -> {
                     sendRequestRemoveFile(addedFile);
@@ -171,7 +173,8 @@ public class PostCreationController {
 
             HBox tagBox = new HBox(tagName, removeTagBtn);
             tagBox.getStyleClass().add("rounded-hbox");
-            tagBox.setPadding(new Insets(5));
+            tagBox.setMinWidth(Region.USE_PREF_SIZE);
+            tagBox.setMaxWidth(Region.USE_PREF_SIZE);
 
             removeTagBtn.setOnAction(event -> {
                 sendRequestRemoveTag(tag);
