@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static frameforge.model.MainPageModel.ViewActions;
+
 public class MainPageViewModel extends ViewModel<MainPageModel> {
 
     public MainPageViewModel(MainPageModel model) {
@@ -24,16 +26,16 @@ public class MainPageViewModel extends ViewModel<MainPageModel> {
 
     public void quit() {
         System.out.println("mainPageViewModel: sending signal to open a login menu");
-        model.viewAction.setValue(MainPageModel.ViewActions.returnToLoginBtnClicked);
+        model.viewAction.setValue(ViewActions.returnToLoginBtnClicked);
     }
     public void openPostCreationMenu() {
         System.out.println("mainPageViewModel: sending signal to open a post creation menu");
-        model.viewAction.setValue(MainPageModel.ViewActions.openPostCreationMenuBtnClicked);
+        model.viewAction.setValue(ViewActions.openPostCreationMenuBtnClicked);
     }
 
     public void like(String postID) {
         model.likedPost = postID;
-        model.viewAction.setValue(MainPageModel.ViewActions.likeOrDislikePost);
+        model.viewAction.setValue(ViewActions.likeOrDislikePost);
         System.out.println("mainPageViewModel: sending signal to like a picture");
     }
 
@@ -70,6 +72,6 @@ public class MainPageViewModel extends ViewModel<MainPageModel> {
     }
 
     public void toggleLeaderboard() {
-        model.viewAction.setValue(MainPageModel.ViewActions.toggleLeaderboardRequest);
+        model.viewAction.setValue(ViewActions.toggleLeaderboardRequest);
     }
 }

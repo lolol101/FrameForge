@@ -4,8 +4,8 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class LoginModel {
-    public Property<LoginModel.ClientCommands> clientCommand;
-    public Property<LoginModel.ViewActions> viewAction;
+    public Property<ClientCommands> clientCommand;
+    public Property<ViewActions> viewAction;
 
 
     // Data:

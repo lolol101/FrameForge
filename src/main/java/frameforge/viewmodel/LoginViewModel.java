@@ -1,11 +1,10 @@
 package frameforge.viewmodel;
 
 import frameforge.model.LoginModel;
-import frameforge.model.RegistrationModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import javax.swing.text.View;
+import static frameforge.model.LoginModel.ViewActions;
 
 public class LoginViewModel extends ViewModel<LoginModel> {
     public StringProperty nicknameProperty;
@@ -21,11 +20,11 @@ public class LoginViewModel extends ViewModel<LoginModel> {
         System.out.println("logViewModel: add-user request passed");
         model.username = nicknameProperty.getValue();
         model.password = passwordProperty.getValue();
-        model.viewAction.setValue(LoginModel.ViewActions.authBtnClicked);
+        model.viewAction.setValue(ViewActions.authBtnClicked);
     }
 
     public void switchToRegistration() {
         System.out.println("logViewModel: switch-to-reg-window request passed");
-        model.viewAction.setValue(LoginModel.ViewActions.switchToRegistrationBtnClicked);
+        model.viewAction.setValue(ViewActions.switchToRegistrationBtnClicked);
     }
 }

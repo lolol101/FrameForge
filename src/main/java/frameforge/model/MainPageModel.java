@@ -10,8 +10,8 @@ import java.util.*;
 
 public class MainPageModel {
     // TODO: command & action queues
-    public Property<MainPageModel.ClientCommands> clientCommand;
-    public Property<MainPageModel.ViewActions> viewAction;
+    public Property<ClientCommands> clientCommand;
+    public Property<ViewActions> viewAction;
 
     public HashMap<String, Post> currentPosts;
     public String currentPostId;
