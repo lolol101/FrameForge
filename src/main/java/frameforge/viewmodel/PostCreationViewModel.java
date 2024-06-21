@@ -10,8 +10,8 @@ import java.io.File;
 import static frameforge.model.PostCreationModel.ViewActions.sendRequestCreatePost;
 import static frameforge.model.PostCreationModel.ViewActions.sendRequestOpenMainPageMenu;
 
-public class PostCreationViewModel {
-    private PostCreationModel model; // TODO: is it OK if files are passed directly through controller method through viewModel to model, and aren't stored in model?
+public class PostCreationViewModel extends ViewModel<PostCreationModel> {
+    // TODO: is it OK if files are passed directly through controller method through viewModel to model, and aren't stored in model?
     public StringProperty postDescriptionProperty; // TODO:
 
     static int maxFileCountInSinglePost = 5;
@@ -23,14 +23,6 @@ public class PostCreationViewModel {
         postDescriptionProperty = new SimpleStringProperty();
     }
 
-    public void setModel(PostCreationModel model) {
-        this.model = model;
-    }
-
-    public PostCreationModel getModel() {
-        return model;
-    } // TODO: solve getter & setter abundance
-
     public File addImageToPost() throws PostCreationException {
         // TODO: mention it doesn't need to be async: client handles async upload
         FileChooser fileChooser = new FileChooser();
@@ -38,6 +30,7 @@ public class PostCreationViewModel {
 //        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
 //        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
 //        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
+        // TODO: why does Nikita have problems with these filters on his Linux?
 
         File file = fileChooser.showOpenDialog(null);
 

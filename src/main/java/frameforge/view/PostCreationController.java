@@ -5,30 +5,26 @@ import frameforge.viewmodel.PostCreationException;
 import frameforge.viewmodel.PostCreationViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import static frameforge.model.PostCreationModel.ClientCommands;
 
-public class PostCreationController {
-    private Stage stage; // single stage instance shared with some other menus
-    private Scene scene; // unique scene used to avoid repeated loading of the same menu
-
+public class PostCreationController extends Controller<PostCreationModel, PostCreationViewModel> {
     @FXML private VBox uploadedFilesVBox;
     @FXML private VBox tagsVBox;
 //    @FXML private TextField tagEntryTextField; // TODO: switch type
-    @FXML private TilePane chosenTagsTilePane;
+    @FXML private FlowPane chosenTagsTilePane;
 
     private ArrayList<String> chosenFileNames;
 
@@ -40,8 +36,6 @@ public class PostCreationController {
     @FXML private Button switchToMainMenuBtn;
 
     @FXML private TextField suggestionsTextField;
-
-    private PostCreationViewModel viewModel;
 
     // TODO: standardise UI elements naming
     // TODO: clean up member names
@@ -68,6 +62,7 @@ public class PostCreationController {
         viewModel = new PostCreationViewModel(model);
     }
 
+    @Override
     public void setModel(PostCreationModel model) {
         removeListeners();
         viewModel = new PostCreationViewModel(model);
@@ -75,13 +70,13 @@ public class PostCreationController {
         System.out.println("postCreationView: post creation model set");
     }
 
-    private void removeListeners() {
+    void removeListeners() {
         postDescription.textProperty().unbindBidirectional(viewModel.postDescriptionProperty);
         viewModel.getModel().clientCommand.removeListener(clientCommandReceiver);
         System.out.println("postCreationView: post creation listeners removed");
     }
 
-    private void addListeners() {
+    void addListeners() {
         postDescription.textProperty().bindBidirectional(viewModel.postDescriptionProperty);
         viewModel.getModel().clientCommand.addListener(clientCommandReceiver);
         System.out.println("postCreationView: post creation listeners added");
@@ -91,15 +86,9 @@ public class PostCreationController {
         addListeners();
         System.out.println(this.getClass() + " attempting to create autoCompleteEntryChooser with list of suggestions: " + this.viewModel.getModel().allowedTags);
         new AutoCompleteEntryChooser(tagsVBox, suggestionsTextField,
-                this.viewModel.getModel().allowedTags, this::sendRequestAddTag);
+                this.viewModel.getModel().allowedTags, this::sendRequestAddTag, viewModel.getModel().chosenTags);
         // TODO: where to put? What to do with it? I don't need to address an object of this class
 
-    }
-
-    public void passStageAndScene(Stage stage, Scene scene) {
-        this.stage = stage;
-        this.scene = scene;
-        System.out.println("regView: this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
     }
 
     @FXML private void onBtnAddFile() {
@@ -196,18 +185,10 @@ public class PostCreationController {
         viewModel.SwitchToMainPage();
     }
 
-    public void openInView() throws IOException {
-        System.out.println("postCreationView: open-in-view request received");
-        System.out.println("postCreationView: setting scene" + scene.hashCode() + " to stage " + stage.hashCode());
-        stage.setScene(scene);
-        stage.show();
-    }
-
     public void hideInView() {
         System.out.println("postCreationView: close-in-view request received");
         viewModel.reset();
         resetUI();
-
     }
 
     private void resetUI() {

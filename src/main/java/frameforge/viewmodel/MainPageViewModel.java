@@ -12,20 +12,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class MainPageViewModel {
-    private MainPageModel model;
+public class MainPageViewModel extends ViewModel<MainPageModel> {
 
     public MainPageViewModel(MainPageModel model) {
         this.model = model;
     }
-
-    public void setModel(MainPageModel model) {
-        this.model = model;
-    }
-
-    public MainPageModel getModel() {
-        return model;
-    } // TODO: solve getter&setter abundance
 
     public Pair<String, List<Image>> getNextImage() throws NullPointerException {
         return model.getLastLoadedPostData();

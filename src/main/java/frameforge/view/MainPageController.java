@@ -7,7 +7,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -24,11 +26,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import static frameforge.model.MainPageModel.ClientCommands;
 import static java.lang.Thread.sleep;
 
-import static frameforge.model.MainPageModel.ClientCommands;
-
-public class MainPageController {
+public class MainPageController extends Controller<MainPageModel, MainPageViewModel> {
     @FXML
     public HBox fullSizePane; // TODO: edit position & qualifiers
     @FXML
@@ -38,10 +39,6 @@ public class MainPageController {
     @FXML
     public HBox leaderBoardBox; // TODO: switch after testing
     @FXML public VBox leaderBoardContainer;
-    private Stage stage; // single stage instance shared with some other menus
-    private Scene scene; // unique scene used to avoid repeated loading of the same menu
-
-    private MainPageViewModel viewModel;
 
     // TODO: preferred width & height corrections
     @FXML
@@ -78,6 +75,7 @@ public class MainPageController {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
     }
 
+    @Override
     public void setModel(MainPageModel model) {
         removeListeners();
         viewModel.setModel(model);
@@ -85,12 +83,12 @@ public class MainPageController {
         System.out.println("mainPageView: mainPage model set to " + model.hashCode());
     }
 
-    private void removeListeners() {
+    void removeListeners() {
         viewModel.getModel().clientCommand.removeListener(clientCommandReceiver);
         System.out.println("mainPageView: listeners removed");
     }
 
-    private void addListeners() {
+    void addListeners() {
         viewModel.getModel().clientCommand.addListener(clientCommandReceiver);
         System.out.println("mainPageView: listeners added to model " + viewModel.getModel().hashCode());
     }
@@ -102,6 +100,22 @@ public class MainPageController {
         // TODO: is it required to add this to scene?
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
+
+        scene.setOnScroll(event -> {
+            double deltaY = event.getDeltaY();
+            double coefficient = scrollPane.getHeight(); // TODO
+            scrollPane.setVvalue(scrollPane.getVvalue() - deltaY / coefficient);
+
+            double scrollPosition = scrollPane.getVvalue(); // TODO: move outside? Used twice in code
+            if (scrollPosition >= 0.95) {
+                System.out.println("Reached end of scrollPane");
+                if (!isLoadingMore) {
+                    isLoadingMore = true;
+                    sendRequestGetNextImage();
+                    isLoadingMore = false;
+                }
+            }
+        });
     }
 
     boolean isLoadingMore = false;
@@ -299,15 +313,10 @@ public class MainPageController {
         System.out.println("mainPageView: open-in-view request received");
         System.out.println("mainPageView: setting scene=" + scene.hashCode() + " to stage=" + stage.hashCode());
         sendRequestGetNextImage();
-        addScrollListener(); // TODO: should be here or no?
+        addScrollListener(); // TODO: rename method: it does another thing
         stage.setScene(scene);
         stage.show();
     }
-
-    public void hideInView() {
-        System.out.println("mainPageView: close-in-view request received");
-    }
-
 
     public void sendRequestToggleLeaderBoardMode() {
         viewModel.toggleLeaderboard();

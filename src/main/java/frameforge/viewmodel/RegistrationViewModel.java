@@ -5,9 +5,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 
-public class RegistrationViewModel {
+public class RegistrationViewModel extends ViewModel<RegistrationModel> {
     // ViewModel class for view-gui.model interactions; contains gui.model as a member; is a member of Controller class which
-    private RegistrationModel model;
     public StringProperty nicknameProperty;
     public StringProperty passwordProperty;
 
@@ -16,14 +15,6 @@ public class RegistrationViewModel {
         nicknameProperty = new SimpleStringProperty();
         passwordProperty = new SimpleStringProperty();
     }
-
-    public void setModel(RegistrationModel model) {
-        this.model = model;
-    }
-
-    public RegistrationModel getModel() {
-        return model;
-    } // TODO: solve getter&setter abundance
 
     public void addUser() { // TODO: change to private?
         System.out.println("regViewModel: add-user request passed");

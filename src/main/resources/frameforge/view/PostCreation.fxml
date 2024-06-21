@@ -30,9 +30,11 @@
     </top>
     <center>
         <VBox fx:id="tagsVBox" alignment="CENTER">
-            <TilePane fx:id="chosenTagsTilePane" style="-fx-background-color: #8bbbae;"
+            <FlowPane fx:id="chosenTagsTilePane" style="-fx-background-color: #8bbbae;"
+                      prefWrapLength="300" vgap="10" hgap="10" maxWidth="300"
+                      alignment="CENTER"
             />
-            <TextField fx:id="suggestionsTextField"/>
+            <TextField fx:id="suggestionsTextField" maxWidth="300"/>
         </VBox>
     </center>
     <bottom>

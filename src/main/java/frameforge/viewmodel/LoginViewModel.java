@@ -5,8 +5,9 @@ import frameforge.model.RegistrationModel;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class LoginViewModel {
-    private LoginModel model;
+import javax.swing.text.View;
+
+public class LoginViewModel extends ViewModel<LoginModel> {
     public StringProperty nicknameProperty;
     public StringProperty passwordProperty;
 
@@ -15,14 +16,6 @@ public class LoginViewModel {
         nicknameProperty = new SimpleStringProperty();
         passwordProperty = new SimpleStringProperty();
     }
-
-    public void setModel(LoginModel model) {
-        this.model = model;
-    }
-
-    public LoginModel getModel() {
-        return model;
-    } // TODO: solve getter&setter abundance
 
     public void sendLoginRequest() { // TODO: change to private?
         System.out.println("logViewModel: add-user request passed");

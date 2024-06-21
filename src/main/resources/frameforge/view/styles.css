@@ -122,3 +122,36 @@
     -fx-background-color: #4e795c;
     -fx-text-fill: #d1e1d4;
 }
+
+.suggestions-list-view {
+  -fx-background-color: #f7f7f7;
+  -fx-control-inner-background: #d1e1d4;
+  -fx-text-fill: #4e795c;
+  -fx-font-family: "Arial";
+  -fx-font-size: 11px;
+}
+
+.suggestions-list-view .scroll-bar:vertical {
+    -fx-padding: -10;
+    -fx-scale-x: 0;
+}
+
+.suggestions-list-view .list-cell {
+  -fx-background-color: #d1e1d4;
+  -fx-border-color: #2d5335;
+  -fx-border-width: 1px;
+  -fx-padding: 2px;
+}
+
+.list-cell:empty {
+    -fx-opacity: 0;
+}
+
+.list-view .list-cell:hover {
+  -fx-background-color: #4e795c;
+}
+
+.list-view .list-cell:selected {
+  -fx-background-color: #2d5335;
+  -fx-text-fill: #f7f7f7;
+}

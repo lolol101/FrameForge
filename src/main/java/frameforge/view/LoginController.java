@@ -14,17 +14,13 @@ import java.io.IOException;
 
 import static frameforge.model.LoginModel.ClientCommands;
 
-public class LoginController {
-    private Stage stage; // single stage instance shared with some other menus
-    private Scene scene; // unique scene used to avoid repeated loading of the same menu
-
+public class LoginController extends Controller<LoginModel, LoginViewModel> {
     // TODO: scene/stage cleanup: move from creating new stages to switching scenes in single stage: problem is hierarchy & scene dependency on main()
     @FXML private TextField nicknameTextField;
     @FXML private PasswordField passwordTextField;
     @FXML protected Button btnSwitchToRegistration;
     @FXML protected Button btnSubmitLoginRequest;
     // TODO: current textArea usage sucks! Blend into background, set text alignment, correct text position
-    private LoginViewModel viewModel;
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("logView: changeListener fired on client command reception");
@@ -46,6 +42,7 @@ public class LoginController {
         viewModel = new LoginViewModel(model);
     }
 
+    @Override
     public void setModel(LoginModel model) {
         removeListeners();
         viewModel.setModel(model);
@@ -53,20 +50,19 @@ public class LoginController {
         System.out.println("logView: log model set");
     }
 
-    private void removeListeners() {
+    void removeListeners() {
         nicknameTextField.textProperty().unbindBidirectional(viewModel.nicknameProperty);
         passwordTextField.textProperty().unbindBidirectional(viewModel.passwordProperty);
         viewModel.getModel().clientCommand.removeListener(clientCommandReceiver);
         System.out.println("logView: log listeners removed");
     }
 
-    private void addListeners() {
+    void addListeners() {
         nicknameTextField.textProperty().bindBidirectional(viewModel.nicknameProperty);
         passwordTextField.textProperty().bindBidirectional(viewModel.passwordProperty);
         viewModel.getModel().clientCommand.addListener(clientCommandReceiver);
         System.out.println("logView: log listeners added");
     }
-
 
     @FXML public void initialize() {
         addListeners();
@@ -95,18 +91,5 @@ public class LoginController {
 
     private void sendLoginRequest() {
         viewModel.sendLoginRequest();
-    }
-
-    public void openInView() throws IOException {
-        System.out.println("logView: open-in-view request received");
-        System.out.println("logView: setting scene" + scene.hashCode() + " to stage " + stage.hashCode());
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    public void hideInView() {
-        System.out.println("logView: close-in-view request received");
-//        Stage stage = (Stage) btnSwitchToRegistration.getScene().getWindow();
-//        stage.close();
     }
 }
