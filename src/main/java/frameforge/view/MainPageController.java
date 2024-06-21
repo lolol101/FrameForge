@@ -7,9 +7,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -115,6 +113,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                     isLoadingMore = false;
                 }
             }
+            // TODO: remove and bind to a StackPane? HBox? containing ScrollPane
         });
     }
 
@@ -198,13 +197,30 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 setFitCustom(imageView, imageViewWidth, imageViewHeight);
             });
 
-            Button likeButton = new Button("Like");
+            ToggleButton likeButton = new ToggleButton();
             Button commentButton = new Button("Comment");
             Button saveButton = new Button("Save");
 
+            likeButton.getStyleClass().add("like-button");
+            Image imgIsNotLiked = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon-like.png")));
+            ImageView imgViewNotLiked = new ImageView(imgIsNotLiked);
+            imgViewNotLiked.setPreserveRatio(true);
+            imgViewNotLiked.setFitHeight(10);
+            likeButton.setGraphic(imgViewNotLiked);
 
-            // TODO: styles.css color update
-            likeButton.getStyleClass().add("post-button");
+            Image imgIsLiked = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon-unlike.png")));
+            ImageView imgViewLiked = new ImageView(imgIsLiked);
+            imgViewLiked.setPreserveRatio(true);
+            imgViewLiked.setFitHeight(10); // TODO: magic number to constants or nah?
+            likeButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    likeButton.setGraphic(imgViewLiked);
+                } else {
+                    likeButton.setGraphic(imgViewNotLiked);
+                }
+            });
+
+
             commentButton.getStyleClass().add("post-button");
             saveButton.getStyleClass().add("post-button");
 

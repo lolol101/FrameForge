@@ -30,6 +30,34 @@
     -fx-padding: 5px 10px;
 }
 
+.like-button {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+}
+
+.like-button:hover {
+    -fx-background-color: #4e795c;
+}
+
+.like-button:selected {
+    -fx-background-color: #4e795c;
+    -fx-opacity: 1.0;
+}
+
+.post-button {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5px 10px;
+}
+.post-button:hover {
+    -fx-background-color: #4e795c;
+}
+
 /*Registration & Login data: */
 
 .main-container {
@@ -70,17 +98,6 @@
 .checkbox {
     -fx-font-size: 12px;
     -fx-text-fill: #666666;
-}
-
-.post-button {
-    -fx-background-color: transparent;
-    -fx-border-color: white;
-    -fx-text-fill: white;
-    -fx-font-size: 14px;
-    -fx-padding: 5px 10px;
-}
-.post-button:hover {
-    -fx-background-color: #4e795c;
 }
 
 /* Post Creation Data*/
