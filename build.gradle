@@ -24,6 +24,13 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.16.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
+
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.hamcrest:hamcrest:2.2")
+
+    testImplementation "org.testfx:testfx-core:4.0.18"
+    testImplementation "org.testfx:testfx-junit5:4.0.18"
 }
 
 mainClassName = 'frameforge.FrameForgeApplication'
@@ -32,4 +39,8 @@ mainClassName = 'frameforge.FrameForgeApplication'
 task rebuild() {
     dependsOn   clean
     finalizedBy build
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
