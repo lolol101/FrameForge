@@ -28,6 +28,8 @@ import static frameforge.model.MainPageModel.ClientCommands;
 import static java.lang.Thread.sleep;
 
 public class MainPageController extends Controller<MainPageModel, MainPageViewModel> {
+    private static final double FULLSIZE_IMG_FACTOR = 0.9;
+    private static final double SCROLLBAR_MAX_VALUE_BEFORE_UPDATE = 0.95;
     @FXML
     public HBox fullSizePane; // TODO: edit position & qualifiers
     @FXML
@@ -42,7 +44,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     @FXML
     private Button leaderboardButton;
     @FXML
-    private TilePane tilePane;
+    private TilePane postsTilePane;
     @FXML
     private ScrollPane scrollPane;
 
@@ -67,10 +69,22 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         MainPageModel model = new MainPageModel();
         viewModel = new MainPageViewModel(model);
     }
-
+    private static boolean isLoadingMore = false; // TODO: is needed here?
     public void initialize() {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        scrollPane.setOnScroll(event -> {
+            double scrollPosition = scrollPane.getVvalue();
+            if (scrollPosition >= SCROLLBAR_MAX_VALUE_BEFORE_UPDATE) {
+                System.out.println("Reached end of scrollPane");
+                if (!isLoadingMore) {
+                    isLoadingMore = true;
+                    sendRequestGetNextImage();
+                    isLoadingMore = false;
+                }
+            }
+        });
     }
 
     @Override
@@ -117,30 +131,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         });
     }
 
-    boolean isLoadingMore = false;
-
-    private void addScrollListener() {
-        // TODO: redo
-        scrollPane.setOnScroll(event -> {
-            double scrollPosition = scrollPane.getVvalue();
-            if (scrollPosition >= 0.95) {
-                System.out.println("Reached end of scrollPane");
-                if (!isLoadingMore) {
-                    isLoadingMore = true;
-                    sendRequestGetNextImage();
-                    isLoadingMore = false;
-                }
-            }
-        });
-        sendRequestGetNextImage();
-        try {
-            sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        sendRequestGetNextImage(); // TODO: update this method after choosing optimal number of posts to load first
-    }
-
     private void sendRequestGetNextImage() { // TODO: check if it works at all
         viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
 //        loadNextImageButchFromModel();
@@ -161,7 +151,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         // TODO: rewrite to use CompletableFuture!
         try {
             // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
-            Pair<String, List<Image>> nextIdAndImage = getNextImage();
+            Pair<String, List<Image>> nextIdAndImage = getNextPost();
             List<Image> images = nextIdAndImage.getValue();
             ImageView imageView = new ImageView(images.getFirst());
             imageView.setPreserveRatio(true);
@@ -211,7 +201,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             Image imgIsLiked = new Image(Objects.requireNonNull(getClass().getResourceAsStream("icon-unlike.png")));
             ImageView imgViewLiked = new ImageView(imgIsLiked);
             imgViewLiked.setPreserveRatio(true);
-            imgViewLiked.setFitHeight(10); // TODO: magic number to constants or nah?
+            imgViewLiked.setFitHeight(10);
             likeButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     likeButton.setGraphic(imgViewLiked);
@@ -237,7 +227,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 System.out.println("mouse exited imagePane, hide context actions");
             });
 
-            likeButton.setOnAction(event -> sendRequestLikePost(nextIdAndImage.getKey()));
+            likeButton.setOnAction(event -> sendRequestLikeOrUnlikePost(nextIdAndImage.getKey()));
             saveButton.setOnAction(event -> sendRequestSavePic(nextIdAndImage.getKey(), images.indexOf(imageView.getImage())));
 
             imagePane.getChildren().add(contextButtonContainer);
@@ -256,11 +246,11 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 double imageHeight = imageToLoad.getHeight();
 
                 double aspectRatio = imageWidth / imageHeight;
-                double optimalWidth = screenWidth * 0.9; // TODO: magic number 0.9 to class constants
+                double optimalWidth = screenWidth * FULLSIZE_IMG_FACTOR;
                 double optimalHeight = optimalWidth / aspectRatio;
 
-                if (optimalHeight > screenHeight * 0.9) {
-                    optimalHeight = screenHeight * 0.9;
+                if (optimalHeight > screenHeight * FULLSIZE_IMG_FACTOR) {
+                    optimalHeight = screenHeight * FULLSIZE_IMG_FACTOR;
                     optimalWidth = optimalHeight * aspectRatio;
                 }
 
@@ -285,7 +275,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 }
             });
 
-            tilePane.getChildren().add(imagePane);
+            postsTilePane.getChildren().add(imagePane);
 
             System.err.println("Next post loaded");
         } catch (NullPointerException e) {
@@ -293,8 +283,8 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         }
     }
 
-    private Pair<String, List<Image>> getNextImage() {
-        return viewModel.getNextImage();
+    private Pair<String, List<Image>> getNextPost() {
+        return viewModel.getNextPost();
         // TODO: work with image getters, names & anything else goes here
     }
 
@@ -308,7 +298,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         viewModel.openPostCreationMenu();
     }
 
-    private void sendRequestLikePost(String postID) {
+    private void sendRequestLikeOrUnlikePost(String postID) {
         viewModel.like(postID);
     }
 
@@ -328,14 +318,23 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     public void openInView() throws IOException {
         System.out.println("mainPageView: open-in-view request received");
         System.out.println("mainPageView: setting scene=" + scene.hashCode() + " to stage=" + stage.hashCode());
-        sendRequestGetNextImage();
-        addScrollListener(); // TODO: rename method: it does another thing
+        if (postsTilePane.getChildren().isEmpty()) {
+            for (int i = 0; i < 3; i++) {
+                sendRequestGetNextImage();
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         stage.setScene(scene);
         stage.show();
     }
 
     public void sendRequestToggleLeaderBoardMode() {
-        viewModel.toggleLeaderboard();
+//        viewModel.toggleLeaderboard();
+        toggleLeaderboardMode(); // TODO: remove after testing
     }
 
     public void toggleLeaderboardMode() {

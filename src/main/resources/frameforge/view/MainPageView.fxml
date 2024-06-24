@@ -45,7 +45,7 @@
                 <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefWidth="700.0"
                             style="-fx-background-color: #8bbbae">
                     <HBox alignment="CENTER" style="-fx-background-color: #d1e1d4">
-                        <TilePane fx:id="tilePane" prefColumns="1" vgap="10"
+                        <TilePane fx:id="postsTilePane" prefColumns="1" vgap="10"
                                   style="-fx-background-color: #d1e1d4; -fx-padding: 1px;">
                         </TilePane>
                     </HBox>

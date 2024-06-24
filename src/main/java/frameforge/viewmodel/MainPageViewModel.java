@@ -20,7 +20,7 @@ public class MainPageViewModel extends ViewModel<MainPageModel> {
         this.model = model;
     }
 
-    public Pair<String, List<Image>> getNextImage() throws NullPointerException {
+    public Pair<String, List<Image>> getNextPost() throws NullPointerException {
         return model.getLastLoadedPostData();
     }
 
@@ -36,7 +36,7 @@ public class MainPageViewModel extends ViewModel<MainPageModel> {
     public void like(String postID) {
         model.likedPost = postID;
         model.viewAction.setValue(ViewActions.likeOrDislikePost);
-        System.out.println("mainPageViewModel: sending signal to like a picture");
+        System.out.println("mainPageViewModel: sending signal to like or unlike a picture");
     }
 
     public List<MainPageModel.Person> getLeaderboard() {
@@ -73,5 +73,6 @@ public class MainPageViewModel extends ViewModel<MainPageModel> {
 
     public void toggleLeaderboard() {
         model.viewAction.setValue(ViewActions.toggleLeaderboardRequest);
+        System.out.println("mainPageViewModel: sending signal to toggle leaderboard mode");
     }
 }
