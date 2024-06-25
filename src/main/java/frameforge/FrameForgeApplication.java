@@ -22,6 +22,7 @@ public class FrameForgeApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        stage.setMaximized(true);
         Client client = new Client();
 
         client.connectListeners();

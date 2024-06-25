@@ -17,11 +17,13 @@ public abstract class Controller<Model, ViewModel> {
         this.stage = stage;
         this.scene = scene;
     }
-    public void openInView() throws IOException { // TODO: un-make it being public when done with testing
+    void openInView() throws IOException {
         System.out.println("From " + this.getClass() + " : " + viewModel.getClass());
         System.out.println("\topen-in-view request received");
         System.out.println("\tsetting scene" + scene.hashCode() + " to stage " + stage.hashCode());
         stage.setScene(scene);
+        stage.setHeight(1000.0);
+        stage.setWidth(1920.0);
         stage.show();
     }
     void hideInView() {

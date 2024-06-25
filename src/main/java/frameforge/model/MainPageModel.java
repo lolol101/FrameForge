@@ -104,7 +104,7 @@ public class MainPageModel {
         leaderboardMembers.add(new Person("Test8", 2203));
         leaderboardMembers.add(new Person("Test9", 11));
         leaderboardMembers.add(new Person("Test10", 57));
-        leaderboardMembers.sort(Comparator.comparing(p -> p.likeCount)); // TODO: is there no better way?
+        leaderboardMembers.sort(Comparator.comparingInt(p -> -p.likeCount));
         return leaderboardMembers;
     }
 }

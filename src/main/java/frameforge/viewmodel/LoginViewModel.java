@@ -16,7 +16,7 @@ public class LoginViewModel extends ViewModel<LoginModel> {
         passwordProperty = new SimpleStringProperty();
     }
 
-    public void sendLoginRequest() { // TODO: change to private?
+    public void sendLoginRequest() {
         System.out.println("logViewModel: add-user request passed");
         model.username = nicknameProperty.getValue();
         model.password = passwordProperty.getValue();

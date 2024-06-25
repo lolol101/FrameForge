@@ -50,7 +50,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     @FXML
     private VBox leaderBoardContainer;
 
-    // TODO: preferred width & height corrections
     @FXML
     private Button leaderboardButton;
     @FXML
@@ -71,7 +70,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             }
             case close -> hideInView();
             case loadPost -> loadNextImageBatchFromModel();
-            case toggleLeaderBoard -> toggleLeaderboardMode(); // TODO: client to use this
+            case toggleLeaderBoard -> toggleLeaderboardMode();
         }
         viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
@@ -149,10 +148,9 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
     private void sendRequestGetNextImage() {
         viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
-//        loadNextImageBatchFromModel(); // TODO: remove after testing
     }
 
-    private void setFitCustom(ImageView imageView) { // TODO: is needed?
+    private void setFitCustom(ImageView imageView) {
         Image image = imageView.getImage();
         if (image != null) {
             if (image.getHeight() / image.getWidth() > imageInFeedHeight / imageInFeedWidth) {
@@ -187,9 +185,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                     nextImageButton.getStyleClass().add("post-button");
                     Button previousImageButton = new Button("<-"); // TODO: switch to free-use icons
                     previousImageButton.getStyleClass().add("post-button");
-
-                    // TODO: position image switch buttons on mid-height
-                    // TODO: set them visible if courser is on the sides of image
 
                     nextImageButton.setOnAction(event -> {
                         int currentImageIndex = images.indexOf(imageView.getImage());
@@ -314,7 +309,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     }
 
     private void sendRequestSavePic(String postID, Integer picNum) {
-        // TODO: move to model and add signals
         handleSignalSavePic(postID, picNum); // TODO: remove when connecting to client
     }
 
@@ -336,6 +330,8 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             }
         }
         stage.setScene(scene);
+        stage.setHeight(1000.0);
+        stage.setWidth(1920.0);
         stage.show();
     }
 
@@ -348,7 +344,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
     public void sendRequestToggleLeaderBoardMode() {
         viewModel.toggleLeaderboard();
-//        toggleLeaderboardMode(); // TODO: remove after testing
     }
 
     public void toggleLeaderboardMode() {

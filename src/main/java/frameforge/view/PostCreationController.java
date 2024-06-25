@@ -40,7 +40,6 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
                 }
             }
             case close -> hideInView();
-            // TODO: case reset
         }
         viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
@@ -98,9 +97,8 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
     }
 
     private void sendRequestAddFile() {
-        // TODO: make it async
         try {
-            File addedFile = viewModel.addImageToPost(); // TODO wait here?
+            File addedFile = viewModel.addImageToPost();
 
             if (addedFile != null){
                 Label fileName = new Label(addedFile.getName());
@@ -136,7 +134,7 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
 
     private void sendRequestAddTag(String tag) {
         if (tag != null){
-            viewModel.addTag(tag); // TODO: change, remove, update, this shouldn't be here
+            viewModel.addTag(tag);
 
             Label tagName = new Label(tag);
             tagName.getStyleClass().add("rounded-label");

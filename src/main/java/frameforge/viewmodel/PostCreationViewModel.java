@@ -22,7 +22,6 @@ public class PostCreationViewModel extends ViewModel<PostCreationModel> {
     }
 
     public File addImageToPost() throws PostCreationException {
-        // TODO: mention it doesn't need to be async: client handles async upload
         FileChooser fileChooser = new FileChooser();
 
 //        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");

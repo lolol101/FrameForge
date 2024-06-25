@@ -56,7 +56,7 @@ public class AutoCompleteEntryChooser {
             }
         });
 
-        vbox.getChildren().add(suggestionsListView); // TODO: clean up suggestionsListView usage and placement
+        vbox.getChildren().add(suggestionsListView);
     }
 
     List<String> getSuggestions(String newText, List<String> chosenSuggestions) {
