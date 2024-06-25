@@ -25,7 +25,7 @@ public class FrameForgeApplication extends Application {
         Client client = new Client();
 
         client.connectListeners();
-        client.socketManager.connect("212.113.122.236", 8080);
+        client.socketManager.connect("0.0.0.0", 8080);
 
         stage.setTitle("Frameforge");
         stage.getIcons().add(new Image(Objects.requireNonNull(FrameForgeApplication.class.getResourceAsStream("app-icon.png"))));

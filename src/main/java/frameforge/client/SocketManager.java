@@ -53,7 +53,7 @@ public class SocketManager {
         try {
             this.ip = ip;
             this.port = port;
-            socket = new Socket(ip, port);
+            socket = new Socket(ip, 8080);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
         } catch (Exception e) {
