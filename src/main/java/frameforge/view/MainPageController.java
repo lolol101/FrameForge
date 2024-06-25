@@ -41,7 +41,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     @FXML
     private HBox scrollMode;
     @FXML
-    private HBox leaderboardMode; // TODO: switch after testing
+    private HBox leaderboardMode;
     @FXML
     private VBox leaderBoardContainer;
 
@@ -86,7 +86,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 if (!isLoadingMore) {
                     isLoadingMore = true;
                     sendRequestGetNextImage();
-                    isLoadingMore = false;
                 }
             }
         });
@@ -113,8 +112,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     public void passStageAndScene(Stage stage, Scene scene) {
         this.stage = stage;
         this.scene = scene;
-        // TODO: separate .css files
-        // TODO: is it required to add this to scene?
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
         System.out.println(this.getClass().getName() + ": this.scene=" + scene.hashCode() + "; this.stage=" + stage.hashCode());
 
@@ -128,7 +125,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 if (!isLoadingMore) {
                     isLoadingMore = true;
                     sendRequestGetNextImage();
-                    isLoadingMore = false;
                 }
             }
             // TODO: remove and bind to a StackPane? HBox? containing ScrollPane
@@ -145,13 +141,13 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 //        loadNextImageButchFromModel();
     }
 
-    private void setFitCustom(ImageView imageView, double width, double height) { // TODO: is needed?
+    private void setFitCustom(ImageView imageView) { // TODO: is needed?
         Image image = imageView.getImage();
         if (image != null) {
-            if (image.getHeight() / image.getWidth() > height / width) {
-                imageView.setFitHeight(height);
+            if (image.getHeight() / image.getWidth() > imageInFeedHeight / imageInFeedWidth) {
+                imageView.setFitHeight(imageInFeedHeight);
             } else {
-                imageView.setFitWidth(width);
+                imageView.setFitWidth(imageInFeedWidth);
             }
         }
     }
@@ -170,7 +166,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                     ImageView imageView = new ImageView(images.getFirst());
                     imageView.setPreserveRatio(true);
 
-                    setFitCustom(imageView, imageInFeedWidth, imageInFeedHeight);
+                    setFitCustom(imageView);
 
                     StackPane imagePane = new StackPane(imageView);
                     imagePane.setPrefSize(imageInFeedWidth, imageInFeedHeight);
@@ -188,14 +184,14 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                         int currentImageIndex = images.indexOf(imageView.getImage());
                         int nextImageIndex = (currentImageIndex + 1) % images.size();
                         imageView.setImage(images.get(nextImageIndex));
-                        setFitCustom(imageView, imageInFeedWidth, imageInFeedHeight);
+                        setFitCustom(imageView);
                     });
                     previousImageButton.setOnAction(event -> {
                         int currentImageIndex = images.indexOf(imageView.getImage());
                         int nextImageIndex = (currentImageIndex - 1) % images.size();
                         if (nextImageIndex < 0) nextImageIndex += images.size();
                         imageView.setImage(images.get(nextImageIndex));
-                        setFitCustom(imageView, imageInFeedWidth, imageInFeedHeight);
+                        setFitCustom(imageView);
                     });
 
                     ToggleButton likeButton = new ToggleButton();
@@ -277,6 +273,8 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 } catch (NullPointerException e) {
                     System.err.println("error when trying to load an image: please check path settings and model methods' errors");
                     return false;
+                } finally {
+                    isLoadingMore = false;
                 }
             }
         };
