@@ -2,6 +2,8 @@ package frameforge.view;
 
 import frameforge.model.MainPageModel;
 import frameforge.viewmodel.MainPageViewModel;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Task;
@@ -20,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -34,6 +37,8 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     private static final double SCROLLBAR_MAX_VALUE_BEFORE_UPDATE = 0.95;
     private static final double imageInFeedWidth = 600;
     private static final double imageInFeedHeight = 400;
+    private static boolean postIsLoading = false;
+    private Timeline postRequestResetTimeline;
     @FXML
     private HBox fullSizePane;
     @FXML
@@ -75,7 +80,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         MainPageModel model = new MainPageModel();
         viewModel = new MainPageViewModel(model);
     }
-    private static boolean isLoadingMore = false; // TODO: is needed here?
+
     public void initialize() {
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -83,8 +88,11 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         scrollPane.setOnScroll(event -> {
             if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
                 System.out.println("Reached end of scrollPane");
-                if (!isLoadingMore) {
-                    isLoadingMore = true;
+                if (!postIsLoading) {
+                    postIsLoading = true;
+                    Timeline postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(3), timelineEvent -> postIsLoading = false));
+                    postRequestResetTimeline.play();
+
                     sendRequestGetNextImage();
                 }
             }
@@ -122,8 +130,11 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
             if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
                 System.out.println("Reached end of scrollPane");
-                if (!isLoadingMore) {
-                    isLoadingMore = true;
+                if (!postIsLoading) {
+                    postIsLoading = true;
+                    postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(3), timelineEvent -> postIsLoading = false));
+                    postRequestResetTimeline.play();
+
                     sendRequestGetNextImage();
                 }
             }
@@ -274,7 +285,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                     System.err.println("error when trying to load an image: please check path settings and model methods' errors");
                     return false;
                 } finally {
-                    isLoadingMore = false;
+                    postIsLoading = false;
                 }
             }
         };
@@ -326,6 +337,13 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         }
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override void hideInView() {
+        if (postRequestResetTimeline != null && postRequestResetTimeline.getStatus() == Timeline.Status.RUNNING) {
+            postRequestResetTimeline.stop();
+        }
+        System.out.println(this.getClass() + " hidden in view");
     }
 
     public void sendRequestToggleLeaderBoardMode() {
