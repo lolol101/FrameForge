@@ -9,7 +9,7 @@ Frameforge - социальная сеть для обмена изображе�
 ## Технологии
 - [JavaFX](https://openjfx.io/)
 - [MongoDB](https://www.mongodb.com/)
-- [Java.net, java.util.cuncurrent](https://www.java.com/ru/)
+- [Java.net, java.util.concurrent](https://www.java.com/ru/)
 - [JSON](https://json.com/)
 ## Начало работы
 ### Установка и использование клиента
