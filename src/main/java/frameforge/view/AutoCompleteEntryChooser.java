@@ -16,13 +16,12 @@ public class AutoCompleteEntryChooser {
     private final ListView<String> suggestionsListView;
     private final ObservableList<String> suggestions;
     private final List<String> possibleSuggestions;
+    private final static int LIST_CELL_HEIGHT = 24;
 
     Consumer<String> contextActionWithChosenEntry;
 
     AutoCompleteEntryChooser(VBox vbox, TextField textField, List<String> suggestionsList, Consumer<String> contextActionWithChosenEntry, List<String> chosenSuggestions) {
         // TODO: pass existing @FXML ListView instead to have better control on element placement in VBox
-
-
         suggestions = FXCollections.observableList(new ArrayList<>());
         suggestions.addAll(suggestionsList);
         suggestionsListView = new ListView<>(suggestions);
@@ -45,7 +44,6 @@ public class AutoCompleteEntryChooser {
             return change;
         }));
 
-        final int LIST_CELL_HEIGHT = 24; // TODO: move to appropriate place
         suggestionsListView.prefHeightProperty().bind(Bindings.size(suggestions).multiply(LIST_CELL_HEIGHT));
 
         suggestionsListView.setOnMouseClicked(event -> {

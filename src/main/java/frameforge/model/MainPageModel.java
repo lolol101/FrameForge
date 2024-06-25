@@ -90,6 +90,7 @@ public class MainPageModel {
 
     public List<Person> getLeaderboardMembers() {
         // TODO: remove lines below after connecting to client
+        leaderboardMembers.clear();
         leaderboardMembers.add(new Person("tst1", 100));
         leaderboardMembers.add(new Person("tst2", 120));
         leaderboardMembers.add(new Person("tst3", 101));

@@ -18,4 +18,7 @@ module frameforge {
 
     opens frameforge.view;
     exports frameforge.view;
+    exports frameforge.model;
+//    requires org.hamcrest;
+//    requires org.testfx;
 }

@@ -60,7 +60,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             }
             case close -> hideInView();
             case loadPost -> loadNextImageBatchFromModel();
-            case toggleLeaderBoard -> toggleLeaderboardMode();
+            case toggleLeaderBoard -> toggleLeaderboardMode(); // TODO: client to use this
         }
         viewModel.getModel().clientCommand.setValue(ClientCommands.zero);
     };
@@ -75,8 +75,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         scrollPane.setOnScroll(event -> {
-            double scrollPosition = scrollPane.getVvalue();
-            if (scrollPosition >= SCROLLBAR_MAX_VALUE_BEFORE_UPDATE) {
+            if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
                 System.out.println("Reached end of scrollPane");
                 if (!isLoadingMore) {
                     isLoadingMore = true;
@@ -115,11 +114,10 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
         scene.setOnScroll(event -> {
             double deltaY = event.getDeltaY();
-            double coefficient = scrollPane.getHeight(); // TODO
+            double coefficient = scrollPane.getHeight();
             scrollPane.setVvalue(scrollPane.getVvalue() - deltaY / coefficient);
 
-            double scrollPosition = scrollPane.getVvalue(); // TODO: move outside? Used twice in code
-            if (scrollPosition >= 0.95) {
+            if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
                 System.out.println("Reached end of scrollPane");
                 if (!isLoadingMore) {
                     isLoadingMore = true;
@@ -150,7 +148,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     private void loadNextImageBatchFromModel() {
         // TODO: rewrite to use CompletableFuture!
         try {
-            // TODO: stretch scrollPane over entire screen or find a way for scroll to register when mouse is not pointed to scrollPane
             Pair<String, List<Image>> nextIdAndImage = getNextPost();
             List<Image> images = nextIdAndImage.getValue();
             ImageView imageView = new ImageView(images.getFirst());
@@ -220,11 +217,9 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
             imagePane.setOnMouseEntered(event -> {
                 contextButtonContainer.setVisible(true);
-                System.out.println("mouse entered imagePane, show context actions");
             });
             imagePane.setOnMouseExited(event -> {
                 contextButtonContainer.setVisible(false);
-                System.out.println("mouse exited imagePane, hide context actions");
             });
 
             likeButton.setOnAction(event -> sendRequestLikeOrUnlikePost(nextIdAndImage.getKey()));
@@ -333,8 +328,8 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     }
 
     public void sendRequestToggleLeaderBoardMode() {
-//        viewModel.toggleLeaderboard();
-        toggleLeaderboardMode(); // TODO: remove after testing
+        viewModel.toggleLeaderboard();
+//        toggleLeaderboardMode(); // TODO: remove after testing
     }
 
     public void toggleLeaderboardMode() {

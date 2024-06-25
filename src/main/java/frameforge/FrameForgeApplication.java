@@ -30,29 +30,26 @@ public class FrameForgeApplication extends Application {
         stage.setTitle("Frameforge");
         stage.getIcons().add(new Image(Objects.requireNonNull(FrameForgeApplication.class.getResourceAsStream("app-icon.png"))));
 
-
-        // TODO: move to client method all 3+ of repeated code fragments. Or to an app method?
-        //  Will be easier with better inheritance in *Controller classes
         FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
-        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 640, 480);
+        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 1024, 768);
         registrationView = fxmlLoaderRegistration.getController();
         registrationView.setModel(client.regModel);
         registrationView.passStageAndScene(stage, sceneRegistration);
 
         FXMLLoader fxmlLoaderLogin = new FXMLLoader(getClass().getResource("view/LoginView.fxml"));
-        Scene sceneLogin = new Scene(fxmlLoaderLogin.load(), 640, 480);
+        Scene sceneLogin = new Scene(fxmlLoaderLogin.load(), 1024, 768);
         loginView = fxmlLoaderLogin.getController();
         loginView.setModel(client.loginModel);
         loginView.passStageAndScene(stage, sceneLogin);
 
         FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
-        Scene sceneMain = new Scene(fxmlLoaderMain.load(), 640, 480);
+        Scene sceneMain = new Scene(fxmlLoaderMain.load(), 1024, 768);
         mainPageView = fxmlLoaderMain.getController();
         mainPageView.setModel(client.mainPageModel);
         mainPageView.passStageAndScene(stage, sceneMain);
 
         FXMLLoader fxmlLoaderPost = new FXMLLoader(getClass().getResource("view/PostCreation.fxml"));
-        Scene scenePost = new Scene(fxmlLoaderPost.load(), 640, 480);
+        Scene scenePost = new Scene(fxmlLoaderPost.load(), 1024, 768);
         postCreationView = fxmlLoaderPost.getController();
         postCreationView.setModel(client.postCreationModel);
         postCreationView.passStageAndScene(stage, scenePost);

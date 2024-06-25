@@ -11,12 +11,10 @@ import static frameforge.model.PostCreationModel.ViewActions.sendRequestCreatePo
 import static frameforge.model.PostCreationModel.ViewActions.sendRequestOpenMainPageMenu;
 
 public class PostCreationViewModel extends ViewModel<PostCreationModel> {
-    // TODO: is it OK if files are passed directly through controller method through viewModel to model, and aren't stored in model?
     public StringProperty postDescriptionProperty; // TODO:
 
-    static int maxFileCountInSinglePost = 5;
-    static int maxFileSizeInKilobytes = 5*1024;
-    // TODO: move FileChooser from Controller here. Or not?
+    private final static int maxFileCountInSinglePost = 5;
+    private final static int maxFileSizeInKilobytes = 5*1024;
 
     public PostCreationViewModel(PostCreationModel model) {
         this.model = model;
@@ -30,7 +28,7 @@ public class PostCreationViewModel extends ViewModel<PostCreationModel> {
 //        FileChooser.ExtensionFilter extFilterJPG = new FileChooser.ExtensionFilter("JPG files (*.jpg)", "*.JPG");
 //        FileChooser.ExtensionFilter extFilterPNG = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.PNG");
 //        fileChooser.getExtensionFilters().addAll(extFilterJPG, extFilterPNG);
-        // TODO: why does Nikita have problems with these filters on his Linux?
+        // TODO: why does Nikita have problems with these filters on his Linux setup?
 
         File file = fileChooser.showOpenDialog(null);
 
@@ -63,7 +61,6 @@ public class PostCreationViewModel extends ViewModel<PostCreationModel> {
         model.chosenTags.remove(tag);
     }
     public void createPost() {
-        // TODO: add file counter check here: no empty posts!
         if (!model.attachedFiles.isEmpty()) {
             System.out.println("postCreationViewModel: createPost request passed");
             model.postDescription = postDescriptionProperty.getValue();

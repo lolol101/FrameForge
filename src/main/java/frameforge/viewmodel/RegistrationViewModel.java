@@ -7,7 +7,6 @@ import javafx.beans.property.StringProperty;
 import static frameforge.model.RegistrationModel.ViewActions;
 
 public class RegistrationViewModel extends ViewModel<RegistrationModel> {
-    // ViewModel class for view-gui.model interactions; contains gui.model as a member; is a member of Controller class which
     public StringProperty nicknameProperty;
     public StringProperty passwordProperty;
 
@@ -17,7 +16,7 @@ public class RegistrationViewModel extends ViewModel<RegistrationModel> {
         passwordProperty = new SimpleStringProperty();
     }
 
-    public void addUser() { // TODO: change to private?
+    public void addUser() {
         System.out.println("regViewModel: add-user request passed");
         model.username = nicknameProperty.getValue();
         model.password = passwordProperty.getValue();

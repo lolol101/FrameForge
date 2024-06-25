@@ -23,9 +23,6 @@
                 <MenuButton mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Me"
                             styleClass="menu-button-main">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Profile"/>
-                        <MenuItem mnemonicParsing="false" text="Preferences"/>
-                        <MenuItem mnemonicParsing="false" text="Settings"/>
                         <MenuItem mnemonicParsing="false" text="Quit to login window" onAction="#sendRequestQuitToLogin"/>
                     </items>
                 </MenuButton>

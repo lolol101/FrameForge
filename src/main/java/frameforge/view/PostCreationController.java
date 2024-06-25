@@ -16,29 +16,17 @@ import javafx.scene.layout.VBox;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static frameforge.model.PostCreationModel.ClientCommands;
 
 public class PostCreationController extends Controller<PostCreationModel, PostCreationViewModel> {
     @FXML private VBox uploadedFilesVBox;
     @FXML private VBox tagsVBox;
-//    @FXML private TextField tagEntryTextField; // TODO: switch type
-    @FXML private FlowPane chosenTagsTilePane;
-
-    private ArrayList<String> chosenFileNames;
-
+    @FXML private FlowPane chosenTagsFlowPane;
     @FXML private TextArea postDescription;
-    @FXML private Button addAnotherImageBtn;
-
-    @FXML private Button createPostBtn;
-
-    @FXML private Button switchToMainMenuBtn;
-
     @FXML private TextField suggestionsTextField;
 
     // TODO: standardise UI elements naming
-    // TODO: clean up member names
     // TODO: static logger method to interface
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
@@ -131,8 +119,6 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
                     sendRequestRemoveFile(addedFile);
                     uploadedFilesVBox.getChildren().remove(fileBox);
                 });
-                // TODO: button style
-
                 uploadedFilesVBox.getChildren().add(fileBox);
             }
         } catch (PostCreationException e) {
@@ -148,7 +134,6 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
         }
     }
 
-    // TODO: functions like that shouldn't be part of view! Make chosen tags & file list 4 bidirectionally bounded lists in view & viewmodel
     private void sendRequestAddTag(String tag) {
         if (tag != null){
             viewModel.addTag(tag); // TODO: change, remove, update, this shouldn't be here
@@ -167,10 +152,9 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
 
             removeTagBtn.setOnAction(event -> {
                 sendRequestRemoveTag(tag);
-                chosenTagsTilePane.getChildren().remove(tagBox);
-                System.out.println(viewModel.getModel().chosenTags); // TODO: remove line
+                chosenTagsFlowPane.getChildren().remove(tagBox);
             });
-            chosenTagsTilePane.getChildren().add(tagBox);
+            chosenTagsFlowPane.getChildren().add(tagBox);
         }
     }
 
@@ -193,6 +177,6 @@ public class PostCreationController extends Controller<PostCreationModel, PostCr
 
     private void resetUI() {
         uploadedFilesVBox.getChildren().clear();
-        chosenTagsTilePane.getChildren().clear();
+        chosenTagsFlowPane.getChildren().clear();
     }
 }

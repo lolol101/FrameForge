@@ -4,7 +4,6 @@ import frameforge.model.RegistrationModel;
 import frameforge.viewmodel.RegistrationViewModel;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -13,12 +12,8 @@ import java.io.IOException;
 import static frameforge.model.RegistrationModel.ClientCommands;
 
 public class RegistrationController extends Controller<RegistrationModel, RegistrationViewModel> {
-    // TODO: standardise UI elements naming
     @FXML private TextField nicknameTextField;
     @FXML private PasswordField passwordTextField;
-
-    @FXML private Button btnSubmitRequest; // TODO: grey out on click
-    @FXML private Button btnSwitchToLogin;
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("regView: changeListener fired on client command reception");

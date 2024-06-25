@@ -11,7 +11,8 @@ Frameforge - социальная сеть для обмена изображе�
 - [MongoDB](https://www.mongodb.com/)
 - [Java.net, java.util.cuncurrent](https://www.java.com/ru/)
 - [JSON](https://json.com/)
-## Установка и использование клиента
+## Начало работы
+### Установка и использование клиента
 ```
 git clone git@github.com:lolol101/FrameForge.git
 cd FrameForge
