@@ -94,6 +94,9 @@ public class Client {
                     String id = mainPageModel.likedPost;
                     setReactionOnPost(id);
                     break;
+                case toggleLeaderboardRequest:
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.toggleLeaderBoard);
+                    break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
         });
