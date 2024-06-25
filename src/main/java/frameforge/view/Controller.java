@@ -22,8 +22,6 @@ public abstract class Controller<Model, ViewModel> {
         System.out.println("\topen-in-view request received");
         System.out.println("\tsetting scene" + scene.hashCode() + " to stage " + stage.hashCode());
         stage.setScene(scene);
-        stage.setHeight(1000.0);
-        stage.setWidth(1920.0);
         stage.show();
     }
     void hideInView() {

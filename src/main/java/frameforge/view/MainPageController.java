@@ -38,6 +38,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     private static final double imageInFeedWidth = 600;
     private static final double imageInFeedHeight = 400;
     private static boolean postIsLoading = false;
+    private static final int loadNextPostCooldown = 1;
     private Timeline postRequestResetTimeline;
     @FXML
     private HBox fullSizePane;
@@ -84,18 +85,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        scrollPane.setOnScroll(event -> {
-            if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
-                System.out.println("Reached end of scrollPane");
-                if (!postIsLoading) {
-                    postIsLoading = true;
-                    Timeline postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(1), timelineEvent -> postIsLoading = false));
-                    postRequestResetTimeline.play();
-
-                    sendRequestGetNextImage();
-                }
-            }
-        });
+        scrollPane.setOnScroll(event -> conditionallySendRequestGetNextPost());
     }
 
     @Override
@@ -127,17 +117,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             double coefficient = scrollPane.getHeight();
             scrollPane.setVvalue(scrollPane.getVvalue() - deltaY / coefficient);
 
-            if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
-                System.out.println("Reached end of scrollPane");
-                if (!postIsLoading) {
-                    postIsLoading = true;
-                    postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(1), timelineEvent -> postIsLoading = false));
-                    postRequestResetTimeline.play();
-
-                    sendRequestGetNextImage();
-                }
-            }
-            // TODO: remove and bind to a StackPane? HBox? containing ScrollPane
+            conditionallySendRequestGetNextPost();
         });
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
@@ -321,7 +301,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         System.out.println("mainPageView: setting scene=" + scene.hashCode() + " to stage=" + stage.hashCode());
         if (postsTilePane.getChildren().isEmpty()) {
             for (int i = 0; i < 3; i++) {
-                sendRequestGetNextImage();
+                sendRequestGetNextPost();
                 try {
                     sleep(100);
                 } catch (InterruptedException e) {
@@ -330,8 +310,6 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
             }
         }
         stage.setScene(scene);
-        stage.setHeight(1000.0);
-        stage.setWidth(1920.0);
         stage.show();
     }
 

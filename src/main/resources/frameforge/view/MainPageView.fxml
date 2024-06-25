@@ -28,9 +28,9 @@
                 </MenuButton>
             </HBox>
             <Button fx:id="leaderboardButton" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT"
-                        text="Leaderboard"
-                        styleClass="menu-button-upload"
-                        onAction="#sendRequestToggleLeaderBoardMode">
+                    text="Leaderboard"
+                    styleClass="menu-button-upload"
+                    onAction="#sendRequestToggleLeaderBoardMode">
             </Button>
         </StackPane>
     </top>

@@ -32,25 +32,25 @@ public class FrameForgeApplication extends Application {
         stage.getIcons().add(new Image(Objects.requireNonNull(FrameForgeApplication.class.getResourceAsStream("app-icon.png"))));
 
         FXMLLoader fxmlLoaderRegistration = new FXMLLoader(getClass().getResource("view/RegistrationView.fxml"));
-        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 1024, 768);
+        Scene sceneRegistration = new Scene(fxmlLoaderRegistration.load(), 1920, 1000);
         registrationView = fxmlLoaderRegistration.getController();
         registrationView.setModel(client.regModel);
         registrationView.passStageAndScene(stage, sceneRegistration);
 
         FXMLLoader fxmlLoaderLogin = new FXMLLoader(getClass().getResource("view/LoginView.fxml"));
-        Scene sceneLogin = new Scene(fxmlLoaderLogin.load(), 1024, 768);
+        Scene sceneLogin = new Scene(fxmlLoaderLogin.load(), 1920, 1000);
         loginView = fxmlLoaderLogin.getController();
         loginView.setModel(client.loginModel);
         loginView.passStageAndScene(stage, sceneLogin);
 
         FXMLLoader fxmlLoaderMain = new FXMLLoader(getClass().getResource("view/MainPageView.fxml"));
-        Scene sceneMain = new Scene(fxmlLoaderMain.load(), 1024, 768);
+        Scene sceneMain = new Scene(fxmlLoaderMain.load(), 1920, 1000);
         mainPageView = fxmlLoaderMain.getController();
         mainPageView.setModel(client.mainPageModel);
         mainPageView.passStageAndScene(stage, sceneMain);
 
         FXMLLoader fxmlLoaderPost = new FXMLLoader(getClass().getResource("view/PostCreation.fxml"));
-        Scene scenePost = new Scene(fxmlLoaderPost.load(), 1024, 768);
+        Scene scenePost = new Scene(fxmlLoaderPost.load(), 1920, 1000);
         postCreationView = fxmlLoaderPost.getController();
         postCreationView.setModel(client.postCreationModel);
         postCreationView.passStageAndScene(stage, scenePost);
