@@ -90,7 +90,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 System.out.println("Reached end of scrollPane");
                 if (!postIsLoading) {
                     postIsLoading = true;
-                    Timeline postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(3), timelineEvent -> postIsLoading = false));
+                    Timeline postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(1), timelineEvent -> postIsLoading = false));
                     postRequestResetTimeline.play();
 
                     sendRequestGetNextImage();
@@ -132,7 +132,7 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                 System.out.println("Reached end of scrollPane");
                 if (!postIsLoading) {
                     postIsLoading = true;
-                    postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(3), timelineEvent -> postIsLoading = false));
+                    postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(1), timelineEvent -> postIsLoading = false));
                     postRequestResetTimeline.play();
 
                     sendRequestGetNextImage();
@@ -147,9 +147,9 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         });
     }
 
-    private void sendRequestGetNextImage() { // TODO: check if it works at all
+    private void sendRequestGetNextImage() {
         viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
-//        loadNextImageButchFromModel();
+//        loadNextImageBatchFromModel(); // TODO: remove after testing
     }
 
     private void setFitCustom(ImageView imageView) { // TODO: is needed?

@@ -15,7 +15,6 @@ public class PostCreationModel {
 
     public String postDescription;
     public List<File> attachedFiles;
-
     public List<String> chosenTags;
 
     public static List<String> allowedTags;
@@ -32,7 +31,7 @@ public class PostCreationModel {
         zero
     }
 
-    public enum ClientCommands { // TODO: add reset
+    public enum ClientCommands {
         show,
         close,
         zero
