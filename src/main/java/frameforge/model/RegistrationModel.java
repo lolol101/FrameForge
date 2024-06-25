@@ -13,7 +13,7 @@ public class RegistrationModel {
 
     public enum ViewActions {
         // VM commands:
-        regBtnClicked, // TODO: rename to action, not event - events stay in *Controller classes
+        regBtnClicked,
         switchToLoginBtnClicked,
         zero
     }
@@ -22,7 +22,7 @@ public class RegistrationModel {
         show,
         close,
         zero
-    } // TODO: add reset command
+    }
 
     public RegistrationModel() {
         viewAction = new SimpleObjectProperty<>();

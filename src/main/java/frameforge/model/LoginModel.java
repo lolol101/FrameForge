@@ -14,7 +14,7 @@ public class LoginModel {
 
     public enum ViewActions {
         // VM commands:
-        authBtnClicked, // TODO: rename to action, not event - events stay in *Controller classes
+        authBtnClicked,
         switchToRegistrationBtnClicked,
         zero
     }

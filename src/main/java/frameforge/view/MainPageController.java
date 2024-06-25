@@ -31,14 +31,15 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     private static final double FULLSIZE_IMG_FACTOR = 0.9;
     private static final double SCROLLBAR_MAX_VALUE_BEFORE_UPDATE = 0.95;
     @FXML
-    public HBox fullSizePane; // TODO: edit position & qualifiers
+    private HBox fullSizePane;
     @FXML
-    public ImageView fullSizeImageView;
+    private ImageView fullSizeImageView;
     @FXML
-    public HBox scrollMode;
+    private HBox scrollMode;
     @FXML
-    public HBox leaderBoardBox; // TODO: switch after testing
-    @FXML public VBox leaderBoardContainer;
+    private HBox leaderboardMode; // TODO: switch after testing
+    @FXML
+    private VBox leaderBoardContainer;
 
     // TODO: preferred width & height corrections
     @FXML
@@ -335,9 +336,10 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
     public void toggleLeaderboardMode() {
         if (scrollMode.isVisible()) {
             scrollMode.setVisible(false);
-            leaderBoardBox.setVisible(true);
+            leaderboardMode.setVisible(true);
             leaderboardButton.setText("Resume scrolling");
 
+            leaderBoardContainer.getChildren().clear();
             int place = 1;
             for (var person : viewModel.getLeaderboard()) {
                 HBox personContainer = new HBox();
@@ -359,12 +361,9 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
 
                 leaderBoardContainer.getChildren().add(personContainer);
             }
-
-            leaderBoardBox.getChildren().clear();
-            leaderBoardBox.getChildren().add(leaderBoardContainer);
         } else {
             scrollMode.setVisible(true);
-            leaderBoardBox.setVisible(false);
+            leaderboardMode.setVisible(false);
             leaderboardButton.setText("Leaderboard");
         }
     }

@@ -9,7 +9,6 @@ import javafx.util.Pair;
 import java.util.*;
 
 public class MainPageModel {
-    // TODO: command & action queues
     public Property<ClientCommands> clientCommand;
     public Property<ViewActions> viewAction;
 

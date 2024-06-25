@@ -2,6 +2,8 @@ package frameforge.view;
 
 import frameforge.model.LoginModel;
 import frameforge.viewmodel.LoginViewModel;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -9,18 +11,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
 import static frameforge.model.LoginModel.ClientCommands;
 
 public class LoginController extends Controller<LoginModel, LoginViewModel> {
-    // TODO: scene/stage cleanup: move from creating new stages to switching scenes in single stage: problem is hierarchy & scene dependency on main()
     @FXML private TextField nicknameTextField;
     @FXML private PasswordField passwordTextField;
     @FXML protected Button btnSwitchToRegistration;
     @FXML protected Button btnSubmitLoginRequest;
-    // TODO: current textArea usage sucks! Blend into background, set text alignment, correct text position
+
+    private Timeline loginBtnResetTimeline;
+    private static final int SECONDS_FOR_REQUEST = 3;
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("logView: changeListener fired on client command reception");
@@ -75,8 +79,10 @@ public class LoginController extends Controller<LoginModel, LoginViewModel> {
     }
 
     @FXML private void onBtnSubmitLoginRequestClick() {
-        // TODO: is needed? need to prevent button mashing, but where?
         System.out.println("logView: reg request button pressed");
+        btnSubmitLoginRequest.setDisable(true);
+        loginBtnResetTimeline = new Timeline(new KeyFrame(Duration.seconds(SECONDS_FOR_REQUEST), event -> btnSubmitLoginRequest.setDisable(false)));
+        loginBtnResetTimeline.play();
         sendLoginRequest();
     }
 
@@ -91,5 +97,12 @@ public class LoginController extends Controller<LoginModel, LoginViewModel> {
 
     private void sendLoginRequest() {
         viewModel.sendLoginRequest();
+    }
+
+    @Override void hideInView() {
+        if (loginBtnResetTimeline != null && loginBtnResetTimeline.getStatus() == Timeline.Status.RUNNING) {
+            loginBtnResetTimeline.stop();
+        }
+        System.out.println(this.getClass() + " hidden in view");
     }
 }

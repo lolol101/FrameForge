@@ -2,18 +2,26 @@ package frameforge.view;
 
 import frameforge.model.RegistrationModel;
 import frameforge.viewmodel.RegistrationViewModel;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
 import static frameforge.model.RegistrationModel.ClientCommands;
 
 public class RegistrationController extends Controller<RegistrationModel, RegistrationViewModel> {
+    @FXML protected Button btnSubmitRegistrationRequest;
     @FXML private TextField nicknameTextField;
     @FXML private PasswordField passwordTextField;
+
+    private Timeline registerBtnResetTimeline;
+    private static final int SECONDS_FOR_REQUEST = 3;
 
     private final ChangeListener<ClientCommands> clientCommandReceiver = (obs, oldCommand, newCommand) -> {
         System.out.println("regView: changeListener fired on client command reception");
@@ -61,9 +69,11 @@ public class RegistrationController extends Controller<RegistrationModel, Regist
         addListeners();
     }
 
-    @FXML private void onBtnSubmitRequestClick() {
-        // TODO: prevent multiple button clicks
+    @FXML private void onBtnSubmitRegistrationRequestClick() {
         System.out.println("regView: registration request button pressed");
+        btnSubmitRegistrationRequest.setDisable(true);
+        registerBtnResetTimeline = new Timeline(new KeyFrame(Duration.seconds(SECONDS_FOR_REQUEST), event -> btnSubmitRegistrationRequest.setDisable(false)));
+        registerBtnResetTimeline.play();
         sendRegistrationRequest();
     }
 
@@ -78,5 +88,12 @@ public class RegistrationController extends Controller<RegistrationModel, Regist
 
     private void sendSwitchToLoginRequest() {
         viewModel.switchToLogin();
+    }
+
+    @Override void hideInView() {
+        if (registerBtnResetTimeline != null && registerBtnResetTimeline.getStatus() == Timeline.Status.RUNNING) {
+            registerBtnResetTimeline.stop();
+        }
+        System.out.println(this.getClass() + " hidden in view");
     }
 }

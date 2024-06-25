@@ -16,7 +16,7 @@ public class AutoCompleteEntryChooser {
     private final ListView<String> suggestionsListView;
     private final ObservableList<String> suggestions;
     private final List<String> possibleSuggestions;
-    private final static int LIST_CELL_HEIGHT = 24;
+    private static final int LIST_CELL_HEIGHT = 24;
 
     Consumer<String> contextActionWithChosenEntry;
 
@@ -50,7 +50,7 @@ public class AutoCompleteEntryChooser {
             if (event.getClickCount() == 2) {
                 String selectedSuggestion = suggestionsListView.getSelectionModel().getSelectedItem();
                 contextActionWithChosenEntry.accept(selectedSuggestion);
-                textField.setText(""); // TODO: or edit?
+                textField.setText("");
                 suggestionsListView.setVisible(false);
                 System.out.println("chosen tags: " + chosenSuggestions);
             }

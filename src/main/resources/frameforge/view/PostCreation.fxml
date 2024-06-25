@@ -26,12 +26,13 @@
                     styleClass="action-button"
                     text="Back to main menu"
             />
+            <Region prefHeight="10" minHeight="10"/>
         </VBox>
     </top>
     <center>
-        <VBox fx:id="tagsVBox" alignment="CENTER">
+        <VBox fx:id="tagsVBox" alignment="TOP_CENTER">
             <FlowPane fx:id="chosenTagsFlowPane" style="-fx-background-color: #8bbbae;"
-                      prefWrapLength="300" vgap="10" hgap="10" maxWidth="300"
+                      prefWrapLength="300" vgap="5" hgap="5" maxWidth="300"
                       alignment="CENTER"
             />
             <TextField fx:id="suggestionsTextField" maxWidth="300"/>
@@ -39,7 +40,7 @@
     </center>
     <bottom>
         <VBox alignment="CENTER" spacing="10">
-            <HBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 10px;">
+            <HBox alignment="CENTER" style="-fx-background-color: #8bbbae; -fx-padding: 5px;">
                 <VBox fx:id="uploadedFilesVBox" alignment="CENTER"
                       style="-fx-background-color: #8bbbae; -fx-padding: 5px;">
                 </VBox>

@@ -18,7 +18,7 @@ public class PostCreationModel {
 
     public List<String> chosenTags;
 
-    public List<String> allowedTags; // TODO: arrange file & hierarchy placement with Nikita; static?
+    public static List<String> allowedTags;
 
     public void reset() {
         postDescription = "";
@@ -44,7 +44,7 @@ public class PostCreationModel {
         clientCommand = new SimpleObjectProperty<>();
         chosenTags = new ArrayList<>();
 
-        allowedTags = new ArrayList<>(new ArrayList<>(Arrays.asList("Cars",
+        allowedTags = new ArrayList<>(Arrays.asList("Cars",
                 "Nature",
                 "Animals",
                 "Abstract",
@@ -72,6 +72,6 @@ public class PostCreationModel {
                 "Joy",
                 "Madness",
                 "Other"
-        )));
+        ));
     }
 }

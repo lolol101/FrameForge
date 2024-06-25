@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public abstract class Controller<Model, ViewModel> {
-    ViewModel viewModel;
+    public ViewModel viewModel;
     Stage stage;
     Scene scene;
 

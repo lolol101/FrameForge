@@ -13,8 +13,8 @@ import static frameforge.model.PostCreationModel.ViewActions.sendRequestOpenMain
 public class PostCreationViewModel extends ViewModel<PostCreationModel> {
     public StringProperty postDescriptionProperty; // TODO:
 
-    private final static int maxFileCountInSinglePost = 5;
-    private final static int maxFileSizeInKilobytes = 5*1024;
+    private static final int maxFileCountInSinglePost = 5;
+    private static final int maxFileSizeInKilobytes = 5*1024;
 
     public PostCreationViewModel(PostCreationModel model) {
         this.model = model;
