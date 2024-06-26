@@ -126,7 +126,20 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
         });
     }
 
-    private void sendRequestGetNextImage() {
+    private void conditionallySendRequestGetNextPost() {
+        if (scrollPane.getVvalue() >= scrollPane.getVmax() - 1) {
+            System.out.println("Reached end of scrollPane");
+            if (!postIsLoading) {
+                postIsLoading = true;
+                postRequestResetTimeline = new Timeline(new KeyFrame(Duration.seconds(loadNextPostCooldown), timelineEvent -> postIsLoading = false));
+                postRequestResetTimeline.play();
+
+                sendRequestGetNextPost();
+            }
+        }
+    }
+
+    private void sendRequestGetNextPost() {
         viewModel.getModel().viewAction.setValue(MainPageModel.ViewActions.reachedNextPostBox);
     }
 
@@ -161,9 +174,9 @@ public class MainPageController extends Controller<MainPageModel, MainPageViewMo
                     imagePane.setPrefSize(imageInFeedWidth, imageInFeedHeight);
                     imagePane.setStyle("-fx-background-color: #d1e1d4;");
 
-                    Button nextImageButton = new Button("->"); // TODO: switch to free-use icons
+                    Button nextImageButton = new Button("->");
                     nextImageButton.getStyleClass().add("post-button");
-                    Button previousImageButton = new Button("<-"); // TODO: switch to free-use icons
+                    Button previousImageButton = new Button("<-");
                     previousImageButton.getStyleClass().add("post-button");
 
                     nextImageButton.setOnAction(event -> {

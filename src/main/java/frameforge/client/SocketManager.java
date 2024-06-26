@@ -86,7 +86,7 @@ public class SocketManager {
                 acceptedData.add(inData);
                 Platform.runLater(() -> socketAction.setValue(SocketActions.acceptData));
             }
-        } catch(IOException | ClassNotFoundException | NoSuchElementException e){
+        } catch(Exception e){
             System.out.println(e.getMessage());
         }
     }

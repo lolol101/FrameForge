@@ -1,5 +1,6 @@
 package frameforge.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -21,9 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 
 public class Client {
     public PostCreationModel postCreationModel;
@@ -95,7 +94,7 @@ public class Client {
                     setReactionOnPost(id);
                     break;
                 case toggleLeaderboardRequest:
-                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.toggleLeaderBoard);
+                    getLeaderBoardData();
                     break;
             }
             mainPageModel.viewAction.setValue(MainPageModel.ViewActions.zero);
@@ -157,6 +156,22 @@ public class Client {
                     // TODO
                 }
                 break;
+            case GET_TOP_USERS_BACK:
+                if (status == ServerCommands.STATUS.OK) {
+                    JsonNode users = data.getJson().get("users");
+                    JsonNode likes = data.getJson().get("likes");
+                    ArrayList<String> arr1 = new ArrayList<>();
+                    ArrayList<Integer> arr2 = new ArrayList<>();
+                    for (JsonNode iter : users)
+                        arr1.add(iter.textValue());
+                    for (JsonNode iter : likes)
+                        arr2.add(iter.intValue());
+                    mainPageModel.leaderboardMembers.clear();
+                    for (int i = 0; i < arr1.size(); ++i)
+                        mainPageModel.leaderboardMembers.add(new MainPageModel.Person(arr1.get(i), arr2.get(i)));
+                    mainPageModel.clientCommand.setValue(MainPageModel.ClientCommands.toggleLeaderBoard);
+                }
+                break;
         }
     }
 
@@ -207,7 +222,7 @@ public class Client {
     }
 
     private void getMainPost() {
-         ObjectNode json = jsMapper.createObjectNode();
+        ObjectNode json = jsMapper.createObjectNode();
         json.put("username", loginModel.username);
         json.put("type", ServerCommands.ACTIONS.GET_MAIN_POST.toString());
         json.put("typeImage", ServerCommands.ImgType.FULL.toString());
@@ -268,6 +283,15 @@ public class Client {
                 : MainPageModel.Post.REACTION.LIKE.toString()));
         json.put("reaction",mainPageModel.currentPosts.get(id).json.get("reaction").textValue());
         json.put("id", mainPageModel.likedPost);
+        data.setJson(json);
+        socketManager.sendingData.add(data);
+        socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
+    }
+
+    private void getLeaderBoardData() {
+        ObjectNode json = jsMapper.createObjectNode();
+        json.put("type", ServerCommands.ACTIONS.GET_TOP_USERS.toString());
+        JsonSerializable data = new JsonSerializable();
         data.setJson(json);
         socketManager.sendingData.add(data);
         socketManager.clientCommand.setValue(SocketManager.ClientCommands.sendData);
