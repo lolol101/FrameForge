@@ -50,7 +50,7 @@ public class MainPageModel {
         }
     }
 
-    List<Person> leaderboardMembers;
+    public List<Person> leaderboardMembers;
 
     public enum ViewActions {
         reachedNextPostBox,
@@ -92,18 +92,6 @@ public class MainPageModel {
     }
 
     public List<Person> getLeaderboardMembers() {
-        // TODO: remove lines below after connecting to client
-        leaderboardMembers.clear();
-        leaderboardMembers.add(new Person("Test1", 100));
-        leaderboardMembers.add(new Person("Test2", 120));
-        leaderboardMembers.add(new Person("Test3", 1010));
-        leaderboardMembers.add(new Person("Test4", 1300));
-        leaderboardMembers.add(new Person("Test5", 1208));
-        leaderboardMembers.add(new Person("Test6", 1014));
-        leaderboardMembers.add(new Person("Test7", 1009));
-        leaderboardMembers.add(new Person("Test8", 2203));
-        leaderboardMembers.add(new Person("Test9", 11));
-        leaderboardMembers.add(new Person("Test10", 57));
         leaderboardMembers.sort(Comparator.comparingInt(p -> -p.likeCount));
         return leaderboardMembers;
     }

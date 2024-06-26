@@ -9,6 +9,11 @@ plugins {
 repositories {
     mavenCentral()
 }
+
+tasks.compileJava {
+    options.release.set(21)
+}
+
 javafx {
     version = '21'
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
@@ -29,12 +34,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
-mainClassName = 'frameforge.FrameForgeApplication'
+application {
+    mainModule = 'frameforge'
+    mainClass = 'frameforge.FrameForgeApplication'
+}
 
-
-task rebuild() {
-    dependsOn   clean
-    finalizedBy build
+task rerun() {
+    finalizedBy run
 }
 
 tasks.test {
