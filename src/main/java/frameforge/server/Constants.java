@@ -51,6 +51,7 @@ public class Constants {
         SET_LIKE, 
         SET_COMMENT,
         SUBSCRIBE,
+        GET_TOP_USERS
         //EXTEND_TOKEN
     };
 
@@ -63,6 +64,7 @@ public class Constants {
         SET_LIKE_BACK,
         SET_COMMENT_BACK,
         SUBSCRIBE_BACK,
+        GET_TOP_USERS_BACK
         //EXTEND_TOKEN_BACK
     };
 

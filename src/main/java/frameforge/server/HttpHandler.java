@@ -17,6 +17,7 @@ import java.awt.Image;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Sorts.*;
 import java.security.*;
 import java.math.*;
 
@@ -98,6 +99,10 @@ public class HttpHandler implements Runnable {
                 System.out.println("Case GET_FULL_PHOTO");
                 response = getFullPhoto(req);
                 break;
+            case GET_TOP_USERS:
+                System.out.println("Case GET_TOP_USERS");
+                response = getTopUsers(req);
+                break;
             case SET_LIKE:
                 System.out.println("Case SET_LIKE");
                 response = setLike(req);
@@ -105,9 +110,6 @@ public class HttpHandler implements Runnable {
             case SET_COMMENT:
                 System.out.println("Case SET_COMMENT");
                 response = setComment(req);
-                break;
-            case SUBSCRIBE:
-                response = subscribe(req);
                 break;
             default:
                 System.out.println("Unsuppoted type");
@@ -135,6 +137,35 @@ public class HttpHandler implements Runnable {
         out.writeObject(obj);
         out.flush();
     }
+
+    private JsonSerializable getTopUsers(ObjectNode req)
+    throws IOException {
+        ObjectNode response = jsMapper.createObjectNode();
+        JsonSerializable ret = new JsonSerializable();
+        response.put("type", RESPONSE_TYPE.GET_TOP_USERS_BACK.toString());
+        response.put("status", STATUS.OK.toString());
+        MongoCollection<Document> users = db.getCollection("users");
+        ArrayList<Document> receivedDocs = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        // get users
+
+        users.find()
+            .sort(ascending("likes"))
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDocs));
+        try {
+            latch.await();
+        } catch (Exception e) {}
+
+        ArrayNode arrUsers = response.putArray("users");
+        for (var item: receivedDocs) 
+            arrUsers.add(item.get("username").toString());        
+        ArrayNode arrLikes = response.putArray("likes");
+        for (var item: receivedDocs)
+            arrLikes.add(item.get("likes").toString());
+
+        ret.setJson(response);
+        return ret;
+    } 
 
     private JsonSerializable getFullPhoto(ObjectNode req)
     throws IOException {
@@ -195,7 +226,8 @@ public class HttpHandler implements Runnable {
         
         Document newUser = new Document()
                             .append("username", username)
-                            .append("password", password);
+                            .append("password", password)
+                            .append("likes", 0);
     
         recommender.initUserByUsername(username); // Recommender init user
         users.insertOne(newUser)
@@ -395,6 +427,7 @@ public class HttpHandler implements Runnable {
         response.put("type", RESPONSE_TYPE.SET_LIKE_BACK.toString());
         response.put("status", STATUS.OK.toString());
         MongoCollection<Document> posts = db.getCollection("posts");
+        MongoCollection<Document> users = db.getCollection("users");
 
         CountDownLatch latch = new CountDownLatch(1);
         String username = req.get("username").textValue();
@@ -421,9 +454,23 @@ public class HttpHandler implements Runnable {
             set("likes", counterLikes))
         .subscribe(new SubscriberHelper.PrintSubscriber<>(new CountDownLatch(0)));
 
-        // We don't wait here 
-        recommender.updateStatByUsername(username, tagsPost, reaction); // Update stat in Recommender for user
+        //set like owner of post
+        receivedDoc.clear();
+        latch = new CountDownLatch(1);
+        Bson filter = eq("username", username);
+        users.find(filter)
+            .subscribe(new DocumentSubscriber<Document>(latch, receivedDoc));
+        try {
+            latch.await();
+        } catch (Exception e) {
+            System.err.println("EXCEPTION setLike");
+        }
+        doc = receivedDoc.get(0);
+        users.updateOne(eq("username", username),
+                        set("likes", (Integer) doc.get("likes") + 1))
+        .subscribe(new SubscriberHelper.PrintSubscriber<>(new CountDownLatch(0)));
 
+        recommender.updateStatByUsername(username, tagsPost, reaction); // Update stat in Recommender for user
         return ret;
     }
 
@@ -437,15 +484,6 @@ public class HttpHandler implements Runnable {
         return ret;
     }
 
-    private JsonSerializable subscribe(ObjectNode req) {
-        ObjectNode response = jsMapper.createObjectNode();
-        JsonSerializable ret = new JsonSerializable();
-        response.put("type", RESPONSE_TYPE.SUBSCRIBE_BACK.toString());
-
-
-
-        return ret;
-    }
     public byte[] convertBufferImageToByteArray(BufferedImage bufferedImage, String ext) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage, ext, baos);
